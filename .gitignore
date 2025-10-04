@@ -5,6 +5,9 @@ node_modules/
 dist/
 *.tsbuildinfo
 
+# Documentation
+docs/api/
+
 # Coverage
 coverage/
 .nyc_output/
