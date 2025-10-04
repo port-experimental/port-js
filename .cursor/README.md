@@ -4,9 +4,10 @@ AI coding assistant rules for maintaining code quality.
 
 ## Files
 
-- `rules` - Security-first development standards
-- `rules-examples` - Example and testing guidelines
-- `tdd-requirements.mdc` - Test-Driven Development requirements ⭐
+- `rules/` - Security-first development standards
+- `rules-examples/` - Example and testing guidelines
+- `rules/tdd-requirements.mdc` - Test-Driven Development requirements ⭐
+- `rules/version-management.mdc` - Version management and release guidelines 📦
 
 ## Core Principles
 
@@ -15,6 +16,7 @@ AI coding assistant rules for maintaining code quality.
 3. 📘 **Type Safety** - Strict TypeScript, no `any`
 4. 📚 **Well Documented** - Clear comments and examples
 5. 🎯 **User Focused** - Easy to use, hard to misuse
+6. 📦 **Semantic Versioning** - Follow semver strictly for all releases
 
 ## Documentation
 

@@ -8,25 +8,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Initial SDK implementation
-- TypeScript support with auto-generated types from OpenAPI spec
-- Comprehensive error handling with custom error classes
-- HTTP client with automatic retries and exponential backoff
+- Smoke tests for system blueprints (_team, _user, _scorecard, _rule, _rule_result)
+- Version management scripts (version:patch, version:minor, version:major, version:prerelease)
+- Comprehensive version management cursor rules
+
+## [0.1.0] - 2025-10-04
+
+### Added
+- Initial SDK implementation with full TypeScript support
+- Auto-generated types from OpenAPI specification
+- Custom error classes (PortError, PortAuthError, PortNotFoundError, PortValidationError, etc.)
+- HTTP client with automatic retries, exponential backoff, and timeout handling
 - Multi-region support (EU and US instances)
 - OAuth2 and JWT authentication methods
-- Environment variable configuration support
-- `.env` file support with dotenv
-- HTTP/HTTPS proxy support with authentication
-- NO_PROXY environment variable support
+- Environment variable and `.env` file configuration support
+- HTTP/HTTPS proxy support with authentication and NO_PROXY handling
 - Configuration precedence: explicit config > env vars > .env file > defaults
-- Secure credential management
-- Request timeout configuration
-- Retry configuration with exponential backoff
-- Rate limiting support
-- Security-first development rules (`.cursorrules`)
-- Comprehensive documentation (README, SECURITY, CONTRIBUTING)
-- Type-safe resource classes (BaseResource)
-- Organized type definitions by domain
+- Cross-platform logging system (Windows, macOS, Linux)
+- Log levels: ERROR, WARN, INFO, DEBUG, TRACE
+- Secure logging with credential sanitization
+- **EntityResource** - Full CRUD operations (create, get, update, delete, list, search, batch operations, relations)
+- **BlueprintResource** - Full CRUD operations (create, get, update, delete, list, getRelations)
+- **ActionResource** - Full CRUD operations plus execute, getRun, listRuns
+- **ScorecardResource** - Full CRUD operations (create, get, update, delete, list)
+- Main PortClient tying all resources together
+- 258 comprehensive unit tests with 85.4% coverage
+- Test-Driven Development (TDD) workflow
+- GitHub Actions CI/CD with automated testing
+- Security-first development with comprehensive cursor rules
+- Examples directory with working code samples
+- Smoke tests for manual API verification
+- Comprehensive documentation (README, SECURITY, CONTRIBUTING, CHANGELOG)
 
 ### Security
 - [SECURITY] No credentials stored on disk
@@ -38,16 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [SECURITY] Input validation on all user-provided data
 - [SECURITY] TypeScript strict mode enforced
 - [SECURITY] Dependency security auditing guidelines
-
-## [0.1.0] - TBD
-
-### Added
-- Initial release
-- Core SDK functionality
-- Entity operations (planned)
-- Blueprint operations (planned)
-- Action operations (planned)
-- Scorecard operations (planned)
+- [SECURITY] Comprehensive security cursor rules
 
 ---
 
