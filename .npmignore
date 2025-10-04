@@ -1,0 +1,43 @@
+# Source files
+src/
+tsconfig.json
+tsup.config.ts
+
+# Tests
+tests/
+smoke-tests/
+vitest.config.ts
+vitest.integration.config.ts
+.env.local
+.env.test
+
+# Examples
+examples/
+
+# Scripts
+scripts/
+
+# Development files
+.cursor/
+.git/
+.github/
+.vscode/
+.gitignore
+.gitattributes
+
+# Documentation (not needed in published package)
+docs/
+CONTRIBUTING.md
+*.md
+!README.md
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Misc
+node_modules/
+*.log
+*.tgz
+.DS_Store
+
