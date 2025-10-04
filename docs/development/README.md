@@ -11,6 +11,7 @@ Documentation for contributing to and maintaining the Port SDK.
 
 ### Core Concepts
 - [Type Generation](./TYPE_GENERATION.md) - How types are generated from OpenAPI
+- [API Documentation](./API_DOCUMENTATION.md) - Generating and maintaining API docs with TypeDoc
 - [Testing Guide](../TESTING.md) - Testing strategy and practices
 - [Security Guidelines](./SECURITY_GUIDELINES.md) - Security best practices
 
@@ -289,6 +290,7 @@ port-js/
 | `pnpm types:download` | Download OpenAPI spec |
 | `pnpm types:generate` | Generate TypeScript types |
 | `pnpm types:update` | Update types (download + generate) |
+| `pnpm docs:generate` | Generate API documentation |
 | `pnpm smoke` | Run smoke tests |
 | `pnpm version:patch` | Bump patch version |
 | `pnpm version:minor` | Bump minor version |

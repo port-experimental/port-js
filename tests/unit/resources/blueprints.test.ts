@@ -163,7 +163,7 @@ describe('BlueprintResource', () => {
       const updates = {
         schema: {
           properties: {
-            name: { type: 'string' },
+            name: { type: 'string' as const },
           },
         },
       };

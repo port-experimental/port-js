@@ -1,0 +1,46 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["src/index.ts"],
+  "out": "docs/api",
+  "plugin": [],
+  "excludePrivate": true,
+  "excludeProtected": false,
+  "excludeExternals": true,
+  "readme": "none",
+  "name": "Port SDK for TypeScript/JavaScript",
+  "includeVersion": true,
+  "sort": ["source-order"],
+  "searchInComments": true,
+  "navigation": {
+    "includeCategories": true,
+    "includeGroups": true
+  },
+  "categorizeByGroup": true,
+  "defaultCategory": "Core",
+  "categoryOrder": [
+    "Client",
+    "Resources",
+    "Types",
+    "Errors",
+    "Configuration",
+    "Logging",
+    "*"
+  ],
+  "exclude": [
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "**/node_modules/**",
+    "**/tests/**",
+    "**/examples/**",
+    "**/scripts/**"
+  ],
+  "validation": {
+    "notExported": true,
+    "invalidLink": true,
+    "notDocumented": false
+  },
+  "compilerOptions": {
+    "skipLibCheck": true
+  }
+}
+

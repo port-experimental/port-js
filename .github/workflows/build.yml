@@ -1,0 +1,75 @@
+name: Build
+
+on:
+  pull_request:
+    branches: [main, dev]
+  push:
+    branches: [main, dev]
+
+jobs:
+  build:
+    name: Build & Package
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
+      
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Build package
+        run: pnpm build
+      
+      - name: Verify build output
+        run: |
+          echo "📦 Checking build output..."
+          ls -la dist/
+          
+          # Check required files exist
+          test -f dist/index.js || { echo "❌ Missing dist/index.js"; exit 1; }
+          test -f dist/index.mjs || { echo "❌ Missing dist/index.mjs"; exit 1; }
+          test -f dist/index.d.ts || { echo "❌ Missing dist/index.d.ts"; exit 1; }
+          
+          echo "✅ All required build files present"
+      
+      - name: Test package creation
+        run: |
+          echo "📦 Testing npm pack..."
+          npm pack --dry-run
+          echo "✅ Package can be created successfully"
+      
+      - name: Check package size
+        run: |
+          SIZE=$(npm pack --dry-run 2>&1 | grep "package size" | awk '{print $3}')
+          echo "📊 Package size: $SIZE"
+          
+          # Warn if package is larger than 200 KB
+          SIZE_KB=$(echo $SIZE | sed 's/[^0-9.]//g')
+          if (( $(echo "$SIZE_KB > 200" | bc -l) )); then
+            echo "⚠️  Warning: Package size exceeds 200 KB"
+          fi
+
