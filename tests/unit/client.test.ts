@@ -150,6 +150,15 @@ describe('PortClient', () => {
       expect(typeof client.actions.getRun).toBe('function');
       expect(typeof client.actions.listRuns).toBe('function');
     });
+
+    it('should have scorecards resource', () => {
+      expect(client.scorecards).toBeDefined();
+      expect(typeof client.scorecards.create).toBe('function');
+      expect(typeof client.scorecards.get).toBe('function');
+      expect(typeof client.scorecards.update).toBe('function');
+      expect(typeof client.scorecards.delete).toBe('function');
+      expect(typeof client.scorecards.list).toBe('function');
+    });
   });
 
   describe('getHttpClient', () => {

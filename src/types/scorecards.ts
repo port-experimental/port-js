@@ -1,40 +1,51 @@
 /**
- * Scorecard-related types
+ * Types for Port Scorecards
  */
 
 /**
- * Scorecard level colors
+ * Scorecard rule level
  */
-export type ScorecardLevelColor =
-  | 'paleBlue'
-  | 'blue'
-  | 'turquoise'
-  | 'green'
-  | 'yellow'
-  | 'orange'
-  | 'red'
-  | 'pink'
-  | 'purple'
-  | 'darkGray'
-  | 'lightGray';
+export type ScorecardLevel = 'Bronze' | 'Silver' | 'Gold';
 
 /**
- * Scorecard level
+ * Query combinator
  */
-export interface ScorecardLevel {
-  color: ScorecardLevelColor | string;
-  title: string;
+export type QueryCombinator = 'and' | 'or';
+
+/**
+ * Query operator
+ */
+export type QueryOperator =
+  | '='
+  | '!='
+  | '<'
+  | '>'
+  | '<='
+  | '>='
+  | 'contains'
+  | 'doesNotContains'
+  | 'isEmpty'
+  | 'isNotEmpty'
+  | 'in'
+  | 'notIn'
+  | 'between'
+  | 'notBetween';
+
+/**
+ * Scorecard rule query condition
+ */
+export interface ScorecardQueryCondition {
+  property: string;
+  operator: QueryOperator;
+  value?: unknown;
 }
 
 /**
  * Scorecard rule query
  */
-export interface ScorecardRuleQuery {
-  property?: string;
-  operator?: string;
-  value?: unknown;
-  combinator?: 'and' | 'or';
-  conditions?: ScorecardRuleQuery[];
+export interface ScorecardQuery {
+  combinator: QueryCombinator;
+  conditions: ScorecardQueryCondition[];
 }
 
 /**
@@ -44,8 +55,8 @@ export interface ScorecardRule {
   identifier: string;
   title: string;
   description?: string;
-  level: string;
-  query?: ScorecardRuleQuery;
+  level: ScorecardLevel;
+  query: ScorecardQuery;
 }
 
 /**
@@ -53,29 +64,32 @@ export interface ScorecardRule {
  */
 export interface Scorecard {
   identifier: string;
-  title?: string;
+  title: string;
+  description?: string;
   blueprint: string;
-  levels?: ScorecardLevel[];
-  rules?: ScorecardRule[];
-  createdAt?: Date;
-  updatedAt?: Date;
+  rules: ScorecardRule[];
+  createdAt: Date | string;
+  updatedAt: Date | string;
   createdBy?: string;
   updatedBy?: string;
 }
 
 /**
- * Create scorecard input
+ * Input for creating a scorecard
  */
 export interface CreateScorecardInput {
   identifier: string;
-  title?: string;
+  title: string;
+  description?: string;
   blueprint: string;
-  levels?: ScorecardLevel[];
-  rules?: ScorecardRule[];
+  rules: ScorecardRule[];
 }
 
 /**
- * Update scorecard input
+ * Input for updating a scorecard
  */
-export type UpdateScorecardInput = Partial<Omit<CreateScorecardInput, 'identifier'>>;
-
+export interface UpdateScorecardInput {
+  title?: string;
+  description?: string;
+  rules?: ScorecardRule[];
+}

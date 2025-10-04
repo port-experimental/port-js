@@ -7,8 +7,7 @@ import { PortClientConfig, resolveConfig } from './config';
 import { EntityResource } from './resources/entities';
 import { BlueprintResource } from './resources/blueprints';
 import { ActionResource } from './resources/actions';
-// Resources will be imported as we create them
-// import { ScorecardResource } from './resources/scorecards';
+import { ScorecardResource } from './resources/scorecards';
 
 /**
  * Port SDK Client
@@ -60,8 +59,7 @@ export class PortClient {
   public readonly entities: EntityResource;
   public readonly blueprints: BlueprintResource;
   public readonly actions: ActionResource;
-  // Resources (will be uncommented as we implement them)
-  // public readonly scorecards: ScorecardResource;
+  public readonly scorecards: ScorecardResource;
 
   /**
    * Create a new Port SDK client
@@ -87,8 +85,7 @@ export class PortClient {
     this.entities = new EntityResource(this.httpClient);
     this.blueprints = new BlueprintResource(this.httpClient);
     this.actions = new ActionResource(this.httpClient);
-    // Resources (will be uncommented as we implement them)
-    // this.scorecards = new ScorecardResource(this.httpClient);
+    this.scorecards = new ScorecardResource(this.httpClient);
   }
 
   /**
