@@ -35,6 +35,11 @@
     "smoke:scorecard": "tsx smoke-tests/04-get-scorecard-blueprint.ts",
     "smoke:rule": "tsx smoke-tests/05-get-rule-blueprint.ts",
     "smoke:rule-result": "tsx smoke-tests/06-get-rule-result-blueprint.ts",
+    "version:patch": "npm version patch -m \"chore: release v%s\"",
+    "version:minor": "npm version minor -m \"chore: release v%s\"",
+    "version:major": "npm version major -m \"chore: release v%s\"",
+    "version:prerelease": "npm version prerelease --preid=beta -m \"chore: release v%s\"",
+    "postversion": "git push && git push --tags",
     "prepublishOnly": "pnpm types:check && pnpm run type-check && pnpm run test && pnpm run build",
     "precommit": "pnpm run type-check && pnpm run test",
     "example": "tsx examples/basic-usage.ts"
