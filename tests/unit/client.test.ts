@@ -1,12 +1,21 @@
 /**
  * Unit tests for PortClient
- * Following TDD principles
+ * Following TDD principles - Comprehensive coverage
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { PortClient } from '../../src/client';
+import { PortAuthError } from '../../src/errors';
+import { ENV_VARS } from '../../src/config';
 
 describe('PortClient', () => {
+  // Clean up environment variables
+  afterEach(() => {
+    Object.values(ENV_VARS).forEach(key => {
+      delete process.env[key];
+    });
+  });
+
   describe('Constructor', () => {
     it('should create client with explicit OAuth credentials', () => {
       const client = new PortClient({
