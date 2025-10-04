@@ -139,8 +139,10 @@ async function main() {
 
     try {
       const run = await client.actions.execute(actionId, {
-        environment: 'staging',
-        version: '1.0.0',
+        properties: {
+          environment: 'staging',
+          version: '1.0.0',
+        },
       });
 
       console.log('✓ Action executed');
