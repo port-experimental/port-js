@@ -22,6 +22,7 @@ import type {
   ApiEntityResponse,
   ApiEntitiesResponse,
 } from '../types';
+import type { RequestOptions } from '../http-client';
 
 /**
  * Entity resource class
@@ -76,12 +77,13 @@ export class EntityResource extends BaseResource {
    * });
    * ```
    */
-  async create(data: CreateEntityInput): Promise<Entity> {
+  async create(data: CreateEntityInput, options?: RequestOptions): Promise<Entity> {
     this.validateCreateInput(data);
     
     const response = await this.httpClient.post<ApiEntityResponse>(
       `${this.basePath}/${data.blueprint}/entities`,
-      data
+      data,
+      options
     );
 
     return this.transformEntity(response.entity);
@@ -101,7 +103,7 @@ export class EntityResource extends BaseResource {
    * const entity = await client.entities.get('my-service');
    * ```
    */
-  async get(identifier: string, blueprint?: string): Promise<Entity> {
+  async get(identifier: string, blueprint?: string, options?: RequestOptions): Promise<Entity> {
     this.validateIdentifier(identifier);
 
     let path: string;
@@ -112,7 +114,7 @@ export class EntityResource extends BaseResource {
       path = `/v1/entities/${identifier}`;
     }
 
-    const response = await this.httpClient.get<ApiEntityResponse>(path);
+    const response = await this.httpClient.get<ApiEntityResponse>(path, options);
     return this.transformEntity(response.entity);
   }
 
@@ -142,7 +144,8 @@ export class EntityResource extends BaseResource {
   async update(
     identifier: string,
     data: UpdateEntityInput,
-    blueprint?: string
+    blueprint?: string,
+    options?: RequestOptions
   ): Promise<Entity> {
     this.validateIdentifier(identifier);
 
@@ -155,7 +158,8 @@ export class EntityResource extends BaseResource {
 
     const response = await this.httpClient.patch<ApiEntityResponse>(
       path,
-      data
+      data,
+      options
     );
 
     return this.transformEntity(response.entity);
@@ -174,7 +178,7 @@ export class EntityResource extends BaseResource {
    * await client.entities.delete('my-service');
    * ```
    */
-  async delete(identifier: string, blueprint?: string): Promise<void> {
+  async delete(identifier: string, blueprint?: string, options?: RequestOptions): Promise<void> {
     this.validateIdentifier(identifier);
 
     let path: string;
@@ -184,7 +188,7 @@ export class EntityResource extends BaseResource {
       path = `/v1/entities/${identifier}`;
     }
 
-    await this.httpClient.delete(path);
+    await this.httpClient.delete(path, options);
   }
 
   /**
@@ -253,12 +257,13 @@ export class EntityResource extends BaseResource {
    * });
    * ```
    */
-  async search(query: EntitySearchQuery): Promise<Entity[]> {
+  async search(query: EntitySearchQuery, options?: RequestOptions): Promise<Entity[]> {
     const path = '/v1/entities/search';
     
     const response = await this.httpClient.post<ApiEntitiesResponse>(
       path,
-      query
+      query,
+      options
     );
 
     return response.entities.map(e => this.transformEntity(e));
@@ -280,12 +285,13 @@ export class EntityResource extends BaseResource {
    * ]);
    * ```
    */
-  async batchCreate(entities: CreateEntityInput[]): Promise<Entity[]> {
+  async batchCreate(entities: CreateEntityInput[], options?: RequestOptions): Promise<Entity[]> {
     entities.forEach(entity => this.validateCreateInput(entity));
 
     const response = await this.httpClient.post<ApiEntitiesResponse>(
       '/v1/entities/batch',
-      { entities }
+      { entities },
+      options
     );
 
     return response.entities.map(e => this.transformEntity(e));
@@ -307,12 +313,13 @@ export class EntityResource extends BaseResource {
    * ]);
    * ```
    */
-  async batchUpdate(updates: BatchUpdateEntityInput[]): Promise<Entity[]> {
+  async batchUpdate(updates: BatchUpdateEntityInput[], options?: RequestOptions): Promise<Entity[]> {
     updates.forEach(update => this.validateIdentifier(update.identifier));
 
     const response = await this.httpClient.patch<ApiEntitiesResponse>(
       '/v1/entities/batch',
-      { updates }
+      { updates },
+      options
     );
 
     return response.entities.map(e => this.transformEntity(e));
@@ -328,12 +335,12 @@ export class EntityResource extends BaseResource {
    * await client.entities.batchDelete(['service-1', 'service-2']);
    * ```
    */
-  async batchDelete(identifiers: string[]): Promise<void> {
+  async batchDelete(identifiers: string[], options?: RequestOptions): Promise<void> {
     identifiers.forEach(id => this.validateIdentifier(id));
 
     await this.httpClient.post('/v1/entities/batch/delete', {
       identifiers,
-    });
+    }, options);
   }
 
   /**
@@ -355,7 +362,8 @@ export class EntityResource extends BaseResource {
   async getRelated(
     identifier: string,
     relation: string,
-    blueprint?: string
+    blueprint?: string,
+    options?: RequestOptions
   ): Promise<Entity[]> {
     this.validateIdentifier(identifier);
 
@@ -366,7 +374,7 @@ export class EntityResource extends BaseResource {
       path = `/v1/entities/${identifier}/relations/${relation}`;
     }
 
-    const response = await this.httpClient.get<ApiEntitiesResponse>(path);
+    const response = await this.httpClient.get<ApiEntitiesResponse>(path, options);
     return response.entities.map(e => this.transformEntity(e));
   }
 

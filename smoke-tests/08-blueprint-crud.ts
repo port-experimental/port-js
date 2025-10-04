@@ -110,7 +110,7 @@ async function main() {
       console.log(`   ✓ Test blueprint found in list`);
     }
 
-    // ✅ Step 5: Delete Blueprint
+    // ✅ Step 5: Delete Blueprint (manual as part of test)
     console.log('\n🗑️  Step 5: Deleting blueprint...');
     await client.blueprints.delete(testIdentifier);
     console.log(`✅ Deleted blueprint: ${testIdentifier}`);
@@ -137,19 +137,18 @@ async function main() {
   } catch (error) {
     console.error('\n❌ Smoke test failed:', error);
     console.error('');
-    
-    // Cleanup on error
+    process.exit(1);
+  } finally {
+    // 🧹 Always cleanup (in case test fails before deletion step)
     if (createdBlueprintId) {
-      console.log('🧹 Cleaning up...');
+      console.log('\n🧹 Cleaning up remaining resources...');
       try {
         await client.blueprints.delete(createdBlueprintId);
         console.log('✅ Cleanup successful\n');
       } catch (cleanupError) {
-        console.error('⚠️  Cleanup failed:', cleanupError);
+        console.error('⚠️  Cleanup failed (resource may not exist):', cleanupError instanceof Error ? cleanupError.message : cleanupError);
       }
     }
-    
-    process.exit(1);
   }
 }
 

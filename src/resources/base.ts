@@ -22,6 +22,16 @@ interface ApiPaginatedResponse<T> {
 
 /**
  * Base resource class
+ * 
+ * ## Return Type Standards
+ * 
+ * All resource classes follow these return type conventions:
+ * - **Single items** (`create`, `get`, `update`): Return `Promise<T>`
+ * - **Delete operations**: Return `Promise<void>`
+ * - **List operations with pagination**: Return `Promise<PaginatedResponse<T>>` (includes metadata)
+ * - **List operations without pagination**: Return `Promise<T[]>` (simple array)
+ * 
+ * The return type depends on what the Port API provides for that endpoint.
  */
 export abstract class BaseResource {
   constructor(protected httpClient: HttpClient) {}

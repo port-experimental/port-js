@@ -13,6 +13,7 @@ import type {
   ApiScorecardsResponse,
   ApiScorecard,
 } from '../types/responses';
+import type { RequestOptions } from '../http-client';
 
 /**
  * Resource for managing Port scorecards
@@ -23,12 +24,13 @@ export class ScorecardResource extends BaseResource {
   /**
    * Create a new scorecard
    */
-  async create(data: CreateScorecardInput): Promise<Scorecard> {
+  async create(data: CreateScorecardInput, options?: RequestOptions): Promise<Scorecard> {
     this.validateCreateInput(data);
 
     const response = await this.httpClient.post<Scorecard>(
       `${this.basePath}/${data.blueprint}/scorecards`,
-      data
+      data,
+      options
     );
 
     return this.transformScorecard(response);
@@ -37,12 +39,13 @@ export class ScorecardResource extends BaseResource {
   /**
    * Get a scorecard by identifier
    */
-  async get(blueprint: string, identifier: string): Promise<Scorecard> {
+  async get(blueprint: string, identifier: string, options?: RequestOptions): Promise<Scorecard> {
     this.validateIdentifier(blueprint, 'blueprint');
     this.validateIdentifier(identifier, 'identifier');
 
     const response = await this.httpClient.get<Scorecard>(
-      `${this.basePath}/${blueprint}/scorecards/${identifier}`
+      `${this.basePath}/${blueprint}/scorecards/${identifier}`,
+      options
     );
 
     return this.transformScorecard(response);
@@ -54,14 +57,16 @@ export class ScorecardResource extends BaseResource {
   async update(
     blueprint: string,
     identifier: string,
-    data: UpdateScorecardInput
+    data: UpdateScorecardInput,
+    options?: RequestOptions
   ): Promise<Scorecard> {
     this.validateIdentifier(blueprint, 'blueprint');
     this.validateIdentifier(identifier, 'identifier');
 
     const response = await this.httpClient.patch<Scorecard>(
       `${this.basePath}/${blueprint}/scorecards/${identifier}`,
-      data
+      data,
+      options
     );
 
     return this.transformScorecard(response);
@@ -70,23 +75,25 @@ export class ScorecardResource extends BaseResource {
   /**
    * Delete a scorecard
    */
-  async delete(blueprint: string, identifier: string): Promise<void> {
+  async delete(blueprint: string, identifier: string, options?: RequestOptions): Promise<void> {
     this.validateIdentifier(blueprint, 'blueprint');
     this.validateIdentifier(identifier, 'identifier');
 
     await this.httpClient.delete(
-      `${this.basePath}/${blueprint}/scorecards/${identifier}`
+      `${this.basePath}/${blueprint}/scorecards/${identifier}`,
+      options
     );
   }
 
   /**
    * List all scorecards for a blueprint
    */
-  async list(blueprint: string): Promise<Scorecard[]> {
+  async list(blueprint: string, options?: RequestOptions): Promise<Scorecard[]> {
     this.validateIdentifier(blueprint, 'blueprint');
 
     const response = await this.httpClient.get<ApiScorecardsResponse>(
-      `${this.basePath}/${blueprint}/scorecards`
+      `${this.basePath}/${blueprint}/scorecards`,
+      options
     );
 
     return response.scorecards.map((scorecard) =>

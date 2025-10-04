@@ -95,7 +95,7 @@ async function main() {
       console.log(`   Found: ${searchResults[0].identifier}`);
     }
 
-    // ✅ Step 6: Delete Entity
+    // ✅ Step 6: Delete Entity (manual as part of test)
     console.log('\n🗑️  Step 6: Deleting entity...');
     await client.entities.delete('service', testIdentifier);
     console.log(`✅ Deleted entity: ${testIdentifier}`);
@@ -122,19 +122,18 @@ async function main() {
   } catch (error) {
     console.error('\n❌ Smoke test failed:', error);
     console.error('');
-    
-    // Cleanup on error
+    process.exit(1);
+  } finally {
+    // 🧹 Always cleanup (in case test fails before deletion step)
     if (createdEntityId) {
-      console.log('🧹 Cleaning up...');
+      console.log('\n🧹 Cleaning up remaining resources...');
       try {
         await client.entities.delete('service', createdEntityId);
         console.log('✅ Cleanup successful\n');
       } catch (cleanupError) {
-        console.error('⚠️  Cleanup failed:', cleanupError);
+        console.error('⚠️  Cleanup failed (resource may not exist):', cleanupError instanceof Error ? cleanupError.message : cleanupError);
       }
     }
-    
-    process.exit(1);
   }
 }
 

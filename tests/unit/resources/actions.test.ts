@@ -47,7 +47,13 @@ describe('ActionResource', () => {
 
       const result = await actionResource.create(input);
 
-      expect(mockHttpClient.post).toHaveBeenCalledWith('/v1/actions', input);
+      // Blueprint goes in URL path, not request body
+      const { blueprint, ...expectedBody } = input;
+      expect(mockHttpClient.post).toHaveBeenCalledWith(
+        '/v1/blueprints/service/actions',
+        expectedBody,
+        undefined
+      );
       expect(result.identifier).toBe('create-deployment');
       expect(result.title).toBe('Create Deployment');
     });
@@ -103,7 +109,7 @@ describe('ActionResource', () => {
 
       const result = await actionResource.get('create-deployment');
 
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/v1/actions/create-deployment');
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/v1/actions/create-deployment', undefined);
       expect(result.identifier).toBe('create-deployment');
     });
 
@@ -145,7 +151,8 @@ describe('ActionResource', () => {
 
       expect(mockHttpClient.patch).toHaveBeenCalledWith(
         '/v1/actions/create-deployment',
-        updates
+        updates,
+        undefined
       );
       expect(result.title).toBe('Updated Title');
     });
@@ -164,7 +171,8 @@ describe('ActionResource', () => {
       await actionResource.delete('create-deployment');
 
       expect(mockHttpClient.delete).toHaveBeenCalledWith(
-        '/v1/actions/create-deployment'
+        '/v1/actions/create-deployment',
+        undefined
       );
     });
 
@@ -201,7 +209,7 @@ describe('ActionResource', () => {
 
       const result = await actionResource.list();
 
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/v1/actions');
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/v1/actions', undefined);
       expect(result).toHaveLength(2);
       expect(result[0].identifier).toBe('create-deployment');
     });
@@ -215,7 +223,7 @@ describe('ActionResource', () => {
 
       const result = await actionResource.list({ blueprint: 'service' });
 
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/v1/blueprints/service/actions');
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/v1/blueprints/service/actions', undefined);
       expect(result).toHaveLength(1);
     });
 
@@ -256,7 +264,8 @@ describe('ActionResource', () => {
         {
           entity: 'my-service',
           properties,
-        }
+        },
+        undefined
       );
       expect(result.id).toBe(runId);
       expect(result.status).toBe('in_progress');
@@ -278,7 +287,8 @@ describe('ActionResource', () => {
         '/v1/actions/global-action/runs',
         {
           properties: { key: 'value' },
-        }
+        },
+        undefined
       );
     });
 
@@ -301,7 +311,7 @@ describe('ActionResource', () => {
 
       const result = await actionResource.getRun('run-123');
 
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/v1/actions/runs/run-123');
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/v1/actions/runs/run-123', undefined);
       expect(result.id).toBe('run-123');
       expect(result.status).toBe('success');
     });
@@ -325,7 +335,8 @@ describe('ActionResource', () => {
       const result = await actionResource.listRuns('create-deployment');
 
       expect(mockHttpClient.get).toHaveBeenCalledWith(
-        '/v1/actions/create-deployment/runs'
+        '/v1/actions/create-deployment/runs',
+        undefined
       );
       expect(result).toHaveLength(2);
     });

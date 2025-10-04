@@ -1,0 +1,598 @@
+# TypeScript Best Practices for Port SDK
+
+## Core Principles
+
+1. **Strict Type Safety**: No `any` types except in controlled transformation scenarios
+2. **Explicit Types**: Always define proper interfaces and types
+3. **Type Inference**: Leverage TypeScript's type inference where it improves readability
+4. **Consistent Patterns**: Follow established patterns across all resource files
+
+---
+
+## Type Safety Rules
+
+### ❌ NEVER Use `any` in Public APIs
+
+```typescript
+// ❌ BAD - Using any defeats TypeScript's purpose
+async create(data: any): Promise<any> {
+  return this.httpClient.post('/endpoint', data);
+}
+
+// ✅ GOOD - Proper types
+async create(data: CreateInput): Promise<Resource> {
+  const response = await this.httpClient.post<ApiResponse>(
+    '/endpoint',
+    data
+  );
+  return this.transformResource(response.data);
+}
+```
+
+### ✅ Use Proper API Response Types
+
+Always define response types in `src/types/responses.ts`:
+
+```typescript
+// src/types/responses.ts
+export interface ApiResourceResponse {
+  resource: Resource | ApiResource;
+  ok?: boolean;
+}
+
+export interface ApiResourcesResponse {
+  resources: (Resource | ApiResource)[];
+  ok?: boolean;
+}
+
+export interface ApiResource extends Omit<Resource, 'createdAt' | 'updatedAt'> {
+  createdAt?: string;
+  updatedAt?: string;
+}
+```
+
+### ✅ Transform Methods with Union Types
+
+```typescript
+// ✅ GOOD - Proper typing with union types
+private transformResource(resource: ApiResource | Resource): Resource {
+  const result: any = { ...resource };
+  if (result.createdAt) {
+    result.createdAt = new Date(result.createdAt);
+  }
+  if (result.updatedAt) {
+    result.updatedAt = new Date(result.updatedAt);
+  }
+  return result as Resource;
+}
+```
+
+**Why `any` is acceptable here**:
+- Limited scope (private method)
+- Controlled transformation
+- Type-safe return with assertion
+- Handles both string and Date types for date fields
+
+---
+
+## Resource Method Patterns
+
+### Standard CRUD Methods
+
+All resource classes should follow this pattern:
+
+```typescript
+import { BaseResource } from './base';
+import { PortValidationError } from '../errors';
+import type { Resource, CreateInput, UpdateInput } from '../types/resources';
+import type {
+  ApiResourceResponse,
+  ApiResourcesResponse,
+  ApiResource,
+} from '../types/responses';
+import type { RequestOptions } from '../http-client';
+
+export class ResourceClass extends BaseResource {
+  private readonly basePath = '/v1/resources';
+
+  /**
+   * Create a new resource
+   */
+  async create(data: CreateInput, options?: RequestOptions): Promise<Resource> {
+    this.validateCreateInput(data);
+    const response = await this.httpClient.post<ApiResourceResponse>(
+      this.basePath,
+      data,
+      options
+    );
+    return this.transformResource(response.resource);
+  }
+
+  /**
+   * Get a resource by identifier
+   */
+  async get(identifier: string, options?: RequestOptions): Promise<Resource> {
+    this.validateIdentifier(identifier);
+    const response = await this.httpClient.get<ApiResourceResponse>(
+      `${this.basePath}/${identifier}`,
+      options
+    );
+    return this.transformResource(response.resource);
+  }
+
+  /**
+   * Update a resource
+   */
+  async update(
+    identifier: string,
+    data: UpdateInput,
+    options?: RequestOptions
+  ): Promise<Resource> {
+    this.validateIdentifier(identifier);
+    const response = await this.httpClient.patch<ApiResourceResponse>(
+      `${this.basePath}/${identifier}`,
+      data,
+      options
+    );
+    return this.transformResource(response.resource);
+  }
+
+  /**
+   * Delete a resource
+   */
+  async delete(identifier: string, options?: RequestOptions): Promise<void> {
+    this.validateIdentifier(identifier);
+    await this.httpClient.delete(`${this.basePath}/${identifier}`, options);
+  }
+
+  /**
+   * List all resources
+   */
+  async list(options?: RequestOptions): Promise<Resource[]> {
+    const response = await this.httpClient.get<ApiResourcesResponse>(
+      this.basePath,
+      options
+    );
+    return (response.resources || []).map((r) => this.transformResource(r));
+  }
+}
+```
+
+### RequestOptions Pattern
+
+**ALWAYS** add `options?: RequestOptions` as the last parameter:
+
+```typescript
+// ✅ Single parameter + options
+async get(identifier: string, options?: RequestOptions): Promise<T>
+
+// ✅ Multiple parameters + options
+async update(
+  identifier: string,
+  data: UpdateInput,
+  options?: RequestOptions
+): Promise<T>
+
+// ✅ Optional parameter + options
+async get(
+  identifier: string,
+  blueprint?: string,
+  options?: RequestOptions
+): Promise<T>
+
+// ⚠️ SPECIAL CASE: List methods with filter options
+// Use intersection type to avoid unused parameter errors
+async list(
+  options?: ListOptions & { requestOptions?: RequestOptions }
+): Promise<T[]> {
+  const response = await this.httpClient.get(url, options?.requestOptions);
+  return response.data;
+}
+```
+
+---
+
+## Import Organization
+
+### Order of Imports
+
+1. Node built-ins (if any)
+2. External packages
+3. Internal base classes
+4. Internal utilities/errors
+5. Types from same domain
+6. API response types
+7. HTTP client types (last)
+
+```typescript
+import { BaseResource } from './base';
+import { PortValidationError } from '../errors';
+import type {
+  Resource,
+  CreateInput,
+  UpdateInput,
+} from '../types/resources';
+import type {
+  ApiResourceResponse,
+  ApiResourcesResponse,
+  ApiResource,
+} from '../types/responses';
+import type { RequestOptions } from '../http-client';
+```
+
+### Remove Unused Imports
+
+TypeScript will flag unused imports. **Always remove them**:
+
+```typescript
+// ❌ BAD - Importing but not using
+import type { ApiResourceResponse, ApiResource } from '../types/responses';
+
+// ApiResourceResponse is never used in the file
+
+// ✅ GOOD - Only import what you need
+import type { ApiResource } from '../types/responses';
+```
+
+---
+
+## Validation Patterns
+
+### Standard Validation Methods
+
+```typescript
+/**
+ * Validate identifier
+ */
+private validateIdentifier(identifier: string): void {
+  if (!identifier || identifier.trim() === '') {
+    throw new PortValidationError('Identifier is required', [
+      { field: 'identifier', message: 'Required field' },
+    ]);
+  }
+
+  // Validate format: alphanumeric, hyphens, underscores only
+  if (!/^[a-zA-Z0-9_-]+$/.test(identifier)) {
+    throw new PortValidationError('Identifier has invalid format', [
+      {
+        field: 'identifier',
+        message: 'Must contain only alphanumeric characters, hyphens, and underscores',
+      },
+    ]);
+  }
+}
+
+/**
+ * Validate create input
+ */
+private validateCreateInput(data: CreateInput): void {
+  if (!data.identifier || data.identifier.trim() === '') {
+    throw new PortValidationError('Identifier is required', [
+      { field: 'identifier', message: 'Required field' },
+    ]);
+  }
+
+  if (!/^[a-zA-Z0-9_-]+$/.test(data.identifier)) {
+    throw new PortValidationError('Identifier has invalid format', [
+      {
+        field: 'identifier',
+        message: 'Must contain only alphanumeric characters, hyphens, and underscores',
+      },
+    ]);
+  }
+
+  if (!data.title || data.title.trim() === '') {
+    throw new PortValidationError('Title is required', [
+      { field: 'title', message: 'Required field' },
+    ]);
+  }
+}
+```
+
+---
+
+## Test Patterns
+
+### Updating Tests for RequestOptions
+
+When you add `options?: RequestOptions` to a method, **ALWAYS update the tests**:
+
+```typescript
+// ❌ OLD TEST - Will fail
+expect(mockHttpClient.post).toHaveBeenCalledWith(
+  '/v1/resources',
+  input
+);
+
+// ✅ NEW TEST - Correct
+expect(mockHttpClient.post).toHaveBeenCalledWith(
+  '/v1/resources',
+  input,
+  undefined  // ← Add this for optional RequestOptions
+);
+```
+
+### Test Assertions for HTTP Methods
+
+```typescript
+// GET
+expect(mockHttpClient.get).toHaveBeenCalledWith('/path', undefined);
+
+// POST
+expect(mockHttpClient.post).toHaveBeenCalledWith('/path', data, undefined);
+
+// PATCH
+expect(mockHttpClient.patch).toHaveBeenCalledWith('/path', data, undefined);
+
+// DELETE
+expect(mockHttpClient.delete).toHaveBeenCalledWith('/path', undefined);
+```
+
+### Type Assertions in Tests
+
+When testing Date transformations:
+
+```typescript
+// ✅ GOOD - Type assertion for Date methods
+expect(result.createdAt).toBeInstanceOf(Date);
+expect((result.createdAt as Date).toISOString()).toBe('2025-10-04T12:00:00.000Z');
+```
+
+---
+
+## Type Assertion Guidelines
+
+### When to Use `as` Assertions
+
+**✅ Acceptable Uses**:
+
+1. **After type guards or validation**:
+```typescript
+if (result.createdAt) {
+  result.createdAt = new Date(result.createdAt);
+}
+return result as Resource;
+```
+
+2. **In controlled transformations**:
+```typescript
+private transformResource(resource: ApiResource | Resource): Resource {
+  const result: any = { ...resource };
+  // Transformations...
+  return result as Resource;
+}
+```
+
+3. **In tests for type-safe property access**:
+```typescript
+expect((result.createdAt as Date).toISOString()).toBe('...');
+```
+
+**❌ Never Use For**:
+- Bypassing actual type errors
+- Casting incompatible types
+- Avoiding proper type definitions
+
+---
+
+## Date Handling
+
+### Transform Date Strings to Date Objects
+
+```typescript
+// ✅ GOOD - Safe transformation
+private transformResource(resource: ApiResource | Resource): Resource {
+  const result: any = { ...resource };
+  
+  // Only transform if the field exists
+  if (result.createdAt) {
+    result.createdAt = typeof result.createdAt === 'string'
+      ? new Date(result.createdAt)
+      : result.createdAt;
+  }
+  
+  if (result.updatedAt) {
+    result.updatedAt = typeof result.updatedAt === 'string'
+      ? new Date(result.updatedAt)
+      : result.updatedAt;
+  }
+  
+  return result as Resource;
+}
+```
+
+### API Response Types for Dates
+
+```typescript
+// API returns string dates
+export interface ApiResource extends Omit<Resource, 'createdAt' | 'updatedAt'> {
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// SDK uses Date objects
+export interface Resource {
+  identifier: string;
+  title: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+```
+
+---
+
+## Error Handling
+
+### Use Specific Error Types
+
+```typescript
+import {
+  PortError,
+  PortValidationError,
+  PortNotFoundError,
+  PortAuthError,
+} from '../errors';
+
+// Validation errors
+if (!data.identifier) {
+  throw new PortValidationError('Identifier is required', [
+    { field: 'identifier', message: 'Required field' },
+  ]);
+}
+
+// The HttpClient will throw appropriate errors for:
+// - 401: PortAuthError
+// - 404: PortNotFoundError
+// - 422: PortValidationError
+// - 5xx: PortServerError
+```
+
+---
+
+## JSDoc Comments
+
+### Public Method Documentation
+
+```typescript
+/**
+ * Create a new resource
+ * 
+ * @param data - Resource data conforming to its schema
+ * @param options - Optional request options (timeout, signal, headers)
+ * @returns The created resource
+ * 
+ * @throws {PortAuthError} If authentication fails
+ * @throws {PortValidationError} If resource data is invalid
+ * @throws {PortNotFoundError} If blueprint doesn't exist
+ * 
+ * @example
+ * ```typescript
+ * const resource = await client.resources.create({
+ *   identifier: 'my-resource',
+ *   title: 'My Resource',
+ *   properties: {
+ *     stringProps: { key: 'value' }
+ *   }
+ * });
+ * ```
+ */
+async create(
+  data: CreateInput,
+  options?: RequestOptions
+): Promise<Resource> {
+  // Implementation
+}
+```
+
+---
+
+## Checklist for Adding New Resource Methods
+
+When adding a new method to a resource class:
+
+- [ ] Add proper TypeScript types for input/output
+- [ ] Add `options?: RequestOptions` as last parameter
+- [ ] Pass `options` to HTTP client method
+- [ ] Add validation if needed
+- [ ] Add JSDoc comment with `@param`, `@returns`, `@throws`, `@example`
+- [ ] Transform API response if needed
+- [ ] Update tests with `undefined` for options parameter
+- [ ] Run `pnpm type-check` to verify
+- [ ] Run `pnpm test` to ensure all tests pass
+
+---
+
+## Checklist for Adding New Types
+
+When adding new types to `src/types/`:
+
+- [ ] Define SDK types with Date objects for date fields
+- [ ] Define API types with string dates in `responses.ts`
+- [ ] Use `Omit` to extend types cleanly
+- [ ] Export from `src/types/index.ts`
+- [ ] Import in resource classes
+- [ ] Use in HTTP client generic type parameters
+
+---
+
+## Common Mistakes to Avoid
+
+### ❌ Don't Forget Unused Imports
+
+```typescript
+// ❌ TypeScript will complain
+import type { ApiResourceResponse } from '../types/responses';
+
+// Never used in file
+
+// ✅ Remove it
+```
+
+### ❌ Don't Mix Parameter Order
+
+```typescript
+// ❌ BAD - RequestOptions in wrong position
+async update(
+  options: RequestOptions,
+  identifier: string,
+  data: UpdateInput
+): Promise<Resource>
+
+// ✅ GOOD - RequestOptions always last and optional
+async update(
+  identifier: string,
+  data: UpdateInput,
+  options?: RequestOptions
+): Promise<Resource>
+```
+
+### ❌ Don't Skip Test Updates
+
+```typescript
+// When you change:
+async create(data: CreateInput): Promise<Resource>
+
+// To:
+async create(data: CreateInput, options?: RequestOptions): Promise<Resource>
+
+// ✅ You MUST update tests:
+expect(mockHttpClient.post).toHaveBeenCalledWith(
+  '/path',
+  input,
+  undefined  // ← Add this
+);
+```
+
+---
+
+## Summary
+
+### Key Takeaways
+
+1. **No `any` in public APIs** - Use proper types always
+2. **RequestOptions last** - Consistent parameter order
+3. **Transform dates** - API strings → SDK Date objects
+4. **Update tests** - Keep assertions in sync with signatures
+5. **Remove unused imports** - TypeScript will flag them
+6. **Validate inputs** - Throw `PortValidationError` early
+7. **Document methods** - Add JSDoc with examples
+
+### Files to Remember
+
+- `src/types/responses.ts` - API response types
+- `src/types/index.ts` - Export all types
+- `src/resources/*.ts` - Resource implementations
+- `tests/unit/resources/*.test.ts` - Keep in sync
+
+---
+
+## References
+
+- [TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/intro.html)
+- [TypeScript Do's and Don'ts](https://www.typescriptlang.org/docs/handbook/declaration-files/do-s-and-don-ts.html)
+- [Effective TypeScript](https://effectivetypescript.com/)
+
+---
+
+**Last Updated**: 2025-10-04  
+**Applies To**: Port SDK v0.1.0+

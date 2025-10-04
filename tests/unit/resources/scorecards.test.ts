@@ -60,7 +60,8 @@ describe('ScorecardResource', () => {
 
       expect(mockHttpClient.post).toHaveBeenCalledWith(
         '/v1/blueprints/service/scorecards',
-        input
+        input,
+        undefined
       );
       expect(result.identifier).toBe('security-scorecard');
       expect(result.createdAt).toBeInstanceOf(Date);
@@ -125,7 +126,8 @@ describe('ScorecardResource', () => {
       const result = await scorecardResource.get('service', 'security-scorecard');
 
       expect(mockHttpClient.get).toHaveBeenCalledWith(
-        '/v1/blueprints/service/scorecards/security-scorecard'
+        '/v1/blueprints/service/scorecards/security-scorecard',
+        undefined
       );
       expect(result.identifier).toBe('security-scorecard');
       expect(result.createdAt).toBeInstanceOf(Date);
@@ -191,7 +193,8 @@ describe('ScorecardResource', () => {
 
       expect(mockHttpClient.patch).toHaveBeenCalledWith(
         '/v1/blueprints/service/scorecards/security-scorecard',
-        updates
+        updates,
+        undefined
       );
       expect(result.title).toBe('Updated Security Scorecard');
       expect(result.updatedAt).toBeInstanceOf(Date);
@@ -219,7 +222,8 @@ describe('ScorecardResource', () => {
       await scorecardResource.delete('service', 'security-scorecard');
 
       expect(mockHttpClient.delete).toHaveBeenCalledWith(
-        '/v1/blueprints/service/scorecards/security-scorecard'
+        '/v1/blueprints/service/scorecards/security-scorecard',
+        undefined
       );
     });
 
@@ -276,7 +280,8 @@ describe('ScorecardResource', () => {
       const result = await scorecardResource.list('service');
 
       expect(mockHttpClient.get).toHaveBeenCalledWith(
-        '/v1/blueprints/service/scorecards'
+        '/v1/blueprints/service/scorecards',
+        undefined
       );
       expect(result).toHaveLength(2);
       expect(result[0].identifier).toBe('scorecard-1');
@@ -360,7 +365,7 @@ describe('ScorecardResource', () => {
       const result = await scorecardResource.get('service', 'test');
 
       expect(result.createdAt).toBeInstanceOf(Date);
-      expect(result.createdAt.toISOString()).toBe('2025-10-04T12:00:00.000Z');
+      expect((result.createdAt as Date).toISOString()).toBe('2025-10-04T12:00:00.000Z');
     });
 
     it('should transform updatedAt string to Date object', async () => {
@@ -378,7 +383,7 @@ describe('ScorecardResource', () => {
       const result = await scorecardResource.get('service', 'test');
 
       expect(result.updatedAt).toBeInstanceOf(Date);
-      expect(result.updatedAt.toISOString()).toBe('2025-10-04T13:00:00.000Z');
+      expect((result.updatedAt as Date).toISOString()).toBe('2025-10-04T13:00:00.000Z');
     });
   });
 });

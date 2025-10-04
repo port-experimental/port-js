@@ -14,6 +14,7 @@ import type {
   ApiAction,
   ApiActionRun,
 } from '../types/responses';
+import type { RequestOptions } from '../http-client';
 
 export interface ListActionsOptions {
   blueprint?: string;
@@ -33,19 +34,28 @@ export class ActionResource extends BaseResource {
   /**
    * Create a new action
    */
-  async create(data: CreateActionInput): Promise<Action> {
+  async create(data: CreateActionInput, options?: RequestOptions): Promise<Action> {
     this.validateCreateInput(data);
-    const response = await this.httpClient.post<ApiActionResponse>(this.basePath, data);
+    
+    // Extract blueprint from data - it goes in the URL, not the body
+    const { blueprint, ...actionData } = data;
+    
+    const url = blueprint 
+      ? `/v1/blueprints/${blueprint}/actions`
+      : this.basePath;
+    
+    const response = await this.httpClient.post<ApiActionResponse>(url, actionData, options);
     return this.transformAction(response.action);
   }
 
   /**
    * Get an action by identifier
    */
-  async get(identifier: string): Promise<Action> {
+  async get(identifier: string, options?: RequestOptions): Promise<Action> {
     this.validateIdentifier(identifier);
     const response = await this.httpClient.get<ApiActionResponse>(
-      `${this.basePath}/${identifier}`
+      `${this.basePath}/${identifier}`,
+      options
     );
     return this.transformAction(response.action);
   }
@@ -53,11 +63,12 @@ export class ActionResource extends BaseResource {
   /**
    * Update an action
    */
-  async update(identifier: string, data: UpdateActionInput): Promise<Action> {
+  async update(identifier: string, data: UpdateActionInput, options?: RequestOptions): Promise<Action> {
     this.validateIdentifier(identifier);
     const response = await this.httpClient.patch<ApiActionResponse>(
       `${this.basePath}/${identifier}`,
-      data
+      data,
+      options
     );
     return this.transformAction(response.action);
   }
@@ -65,16 +76,16 @@ export class ActionResource extends BaseResource {
   /**
    * Delete an action
    */
-  async delete(identifier: string): Promise<void> {
+  async delete(identifier: string, options?: RequestOptions): Promise<void> {
     this.validateIdentifier(identifier);
-    await this.httpClient.delete(`${this.basePath}/${identifier}`);
+    await this.httpClient.delete(`${this.basePath}/${identifier}`, options);
   }
 
   /**
    * List actions
    * @param options - Optional filter by blueprint
    */
-  async list(options?: ListActionsOptions): Promise<Action[]> {
+  async list(options?: ListActionsOptions & { requestOptions?: RequestOptions }): Promise<Action[]> {
     let url: string;
     
     if (options?.blueprint) {
@@ -83,7 +94,7 @@ export class ActionResource extends BaseResource {
       url = this.basePath;
     }
 
-    const response = await this.httpClient.get<ApiActionsResponse>(url);
+    const response = await this.httpClient.get<ApiActionsResponse>(url, options?.requestOptions);
     return (response.actions || []).map((action) => this.transformAction(action));
   }
 
@@ -92,7 +103,8 @@ export class ActionResource extends BaseResource {
    */
   async execute(
     actionIdentifier: string,
-    input: ExecuteActionInput
+    input: ExecuteActionInput,
+    options?: RequestOptions
   ): Promise<ActionRun> {
     this.validateIdentifier(actionIdentifier);
 
@@ -106,7 +118,8 @@ export class ActionResource extends BaseResource {
 
     const response = await this.httpClient.post<ApiActionRunResponse>(
       `${this.basePath}/${actionIdentifier}/runs`,
-      payload
+      payload,
+      options
     );
 
     return this.transformRun(response.run);
@@ -115,7 +128,7 @@ export class ActionResource extends BaseResource {
   /**
    * Get action run status
    */
-  async getRun(runId: string): Promise<ActionRun> {
+  async getRun(runId: string, options?: RequestOptions): Promise<ActionRun> {
     if (!runId || runId.trim() === '') {
       throw new PortValidationError('Run ID is required', [
         { field: 'runId', message: 'Required field' },
@@ -123,7 +136,8 @@ export class ActionResource extends BaseResource {
     }
 
     const response = await this.httpClient.get<ApiActionRunResponse>(
-      `${this.basePath}/runs/${runId}`
+      `${this.basePath}/runs/${runId}`,
+      options
     );
 
     return this.transformRun(response.run);
@@ -132,11 +146,12 @@ export class ActionResource extends BaseResource {
   /**
    * List runs for an action
    */
-  async listRuns(actionIdentifier: string): Promise<ActionRun[]> {
+  async listRuns(actionIdentifier: string, options?: RequestOptions): Promise<ActionRun[]> {
     this.validateIdentifier(actionIdentifier);
 
     const response = await this.httpClient.get<ApiActionRunsResponse>(
-      `${this.basePath}/${actionIdentifier}/runs`
+      `${this.basePath}/${actionIdentifier}/runs`,
+      options
     );
 
     return (response.runs || []).map((run) => this.transformRun(run));

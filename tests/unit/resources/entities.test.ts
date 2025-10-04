@@ -49,7 +49,8 @@ describe('EntityResource', () => {
 
       expect(mockHttpClient.post).toHaveBeenCalledWith(
         '/v1/blueprints/service/entities',
-        input
+        input,
+        undefined
       );
       expect(result.identifier).toBe('test-entity');
     });
@@ -95,7 +96,7 @@ describe('EntityResource', () => {
 
       const result = await entityResource.get('test-entity');
 
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/v1/entities/test-entity');
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/v1/entities/test-entity', undefined);
       expect(result.identifier).toBe('test-entity');
     });
 
@@ -128,7 +129,8 @@ describe('EntityResource', () => {
 
       expect(mockHttpClient.patch).toHaveBeenCalledWith(
         '/v1/entities/test-entity',
-        updates
+        updates,
+        undefined
       );
       expect(result.title).toBe('Updated Title');
     });
@@ -140,7 +142,7 @@ describe('EntityResource', () => {
 
       await entityResource.delete('test-entity');
 
-      expect(mockHttpClient.delete).toHaveBeenCalledWith('/v1/entities/test-entity');
+      expect(mockHttpClient.delete).toHaveBeenCalledWith('/v1/entities/test-entity', undefined);
     });
   });
 
