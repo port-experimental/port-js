@@ -49,18 +49,22 @@ describe('ScorecardResource', () => {
       };
 
       const expected = {
-        ...input,
-        createdAt: '2025-10-04T00:00:00Z',
-        updatedAt: '2025-10-04T00:00:00Z',
+        scorecard: {
+          ...input,
+          createdAt: '2025-10-04T00:00:00Z',
+          updatedAt: '2025-10-04T00:00:00Z',
+        },
       };
 
       vi.mocked(mockHttpClient.post).mockResolvedValue(expected);
 
       const result = await scorecardResource.create(input);
 
+      // Blueprint is removed from request body (API doesn't accept it)
+      const { blueprint, ...expectedBody } = input;
       expect(mockHttpClient.post).toHaveBeenCalledWith(
         '/v1/blueprints/service/scorecards',
-        input,
+        expectedBody,
         undefined
       );
       expect(result.identifier).toBe('security-scorecard');
@@ -113,12 +117,14 @@ describe('ScorecardResource', () => {
   describe('get', () => {
     it('should fetch a scorecard by identifier', async () => {
       const expected = {
-        identifier: 'security-scorecard',
-        title: 'Security Scorecard',
-        blueprint: 'service',
-        rules: [],
-        createdAt: '2025-10-04T00:00:00Z',
-        updatedAt: '2025-10-04T00:00:00Z',
+        scorecard: {
+          identifier: 'security-scorecard',
+          title: 'Security Scorecard',
+          blueprint: 'service',
+          rules: [],
+          createdAt: '2025-10-04T00:00:00Z',
+          updatedAt: '2025-10-04T00:00:00Z',
+        },
       };
 
       vi.mocked(mockHttpClient.get).mockResolvedValue(expected);
@@ -176,14 +182,16 @@ describe('ScorecardResource', () => {
       };
 
       const expected = {
-        identifier: 'security-scorecard',
-        blueprint: 'service',
-        ...updates,
-        createdAt: '2025-10-04T00:00:00Z',
-        updatedAt: '2025-10-04T01:00:00Z',
+        scorecard: {
+          identifier: 'security-scorecard',
+          blueprint: 'service',
+          ...updates,
+          createdAt: '2025-10-04T00:00:00Z',
+          updatedAt: '2025-10-04T01:00:00Z',
+        },
       };
 
-      vi.mocked(mockHttpClient.patch).mockResolvedValue(expected);
+      vi.mocked(mockHttpClient.put).mockResolvedValue(expected);
 
       const result = await scorecardResource.update(
         'service',
@@ -191,7 +199,7 @@ describe('ScorecardResource', () => {
         updates
       );
 
-      expect(mockHttpClient.patch).toHaveBeenCalledWith(
+      expect(mockHttpClient.put).toHaveBeenCalledWith(
         '/v1/blueprints/service/scorecards/security-scorecard',
         updates,
         undefined
@@ -204,14 +212,14 @@ describe('ScorecardResource', () => {
       await expect(
         scorecardResource.update('', 'scorecard-id', { title: 'Test' })
       ).rejects.toThrow(PortValidationError);
-      expect(mockHttpClient.patch).not.toHaveBeenCalled();
+      expect(mockHttpClient.put).not.toHaveBeenCalled();
     });
 
     it('should throw PortValidationError for empty identifier', async () => {
       await expect(
         scorecardResource.update('service', '', { title: 'Test' })
       ).rejects.toThrow(PortValidationError);
-      expect(mockHttpClient.patch).not.toHaveBeenCalled();
+      expect(mockHttpClient.put).not.toHaveBeenCalled();
     });
   });
 
@@ -352,12 +360,14 @@ describe('ScorecardResource', () => {
   describe('Date transformation', () => {
     it('should transform createdAt string to Date object', async () => {
       const scorecard = {
-        identifier: 'test',
-        title: 'Test',
-        blueprint: 'service',
-        rules: [],
-        createdAt: '2025-10-04T12:00:00Z',
-        updatedAt: '2025-10-04T12:00:00Z',
+        scorecard: {
+          identifier: 'test',
+          title: 'Test',
+          blueprint: 'service',
+          rules: [],
+          createdAt: '2025-10-04T12:00:00Z',
+          updatedAt: '2025-10-04T12:00:00Z',
+        },
       };
 
       vi.mocked(mockHttpClient.get).mockResolvedValue(scorecard);
@@ -370,12 +380,14 @@ describe('ScorecardResource', () => {
 
     it('should transform updatedAt string to Date object', async () => {
       const scorecard = {
-        identifier: 'test',
-        title: 'Test',
-        blueprint: 'service',
-        rules: [],
-        createdAt: '2025-10-04T12:00:00Z',
-        updatedAt: '2025-10-04T13:00:00Z',
+        scorecard: {
+          identifier: 'test',
+          title: 'Test',
+          blueprint: 'service',
+          rules: [],
+          createdAt: '2025-10-04T12:00:00Z',
+          updatedAt: '2025-10-04T13:00:00Z',
+        },
       };
 
       vi.mocked(mockHttpClient.get).mockResolvedValue(scorecard);

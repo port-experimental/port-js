@@ -22,7 +22,7 @@ export default defineConfig({
     testTimeout: 60000,
     
     // Run integration tests sequentially (they may hit real API)
-    threads: false,
+    // threads: false,
     
     // Reporter
     reporters: ['verbose'],

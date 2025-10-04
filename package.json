@@ -43,6 +43,8 @@
     "smoke:entity-crud": "tsx smoke-tests/07-entity-crud.ts",
     "smoke:blueprint-crud": "tsx smoke-tests/08-blueprint-crud.ts",
     "smoke:action": "tsx smoke-tests/09-action-execution.ts",
+    "smoke:teams": "tsx smoke-tests/10-teams-crud.ts",
+    "smoke:users": "tsx smoke-tests/11-users-crud.ts",
     "version:patch": "npm version patch -m \"chore: release v%s\"",
     "version:minor": "npm version minor -m \"chore: release v%s\"",
     "version:major": "npm version major -m \"chore: release v%s\"",

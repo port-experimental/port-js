@@ -30,7 +30,11 @@ describe('ActionResource', () => {
         identifier: 'create-deployment',
         title: 'Create Deployment',
         blueprint: 'service',
-        trigger: 'CREATE' as const,
+        trigger: {
+          type: 'self-service' as const,
+          operation: 'DAY-2' as const,
+          userInputs: { properties: {} }
+        },
         invocationMethod: {
           type: 'WEBHOOK' as const,
           url: 'https://example.com/webhook',
@@ -47,10 +51,10 @@ describe('ActionResource', () => {
 
       const result = await actionResource.create(input);
 
-      // Blueprint goes in URL path, not request body
+      // Blueprint is removed from request body (API doesn't accept it)
       const { blueprint, ...expectedBody } = input;
       expect(mockHttpClient.post).toHaveBeenCalledWith(
-        '/v1/blueprints/service/actions',
+        '/v1/actions',
         expectedBody,
         undefined
       );
@@ -223,7 +227,7 @@ describe('ActionResource', () => {
 
       const result = await actionResource.list({ blueprint: 'service' });
 
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/v1/blueprints/service/actions', undefined);
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/v1/actions?blueprint_identifier=service', undefined);
       expect(result).toHaveLength(1);
     });
 
