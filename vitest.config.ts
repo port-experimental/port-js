@@ -11,7 +11,7 @@ export default defineConfig({
     // Coverage configuration
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'json', 'html', 'lcov'],
+      reporter: ['text', 'json', 'json-summary', 'html', 'lcov'],
       reportsDirectory: './coverage',
       exclude: [
         'node_modules/',
@@ -25,10 +25,25 @@ export default defineConfig({
         '**/*-config.ts', // Config files
       ],
       thresholds: {
+        // Global thresholds for business logic
         statements: 68,
         branches: 80,
         functions: 70,
         lines: 68,
+        // Per-file overrides for infrastructure
+        perFile: true,
+        '**/http-client.ts': {
+          statements: 15,
+          branches: 80,
+          functions: 10,
+          lines: 15,
+        },
+        '**/resources/**': {
+          statements: 85,
+          branches: 85,
+          functions: 95,
+          lines: 85,
+        },
       },
       all: true,
     },
