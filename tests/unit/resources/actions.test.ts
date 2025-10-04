@@ -30,11 +30,9 @@ describe('ActionResource', () => {
         identifier: 'create-deployment',
         title: 'Create Deployment',
         blueprint: 'service',
-        trigger: {
-          type: 'self-service' as const,
-        },
+        trigger: 'CREATE' as const,
         invocationMethod: {
-          type: 'webhook' as const,
+          type: 'WEBHOOK' as const,
           url: 'https://example.com/webhook',
         },
       };

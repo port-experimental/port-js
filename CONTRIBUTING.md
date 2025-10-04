@@ -137,7 +137,9 @@ We use TypeScript with strict mode:
 
 ### 5. Commit Messages
 
-Use [Conventional Commits](https://www.conventionalcommits.org/):
+**REQUIRED**: All commits MUST use [Conventional Commits](https://www.conventionalcommits.org/) format.
+
+Commitlint runs automatically on every commit to enforce this.
 
 ```bash
 feat: add entity batch operations
@@ -149,14 +151,26 @@ security: patch credential exposure in logs
 ```
 
 Types:
-- `feat`: New feature
-- `fix`: Bug fix
+- `feat`: New feature (MINOR version bump)
+- `fix`: Bug fix (PATCH version bump)
 - `docs`: Documentation changes
 - `test`: Test additions/changes
 - `refactor`: Code refactoring
 - `perf`: Performance improvements
-- `security`: Security improvements
+- `security`: Security improvements (PATCH version bump)
 - `chore`: Maintenance tasks
+- `ci`: CI/CD changes
+- `build`: Build system changes
+
+**Breaking Changes**: Use `feat!:` or include `BREAKING CHANGE:` in footer (MAJOR version bump)
+
+```bash
+feat!: drop support for Node 18
+
+BREAKING CHANGE: Node 20+ is now required
+```
+
+**See**: `.cursor/rules/changelog-automation.mdc` for complete guidelines.
 
 ## 🔧 Contributing Process
 

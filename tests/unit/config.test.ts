@@ -5,6 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { REGION_BASE_URLS, resolveConfig, type PortRegion } from '../../src/config';
 import { PortAuthError } from '../../src/errors';
+import type { LogLevel } from '../../src/logger';
 
 describe('Configuration', () => {
   describe('REGION_BASE_URLS', () => {

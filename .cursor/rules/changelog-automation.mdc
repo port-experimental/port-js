@@ -1,0 +1,375 @@
+# Changelog Automation Rules
+
+## Commit Message Format
+
+All commits MUST follow Conventional Commits specification.
+
+### Format
+
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+### Types
+
+- `feat`: New feature (triggers MINOR version bump)
+- `fix`: Bug fix (triggers PATCH version bump)
+- `docs`: Documentation changes only
+- `style`: Code formatting (whitespace, semicolons, etc.)
+- `refactor`: Code refactoring (no functional changes)
+- `perf`: Performance improvements
+- `test`: Adding or updating tests
+- `build`: Build system or dependencies
+- `ci`: CI configuration changes
+- `chore`: Other changes (maintenance, etc.)
+- `revert`: Revert a previous commit
+- `security`: Security improvements (triggers PATCH version bump)
+
+### Breaking Changes
+
+Breaking changes MUST include `BREAKING CHANGE:` in the footer or `!` after the type/scope:
+
+```bash
+feat!: drop support for Node 18
+
+BREAKING CHANGE: Node 20+ is now required
+```
+
+This triggers a MAJOR version bump.
+
+### Scope (Optional)
+
+Scope provides context about what part of the codebase changed:
+
+```bash
+feat(entities): add batch update operation
+fix(http): resolve token refresh race condition
+docs(readme): update installation instructions
+test(actions): add integration tests
+```
+
+Common scopes:
+- `entities` - Entity resource
+- `blueprints` - Blueprint resource
+- `actions` - Action resource
+- `scorecards` - Scorecard resource
+- `http` - HTTP client
+- `auth` - Authentication
+- `config` - Configuration
+- `logger` - Logging
+- `types` - TypeScript types
+- `tests` - Test suite
+- `docs` - Documentation
+- `ci` - CI/CD pipeline
+
+### Subject
+
+- Use imperative mood ("add" not "added" or "adds")
+- Lowercase first letter
+- No period at the end
+- Max 100 characters
+
+### Body (Optional)
+
+- Explain WHAT and WHY, not HOW
+- Wrap at 100 characters
+- Separate from subject with blank line
+
+### Footer (Optional)
+
+- Reference issues: `Closes #123` or `Fixes #456`
+- Breaking changes: `BREAKING CHANGE: description`
+- Multiple footers allowed
+
+## Examples
+
+### Good Commits
+
+```bash
+# Feature with scope
+feat(entities): add batch update operation
+
+Allows updating multiple entities in a single API call,
+improving performance for bulk operations.
+
+Closes #45
+
+# Bug fix with issue reference
+fix(http): prevent token refresh race condition
+
+Multiple concurrent requests could trigger duplicate token
+refreshes. Now uses promise-based locking to ensure only
+one refresh happens at a time.
+
+Fixes #123
+
+# Breaking change
+feat!: upgrade to vitest v3
+
+BREAKING CHANGE: Vitest v2 is no longer supported.
+Update your test configuration to use v3 syntax.
+
+# Security fix
+security(auth): sanitize credentials in error logs
+
+Prevents accidental credential exposure in error messages
+and stack traces.
+
+# Documentation
+docs(readme): add proxy configuration examples
+
+Closes #67
+
+# Test addition
+test(actions): add integration tests for action execution
+
+Covers create, execute, getRun, and listRuns operations.
+```
+
+### Bad Commits
+
+```bash
+# ❌ Missing type
+update entities
+
+# ❌ Not imperative mood
+feat: added new feature
+
+# ❌ Capitalized subject
+feat: Add new feature
+
+# ❌ Period at end
+feat: add new feature.
+
+# ❌ Too vague
+fix: bug fix
+chore: updates
+
+# ❌ Mixed changes without proper type
+updated code and fixed tests
+```
+
+## Changelog Generation
+
+### Automatic Generation
+
+Changelog is automatically generated from commit messages:
+
+```bash
+# Generate changelog for latest release
+pnpm changelog
+
+# Regenerate entire changelog
+pnpm changelog:all
+```
+
+### When to Generate
+
+- **Before releasing**: Run `pnpm changelog` before version bump
+- **After major milestones**: Regenerate to review all changes
+
+### Workflow
+
+```bash
+# 1. Commit your changes with conventional commits
+git commit -m "feat(entities): add search operation"
+
+# 2. Generate changelog
+pnpm changelog
+
+# 3. Review CHANGELOG.md
+cat CHANGELOG.md
+
+# 4. Commit changelog
+git add CHANGELOG.md
+git commit -m "docs: update changelog"
+
+# 5. Bump version (includes changelog)
+pnpm version:minor  # or patch/major/prerelease
+
+# 6. Publish
+npm publish
+```
+
+## Commit Message Validation
+
+### Automated Validation
+
+Commitlint runs automatically on every commit via Husky hook:
+
+```bash
+# This will be validated
+git commit -m "feat: add new feature"
+
+# This will FAIL
+git commit -m "added new feature"
+```
+
+### Manual Validation
+
+Test commit message format:
+
+```bash
+echo "feat: add new feature" | npx commitlint
+```
+
+### Bypass Validation (NOT RECOMMENDED)
+
+Only use in emergencies:
+
+```bash
+git commit --no-verify -m "emergency fix"
+```
+
+## Configuration Files
+
+### commitlint.config.js
+
+Defines commit message rules. Do not modify without team approval.
+
+### .husky/commit-msg
+
+Git hook that runs commitlint. Automatically configured.
+
+## Best Practices
+
+### 1. Commit Frequently with Clear Messages
+
+```bash
+# ✅ Good - Clear, focused commits
+git commit -m "feat(entities): add search method"
+git commit -m "test(entities): add search tests"
+git commit -m "docs(entities): document search API"
+
+# ❌ Bad - Large, vague commit
+git commit -m "feat: entity improvements"
+```
+
+### 2. Use Scopes Consistently
+
+```bash
+# Consistent scoping helps organize changelog
+feat(entities): add batch operations
+fix(entities): resolve identifier validation
+test(entities): improve test coverage
+```
+
+### 3. Reference Issues
+
+```bash
+# Always link to issues when applicable
+fix(http): resolve timeout issue
+
+Requests were timing out after 30s even when custom
+timeout was configured. Now respects user-provided timeout.
+
+Fixes #123
+```
+
+### 4. Document Breaking Changes Clearly
+
+```bash
+feat!: require Node 20+
+
+BREAKING CHANGE: Node 18 is no longer supported.
+Users must upgrade to Node 20 or later.
+
+Migration guide: https://docs.example.com/migration
+```
+
+### 5. Squash Feature Branch Commits
+
+When merging feature branches, squash commits and write a clear conventional commit message:
+
+```bash
+# Before squash (multiple WIP commits):
+- wip: start entity search
+- fix: typo
+- update: tests
+- fix: linting
+
+# After squash (one clear commit):
+feat(entities): add search operation with filtering
+
+Implements entity search with support for:
+- Text search across all properties
+- Property-based filtering
+- Pagination support
+
+Closes #45
+```
+
+## Troubleshooting
+
+### Commit Message Rejected
+
+```bash
+# Error: subject may not be empty
+# Fix: Add a subject after the colon
+git commit -m "feat: add new feature"
+
+# Error: type may not be empty
+# Fix: Add a valid type
+git commit -m "feat: add new feature"
+
+# Error: subject must not be sentence-case
+# Fix: Use lowercase
+git commit -m "feat: add new feature"  # not "feat: Add new feature"
+```
+
+### Changelog Not Generating
+
+```bash
+# Ensure conventional-changelog-cli is installed
+pnpm list conventional-changelog-cli
+
+# Check for existing CHANGELOG.md conflicts
+git status
+
+# Regenerate entire changelog
+pnpm changelog:all
+```
+
+### Hook Not Running
+
+```bash
+# Reinstall Husky
+rm -rf .husky
+pnpm prepare
+
+# Make hook executable
+chmod +x .husky/commit-msg
+
+# Test hook
+./.husky/commit-msg .git/COMMIT_EDITMSG
+```
+
+## Resources
+
+- [Conventional Commits](https://www.conventionalcommits.org/)
+- [Commitlint](https://commitlint.js.org/)
+- [Semantic Versioning](https://semver.org/)
+- [Keep a Changelog](https://keepachangelog.com/)
+- [Conventional Changelog](https://github.com/conventional-changelog/conventional-changelog)
+
+## Summary
+
+✅ **DO:**
+- Use conventional commit format
+- Write clear, imperative subjects
+- Reference issues when applicable
+- Document breaking changes
+- Generate changelog before releases
+- Test commit messages locally
+
+❌ **DON'T:**
+- Skip types or use invalid types
+- Write vague commit messages
+- Capitalize subjects or add periods
+- Mix multiple unrelated changes
+- Bypass validation without good reason
+- Forget to update changelog before releasing

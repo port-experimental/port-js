@@ -38,6 +38,7 @@ export interface RequestOptions {
   timeout?: number;
   skipRetry?: boolean;
   headers?: Record<string, string>;
+  signal?: AbortSignal;
 }
 
 /**
@@ -324,6 +325,17 @@ export class HttpClient {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), timeout);
 
+        // If user provided a signal, abort our controller if it's aborted
+        if (options?.signal) {
+          if (options.signal.aborted) {
+            controller.abort(options.signal.reason);
+          } else {
+            options.signal.addEventListener('abort', () => {
+              controller.abort(options.signal!.reason);
+            }, { once: true });
+          }
+        }
+
         // Make request
         const response = await fetch(url, {
           method,
@@ -364,8 +376,14 @@ export class HttpClient {
           error: error instanceof Error ? error.message : String(error) 
         });
 
-        // Handle timeout
+        // Handle abort
         if (error instanceof Error && error.name === 'AbortError') {
+          // Check if it was user-initiated cancellation
+          if (options?.signal?.aborted) {
+            // User cancelled the request
+            throw error; // Re-throw the cancellation error
+          }
+          // Otherwise it was a timeout
           const timeoutError = new PortTimeoutError(
             `Request timeout after ${timeout}ms`,
             timeout
