@@ -46,11 +46,15 @@ Automated CI/CD workflows for the Port SDK.
 - Weekly schedule (Mondays at 9 AM UTC)
 
 **What it does**:
-- Runs `pnpm audit` with moderate severity threshold
+- Runs `pnpm audit --prod` (production dependencies only)
+- Uses moderate severity threshold
+- **Excludes devDependencies** (only used in development, not in published package)
 - Generates audit report if vulnerabilities found
 - Uploads audit report as artifact on failure
 
 **Duration**: ~30-45 seconds
+
+**Note**: DevDependencies are intentionally excluded because they don't affect the published package that users install.
 
 ---
 

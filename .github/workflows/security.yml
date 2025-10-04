@@ -31,21 +31,24 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       
-      - name: Run security audit
+      - name: Run security audit (production only)
         run: |
-          echo "🔒 Running security audit..."
-          pnpm audit --audit-level=moderate || {
+          echo "🔒 Running security audit on production dependencies..."
+          echo "ℹ️  DevDependencies are excluded (only used in development)"
+          echo ""
+          pnpm audit --prod --audit-level=moderate || {
             EXIT_CODE=$?
             if [ $EXIT_CODE -eq 0 ]; then
-              echo "✅ No vulnerabilities found"
+              echo "✅ No vulnerabilities found in production dependencies"
             else
-              echo "⚠️  Vulnerabilities detected!"
+              echo "⚠️  Vulnerabilities detected in production dependencies!"
               echo ""
               echo "📋 Detailed audit report:"
-              pnpm audit --audit-level=moderate --json > audit-report.json || true
+              pnpm audit --prod --audit-level=moderate --json > audit-report.json || true
               cat audit-report.json
               echo ""
-              echo "💡 Run 'pnpm audit fix' to attempt automatic fixes"
+              echo "💡 Run 'pnpm audit --prod fix' to attempt automatic fixes"
+              echo "💡 Or manually update affected packages"
               exit $EXIT_CODE
             fi
           }
