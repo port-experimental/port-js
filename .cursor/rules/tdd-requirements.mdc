@@ -1,0 +1,546 @@
+# Test-Driven Development (TDD) Requirements
+
+**CRITICAL**: This SDK follows strict Test-Driven Development practices. All code must have corresponding tests.
+
+## Core TDD Principles
+
+### 1. Write Tests First (Red-Green-Refactor)
+
+**REQUIRED WORKFLOW**:
+1. **RED**: Write a failing test for new functionality
+2. **GREEN**: Write minimal code to make the test pass
+3. **REFACTOR**: Clean up code while keeping tests passing
+
+### 2. Test Coverage Requirements
+
+**MANDATORY COVERAGE THRESHOLDS**:
+- Overall coverage: **>100%**
+- Statements: **>100%**
+- Branches: **>100%**
+- Functions: **>100%**
+- Lines: **>100%**
+
+If coverage drops below these thresholds, the build must fail.
+
+### 3. Tests Must Be Written for Every Code Change
+
+**REQUIRED**: For every new feature, bug fix, or refactor:
+
+✅ **Write tests for**:
+- New functions/methods
+- New classes
+- New modules
+- Bug fixes (regression tests)
+- Edge cases
+- Error conditions
+- Configuration options
+- API integrations
+
+❌ **No exceptions**: Code without tests will not be merged.
+
+---
+
+## Test Organization
+
+### Directory Structure
+
+```
+tests/
+├── unit/                      # Unit tests (mocked dependencies)
+│   ├── config.test.ts         # Configuration tests
+│   ├── errors.test.ts         # Error class tests
+│   ├── http-client.test.ts    # HTTP client tests
+│   ├── logger.test.ts         # Logger tests
+│   ├── resources/             # Resource tests
+│   │   ├── entities.test.ts
+│   │   ├── blueprints.test.ts
+│   │   ├── actions.test.ts
+│   │   └── scorecards.test.ts
+│   └── utils/                 # Utility tests
+│
+├── integration/               # Integration tests (real HTTP)
+│   ├── entities.integration.test.ts
+│   ├── blueprints.integration.test.ts
+│   └── setup.ts              # Integration test setup
+│
+├── fixtures/                  # Test data
+│   ├── entities.ts
+│   ├── blueprints.ts
+│   └── responses.ts
+│
+└── helpers/                   # Test utilities
+    ├── mock-client.ts
+    └── assertions.ts
+```
+
+### File Naming Convention
+
+✅ **Unit tests**: `<filename>.test.ts`  
+✅ **Integration tests**: `<filename>.integration.test.ts`
+
+**Example**:
+- Source: `src/resources/entities.ts`
+- Unit test: `tests/unit/resources/entities.test.ts`
+- Integration: `tests/integration/entities.integration.test.ts`
+
+---
+
+## Test Template
+
+### Unit Test Template
+
+```typescript
+/**
+ * Unit tests for <Module Name>
+ */
+
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { ModuleName } from '../../src/module';
+
+describe('ModuleName', () => {
+  describe('methodName', () => {
+    it('should handle normal case', () => {
+      // Arrange
+      const input = { /* test data */ };
+      
+      // Act
+      const result = methodName(input);
+      
+      // Assert
+      expect(result).toBe(expected);
+    });
+
+    it('should handle edge case', () => {
+      // Test edge case
+    });
+
+    it('should throw error on invalid input', () => {
+      expect(() => methodName(invalid)).toThrow(ErrorType);
+    });
+  });
+});
+```
+
+### Integration Test Template
+
+```typescript
+/**
+ * Integration tests for <Feature>
+ */
+
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { PortClient } from '../../src';
+
+describe('Feature Integration', () => {
+  let client: PortClient;
+
+  beforeAll(() => {
+    // Skip if no credentials
+    if (!process.env.PORT_CLIENT_ID) {
+      return;
+    }
+
+    client = new PortClient({
+      credentials: {
+        clientId: process.env.PORT_CLIENT_ID!,
+        clientSecret: process.env.PORT_CLIENT_SECRET!,
+      },
+    });
+  });
+
+  it.skipIf(!process.env.PORT_CLIENT_ID)('should perform real operation', async () => {
+    // Test with real API
+    const result = await client.entities.list();
+    expect(result).toBeDefined();
+  });
+});
+```
+
+---
+
+## Test Quality Standards
+
+### 1. Test Names Must Be Descriptive
+
+✅ **GOOD**:
+```typescript
+it('should return EU base URL when region is not specified')
+it('should throw PortAuthError when credentials are missing')
+it('should retry 3 times on network failure before failing')
+```
+
+❌ **BAD**:
+```typescript
+it('works')
+it('test1')
+it('config test')
+```
+
+### 2. Tests Must Be Independent
+
+Each test should:
+- ✅ Set up its own data
+- ✅ Clean up after itself
+- ✅ Not depend on other tests
+- ✅ Be runnable in any order
+
+### 3. Tests Must Be Fast
+
+- ✅ Unit tests: < 100ms per test
+- ✅ Integration tests: < 5s per test
+- ✅ Mock external dependencies in unit tests
+- ✅ Use real API only in integration tests
+
+### 4. Tests Must Cover Edge Cases
+
+For every function, test:
+- ✅ Normal/happy path
+- ✅ Empty/null/undefined inputs
+- ✅ Boundary conditions
+- ✅ Error conditions
+- ✅ Race conditions (if applicable)
+- ✅ Concurrent operations (if applicable)
+
+---
+
+## Testing Patterns
+
+### Pattern 1: Arrange-Act-Assert (AAA)
+
+```typescript
+it('should format entity correctly', () => {
+  // Arrange - Set up test data
+  const input = { identifier: 'test', blueprint: 'service' };
+  
+  // Act - Execute the function
+  const result = formatEntity(input);
+  
+  // Assert - Verify the result
+  expect(result.identifier).toBe('test');
+});
+```
+
+### Pattern 2: Mock External Dependencies
+
+```typescript
+import { vi } from 'vitest';
+
+it('should call HTTP client with correct parameters', async () => {
+  // Mock the HTTP client
+  const mockHttpClient = {
+    post: vi.fn().mockResolvedValue({ entity: { id: '123' } }),
+  };
+
+  const resource = new EntityResource(mockHttpClient as any);
+  
+  await resource.create({ identifier: 'test', blueprint: 'service' });
+  
+  expect(mockHttpClient.post).toHaveBeenCalledWith(
+    '/v1/blueprints/service/entities',
+    expect.objectContaining({ identifier: 'test' })
+  );
+});
+```
+
+### Pattern 3: Test Error Handling
+
+```typescript
+it('should throw PortValidationError for invalid identifier', () => {
+  const invalidData = { identifier: '', blueprint: 'service' };
+  
+  expect(() => resource.create(invalidData))
+    .toThrow(PortValidationError);
+});
+
+it('should handle network errors gracefully', async () => {
+  mockHttpClient.post.mockRejectedValue(new Error('ECONNREFUSED'));
+  
+  await expect(resource.create(validData))
+    .rejects
+    .toThrow(PortNetworkError);
+});
+```
+
+### Pattern 4: Test Async Operations
+
+```typescript
+it('should handle concurrent requests', async () => {
+  const promises = [
+    resource.create(data1),
+    resource.create(data2),
+    resource.create(data3),
+  ];
+
+  const results = await Promise.all(promises);
+  
+  expect(results).toHaveLength(3);
+  results.forEach(result => {
+    expect(result).toHaveProperty('identifier');
+  });
+});
+```
+
+---
+
+## GitHub Actions CI/CD
+
+### Required Workflow
+
+**File**: `.github/workflows/test.yml`
+
+```yaml
+name: Tests
+
+on:
+  pull_request:
+    branches: [main, dev]
+  push:
+    branches: [main, dev]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [20.x, 22.x]
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Type check
+        run: pnpm type-check
+      
+      - name: Run unit tests
+        run: pnpm test:coverage
+      
+      - name: Check coverage thresholds
+        run: |
+          node -e "
+            const coverage = require('./coverage/coverage-summary.json');
+            const { statements, branches, functions, lines } = coverage.total;
+            
+            const failed = [];
+            if (statements.pct < 90) failed.push('statements');
+            if (branches.pct < 85) failed.push('branches');
+            if (functions.pct < 90) failed.push('functions');
+            if (lines.pct < 90) failed.push('lines');
+            
+            if (failed.length > 0) {
+              console.error('Coverage thresholds not met:', failed.join(', '));
+              process.exit(1);
+            }
+          "
+      
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/lcov.info
+          flags: unittests
+```
+
+### CI Requirements
+
+**MANDATORY**: All PRs must:
+1. ✅ Pass type checking
+2. ✅ Pass all tests
+3. ✅ Meet coverage thresholds (>90%)
+4. ✅ Have no linter errors
+
+**BLOCKING**: PRs that fail any check cannot be merged.
+
+---
+
+## When to Write Tests
+
+### ALWAYS Write Tests For
+
+1. **New Features**
+   - Write tests before implementing
+   - Cover all user-facing functionality
+   - Test happy path and error cases
+
+2. **Bug Fixes**
+   - Write a failing test that reproduces the bug
+   - Fix the bug
+   - Verify the test now passes
+
+3. **Refactoring**
+   - Ensure existing tests pass
+   - Add tests for any new code paths
+   - Maintain or improve coverage
+
+4. **API Changes**
+   - Update existing tests
+   - Add tests for new parameters
+   - Test backward compatibility
+
+### Test Checklist
+
+Before submitting a PR:
+
+- [ ] All new code has unit tests
+- [ ] All tests pass locally (`pnpm test`)
+- [ ] Coverage is >90% (`pnpm test:coverage`)
+- [ ] Type checking passes (`pnpm type-check`)
+- [ ] No linter errors
+- [ ] Integration tests pass (if applicable)
+- [ ] Tests follow naming conventions
+- [ ] Tests are independent and isolated
+- [ ] Edge cases are covered
+- [ ] Error conditions are tested
+
+---
+
+## Code Review Requirements
+
+### Reviewers Must Verify
+
+1. ✅ Tests exist for all new code
+2. ✅ Tests are meaningful (not just for coverage)
+3. ✅ Tests follow TDD patterns
+4. ✅ Coverage thresholds are met
+5. ✅ Tests are independent
+6. ✅ Edge cases are covered
+7. ✅ Error handling is tested
+
+### Red Flags in PRs
+
+❌ **Reject PRs that**:
+- Have no tests
+- Have tests that don't actually test functionality
+- Decrease overall coverage
+- Have flaky tests
+- Have interdependent tests
+- Skip tests without good reason
+
+---
+
+## Testing Anti-Patterns
+
+### ❌ DON'T DO THIS
+
+**1. Testing Implementation Details**
+```typescript
+// BAD - Tests internal implementation
+it('should call private method', () => {
+  const spy = vi.spyOn(instance, 'privateMethod' as any);
+  instance.publicMethod();
+  expect(spy).toHaveBeenCalled();
+});
+
+// GOOD - Tests behavior
+it('should return correct result', () => {
+  const result = instance.publicMethod();
+  expect(result).toBe(expected);
+});
+```
+
+**2. Interdependent Tests**
+```typescript
+// BAD - Tests depend on each other
+let sharedEntity;
+it('should create', () => {
+  sharedEntity = create();
+});
+it('should update', () => {
+  update(sharedEntity); // Depends on previous test
+});
+
+// GOOD - Independent tests
+it('should create', () => {
+  const entity = create();
+  expect(entity).toBeDefined();
+});
+it('should update', () => {
+  const entity = create(); // Own setup
+  const updated = update(entity);
+  expect(updated).toBeDefined();
+});
+```
+
+**3. Vague Test Names**
+```typescript
+// BAD
+it('works', () => { /* ... */ });
+it('test1', () => { /* ... */ });
+
+// GOOD
+it('should return entities when valid credentials provided', () => { /* ... */ });
+```
+
+---
+
+## TDD Workflow Example
+
+### Example: Adding a New Feature
+
+**Feature**: Add `blueprints.getRelations()` method
+
+**Step 1 - RED**: Write failing test
+```typescript
+describe('BlueprintResource.getRelations', () => {
+  it('should return relations for a blueprint', async () => {
+    const relations = await client.blueprints.getRelations('service');
+    expect(relations).toBeInstanceOf(Array);
+    expect(relations[0]).toHaveProperty('identifier');
+  });
+});
+```
+
+**Step 2 - GREEN**: Implement minimal code
+```typescript
+async getRelations(identifier: string): Promise<Relation[]> {
+  const response = await this.httpClient.get(
+    `/v1/blueprints/${identifier}/relations`
+  );
+  return response.relations;
+}
+```
+
+**Step 3 - REFACTOR**: Add more tests and refine
+```typescript
+it('should validate identifier', async () => {
+  await expect(client.blueprints.getRelations(''))
+    .rejects.toThrow(PortValidationError);
+});
+
+it('should handle not found error', async () => {
+  await expect(client.blueprints.getRelations('nonexistent'))
+    .rejects.toThrow(PortNotFoundError);
+});
+```
+
+---
+
+## Summary
+
+**Golden Rules**:
+1. 🔴 Tests must be written BEFORE code (TDD)
+2. ✅ All code must have >90% test coverage
+3. 🧪 Every PR must include tests
+4. 🤖 CI must pass before merging
+5. 🚫 No exceptions to these rules
+
+**Remember**: If it's not tested, it's broken.
+
+---
+
+## Resources
+
+- [Testing Guide](../../docs/TESTING.md)
+- [Vitest Documentation](https://vitest.dev/)
+- [Test-Driven Development](https://en.wikipedia.org/wiki/Test-driven_development)

@@ -1,0 +1,130 @@
+name: Tests
+
+on:
+  pull_request:
+    branches: [main, dev]
+  push:
+    branches: [main, dev]
+
+jobs:
+  test:
+    name: Test on Node.js ${{ matrix.node-version }}
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [20.x, 22.x]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
+      
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Type check
+        run: pnpm type-check
+      
+      - name: Run unit tests with coverage
+        run: pnpm test:coverage
+      
+      - name: Check coverage thresholds
+        run: |
+          node -e "
+            const fs = require('fs');
+            const path = require('path');
+            const coveragePath = path.join(process.cwd(), 'coverage', 'coverage-summary.json');
+            
+            if (!fs.existsSync(coveragePath)) {
+              console.error('Coverage file not found!');
+              process.exit(1);
+            }
+            
+            const coverage = JSON.parse(fs.readFileSync(coveragePath, 'utf8'));
+            const { statements, branches, functions, lines } = coverage.total;
+            
+            console.log('Coverage Report:');
+            console.log('  Statements:', statements.pct + '%');
+            console.log('  Branches:', branches.pct + '%');
+            console.log('  Functions:', functions.pct + '%');
+            console.log('  Lines:', lines.pct + '%');
+            console.log('');
+            
+            const failed = [];
+            if (statements.pct < 90) failed.push(\`statements (\${statements.pct}% < 90%)\`);
+            if (branches.pct < 85) failed.push(\`branches (\${branches.pct}% < 85%)\`);
+            if (functions.pct < 90) failed.push(\`functions (\${functions.pct}% < 90%)\`);
+            if (lines.pct < 90) failed.push(\`lines (\${lines.pct}% < 90%)\`);
+            
+            if (failed.length > 0) {
+              console.error('❌ Coverage thresholds not met:');
+              failed.forEach(f => console.error('  -', f));
+              process.exit(1);
+            }
+            
+            console.log('✅ All coverage thresholds met!');
+          "
+      
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        if: matrix.node-version == '20.x'
+        with:
+          files: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+      
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v4
+        if: matrix.node-version == '20.x'
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 30
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Type check
+        run: pnpm type-check

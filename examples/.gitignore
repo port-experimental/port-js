@@ -1,0 +1,14 @@
+# Environment variables (contains secrets)
+.env
+
+# Generated files
+*.log
+*.tmp
+
+# Test data
+test-data/
+*.test.json
+
+# Node modules (if examples have their own)
+node_modules/
+

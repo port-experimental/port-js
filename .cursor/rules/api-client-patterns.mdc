@@ -1,0 +1,489 @@
+---
+alwaysApply: true
+description: API Client Patterns
+globs: ["**/*"]
+---
+## Resource Classes
+
+### Base Resource
+
+✅ **Create a base resource class for common functionality**:
+```typescript
+abstract class BaseResource {
+  constructor(protected httpClient: HttpClient) {}
+
+  protected buildUrl(path: string, params?: Record<string, string | number | boolean>): string {
+    if (!params) return path;
+
+    const query = new URLSearchParams();
+    for (const [key, value] of Object.entries(params)) {
+      if (value !== undefined && value !== null) {
+        query.append(key, String(value));
+      }
+    }
+
+    const queryString = query.toString();
+    return queryString ? `${path}?${queryString}` : path;
+  }
+
+  protected async paginate<T>(
+    path: string,
+    options?: PaginationOptions
+  ): Promise<PaginatedResponse<T>> {
+    const url = this.buildUrl(path, {
+      limit: options?.limit,
+      offset: options?.offset,
+      cursor: options?.cursor,
+    });
+
+    const response = await this.httpClient.get<ApiPaginatedResponse<T>>(url);
+
+    return {
+      data: response.data,
+      pagination: {
+        total: response.total,
+        limit: response.limit,
+        offset: response.offset,
+        hasMore: response.hasMore,
+        nextCursor: response.nextCursor,
+      },
+    };
+  }
+}
+```
+
+### Entity Resource
+
+✅ **Implement full CRUD operations**:
+```typescript
+export class EntityResource extends BaseResource {
+  private readonly basePath = '/v1/entities';
+
+  /**
+   * Create a new entity
+   */
+  async create(data: CreateEntityInput): Promise<Entity> {
+    this.validate(data);
+    return this.httpClient.post<Entity>(this.basePath, data);
+  }
+
+  /**
+   * Get an entity by identifier
+   */
+  async get(identifier: string, options?: GetEntityOptions): Promise<Entity> {
+    const url = this.buildUrl(`${this.basePath}/${identifier}`, {
+      include: options?.include?.join(','),
+    });
+    return this.httpClient.get<Entity>(url);
+  }
+
+  /**
+   * Update an entity
+   */
+  async update(identifier: string, data: UpdateEntityInput): Promise<Entity> {
+    return this.httpClient.patch<Entity>(`${this.basePath}/${identifier}`, data);
+  }
+
+  /**
+   * Delete an entity
+   */
+  async delete(identifier: string): Promise<void> {
+    await this.httpClient.delete(`${this.basePath}/${identifier}`);
+  }
+
+  /**
+   * List entities with pagination
+   */
+  async list(options?: ListEntityOptions): Promise<PaginatedResponse<Entity>> {
+    return this.paginate<Entity>(this.basePath, {
+      limit: options?.limit,
+      offset: options?.offset,
+      ...options,
+    });
+  }
+
+  /**
+   * Search entities by query
+   */
+  async search(query: EntitySearchQuery): Promise<Entity[]> {
+    const response = await this.httpClient.post<{ entities: Entity[] }>(
+      `${this.basePath}/search`,
+      query
+    );
+    return response.entities;
+  }
+
+  /**
+   * Batch create entities
+   */
+  async batchCreate(entities: CreateEntityInput[]): Promise<Entity[]> {
+    const response = await this.httpClient.post<{ entities: Entity[] }>(
+      `${this.basePath}/batch`,
+      { entities }
+    );
+    return response.entities;
+  }
+
+  /**
+   * Batch update entities
+   */
+  async batchUpdate(updates: BatchUpdateInput[]): Promise<Entity[]> {
+    const response = await this.httpClient.patch<{ entities: Entity[] }>(
+      `${this.basePath}/batch`,
+      { updates }
+    );
+    return response.entities;
+  }
+
+  /**
+   * Batch delete entities
+   */
+  async batchDelete(identifiers: string[]): Promise<void> {
+    await this.httpClient.post(`${this.basePath}/batch/delete`, { identifiers });
+  }
+
+  /**
+   * Get related entities
+   */
+  async getRelated(
+    identifier: string,
+    relation: string,
+    options?: PaginationOptions
+  ): Promise<Entity[]> {
+    const url = this.buildUrl(
+      `${this.basePath}/${identifier}/relations/${relation}`,
+      options
+    );
+    const response = await this.httpClient.get<{ entities: Entity[] }>(url);
+    return response.entities;
+  }
+
+  private validate(data: CreateEntityInput): void {
+    if (!data.identifier) {
+      throw new PortValidationError('Entity identifier is required', [
+        { field: 'identifier', message: 'Required field' },
+      ]);
+    }
+    if (!data.blueprint) {
+      throw new PortValidationError('Entity blueprint is required', [
+        { field: 'blueprint', message: 'Required field' },
+      ]);
+    }
+  }
+}
+```
+
+---
+
+## Query Builder Pattern
+
+✅ **Implement fluent query builder**:
+```typescript
+export class EntityQueryBuilder {
+  private query: EntitySearchQuery = {};
+
+  constructor(private resource: EntityResource) {}
+
+  blueprint(blueprint: string): this {
+    this.query.blueprint = blueprint;
+    return this;
+  }
+
+  where(property: string, operator: Operator, value: unknown): this {
+    if (!this.query.rules) {
+      this.query.rules = [];
+    }
+    this.query.rules.push({ property, operator, value });
+    return this;
+  }
+
+  search(text: string): this {
+    this.query.search = text;
+    return this;
+  }
+
+  include(...relations: string[]): this {
+    this.query.include = relations;
+    return this;
+  }
+
+  limit(limit: number): this {
+    this.query.limit = limit;
+    return this;
+  }
+
+  offset(offset: number): this {
+    this.query.offset = offset;
+    return this;
+  }
+
+  async execute(): Promise<Entity[]> {
+    return this.resource.search(this.query);
+  }
+
+  async first(): Promise<Entity | undefined> {
+    this.limit(1);
+    const results = await this.execute();
+    return results[0];
+  }
+
+  async count(): Promise<number> {
+    const results = await this.execute();
+    return results.length;
+  }
+}
+
+// Usage in EntityResource
+export class EntityResource extends BaseResource {
+  // ... existing methods ...
+
+  query(): EntityQueryBuilder {
+    return new EntityQueryBuilder(this);
+  }
+}
+
+// Usage
+const services = await client.entities
+  .query()
+  .blueprint('service')
+  .where('environment', '=', 'production')
+  .where('region', 'in', ['us-east-1', 'us-west-2'])
+  .include('team', 'owner')
+  .limit(100)
+  .execute();
+```
+
+---
+
+## Request/Response Transformation
+
+### Input Transformation
+
+✅ **Transform SDK types to API types**:
+```typescript
+class EntityTransformer {
+  toApiFormat(entity: CreateEntityInput): ApiEntityPayload {
+    return {
+      identifier: entity.identifier,
+      blueprint: entity.blueprint,
+      title: entity.title,
+      properties: this.transformProperties(entity.properties),
+      relations: this.transformRelations(entity.relations),
+    };
+  }
+
+  private transformProperties(props?: EntityProperties): ApiProperties {
+    if (!props) return {};
+
+    return {
+      ...props.stringProps,
+      ...Object.fromEntries(
+        Object.entries(props.numberProps || {}).map(([k, v]) => [k, Number(v)])
+      ),
+      ...props.booleanProps,
+      ...props.arrayProps,
+    };
+  }
+
+  private transformRelations(relations?: EntityRelations): ApiRelations {
+    if (!relations) return {};
+
+    return {
+      ...relations.singleRelations,
+      ...relations.manyRelations,
+    };
+  }
+}
+```
+
+### Response Transformation
+
+✅ **Transform API responses to SDK types**:
+```typescript
+class EntityTransformer {
+  fromApiFormat(apiEntity: ApiEntity): Entity {
+    return {
+      identifier: apiEntity.identifier,
+      blueprint: apiEntity.blueprint,
+      title: apiEntity.title,
+      properties: this.parseProperties(apiEntity.properties),
+      relations: this.parseRelations(apiEntity.relations),
+      createdAt: new Date(apiEntity.createdAt),
+      updatedAt: new Date(apiEntity.updatedAt),
+      createdBy: apiEntity.createdBy,
+      updatedBy: apiEntity.updatedBy,
+    };
+  }
+
+  private parseProperties(apiProps: ApiProperties): EntityProperties {
+    const stringProps: Record<string, string> = {};
+    const numberProps: Record<string, number> = {};
+    const booleanProps: Record<string, boolean> = {};
+    const arrayProps: Record<string, unknown[]> = {};
+
+    for (const [key, value] of Object.entries(apiProps)) {
+      if (typeof value === 'string') {
+        stringProps[key] = value;
+      } else if (typeof value === 'number') {
+        numberProps[key] = value;
+      } else if (typeof value === 'boolean') {
+        booleanProps[key] = value;
+      } else if (Array.isArray(value)) {
+        arrayProps[key] = value;
+      }
+    }
+
+    return { stringProps, numberProps, booleanProps, arrayProps };
+  }
+}
+```
+
+---
+
+## Rate Limiting
+
+✅ **Implement client-side rate limiting**:
+```typescript
+class RateLimiter {
+  private queue: Array<() => Promise<void>> = [];
+  private processing = false;
+  private requestsPerSecond: number;
+  private lastRequestTime = 0;
+
+  constructor(requestsPerSecond: number = 10) {
+    this.requestsPerSecond = requestsPerSecond;
+  }
+
+  async throttle<T>(fn: () => Promise<T>): Promise<T> {
+    return new Promise((resolve, reject) => {
+      this.queue.push(async () => {
+        try {
+          const result = await fn();
+          resolve(result);
+        } catch (error) {
+          reject(error);
+        }
+      });
+
+      if (!this.processing) {
+        this.processQueue();
+      }
+    });
+  }
+
+  private async processQueue(): Promise<void> {
+    if (this.queue.length === 0) {
+      this.processing = false;
+      return;
+    }
+
+    this.processing = true;
+    const now = Date.now();
+    const minInterval = 1000 / this.requestsPerSecond;
+    const timeSinceLastRequest = now - this.lastRequestTime;
+
+    if (timeSinceLastRequest < minInterval) {
+      await new Promise((resolve) =>
+        setTimeout(resolve, minInterval - timeSinceLastRequest)
+      );
+    }
+
+    const task = this.queue.shift();
+    if (task) {
+      this.lastRequestTime = Date.now();
+      await task();
+    }
+
+    // Process next task
+    this.processQueue();
+  }
+}
+
+// Usage in HttpClient
+class HttpClient {
+  private rateLimiter: RateLimiter;
+
+  constructor(config: HttpClientConfig) {
+    // ... existing code ...
+    this.rateLimiter = new RateLimiter(config.requestsPerSecond || 10);
+  }
+
+  async request<T>(
+    method: string,
+    path: string,
+    data?: unknown,
+    options?: RequestOptions
+  ): Promise<T> {
+    return this.rateLimiter.throttle(() => this.executeRequest<T>(method, path, data, options));
+  }
+}
+```
+
+---
+
+## Webhook Support
+
+✅ **Validate and parse webhook payloads**:
+```typescript
+export class WebhookHandler {
+  constructor(private secret?: string) {}
+
+  /**
+   * Verify webhook signature
+   */
+  verify(payload: string, signature: string): boolean {
+    if (!this.secret) {
+      throw new Error('Webhook secret not configured');
+    }
+
+    const crypto = require('crypto');
+    const expectedSignature = crypto
+      .createHmac('sha256', this.secret)
+      .update(payload)
+      .digest('hex');
+
+    return crypto.timingSafeEqual(
+      Buffer.from(signature),
+      Buffer.from(expectedSignature)
+    );
+  }
+
+  /**
+   * Parse webhook event
+   */
+  parse<T = unknown>(payload: string): WebhookEvent<T> {
+    try {
+      const data = JSON.parse(payload);
+      return {
+        type: data.type,
+        action: data.action,
+        entity: data.entity,
+        context: data.context,
+        timestamp: new Date(data.timestamp),
+        data: data.data as T,
+      };
+    } catch (error) {
+      throw new PortValidationError('Invalid webhook payload', [
+        { field: 'payload', message: 'Must be valid JSON' },
+      ]);
+    }
+  }
+}
+```
+
+---
+
+## Summary
+
+Key patterns for API client implementation:
+
+1. ✅ **HTTP Client** - Centralized request handling with retries and interceptors
+2. ✅ **Resource Classes** - Organize operations by resource type
+3. ✅ **Query Builder** - Fluent API for complex queries
+4. ✅ **Transformers** - Convert between SDK and API formats
+5. ✅ **Rate Limiting** - Client-side throttling to respect API limits
+6. ✅ **Error Handling** - Custom error classes for each error type
+7. ✅ **Authentication** - Automatic token management and refresh
+8. ✅ **Pagination** - Consistent pagination across all list operations
+
+These patterns ensure a maintainable, performant, and developer-friendly SDK.

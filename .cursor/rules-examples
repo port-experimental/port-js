@@ -1,0 +1,633 @@
+# Examples & Testing Standards for Port SDK
+
+## 🎯 Purpose
+
+These rules ensure that examples and tests are:
+- **Working**: All examples must run without errors
+- **Secure**: No credentials or secrets in examples
+- **Clear**: Easy to understand and follow
+- **Complete**: Cover all major use cases
+- **Tested**: Examples are validated in CI/CD
+
+---
+
+## 📝 Example File Standards
+
+### File Naming
+
+```
+examples/
+├── 01-basic-usage.ts          # Getting started
+├── 02-authentication.ts        # Auth patterns
+├── 03-entities-crud.ts         # Entity CRUD
+├── 04-entities-search.ts       # Search & filter
+├── 05-entities-batch.ts        # Batch operations
+├── 06-blueprints.ts            # Blueprint management
+├── 07-actions.ts               # Action execution
+├── 08-scorecards.ts            # Scorecards
+├── 09-error-handling.ts        # Error scenarios
+├── 10-logging-debug.ts         # Logging & debugging
+├── 11-proxy-config.ts          # Proxy setup
+├── 12-advanced/                # Complex examples
+│   ├── service-catalog.ts
+│   ├── security-dashboard.ts
+│   └── automated-workflows.ts
+└── README.md
+```
+
+### Structure Every Example File
+
+```typescript
+/**
+ * Example: [Clear Title]
+ * 
+ * Description: [What this example demonstrates]
+ * 
+ * Prerequisites:
+ * - PORT_CLIENT_ID and PORT_CLIENT_SECRET in .env
+ * - [Any other requirements]
+ * 
+ * Usage:
+ *   pnpm tsx examples/[filename].ts
+ */
+
+import { PortClient } from '../src';
+import * as dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
+
+async function main() {
+  // 1. Setup (with error handling)
+  if (!process.env.PORT_CLIENT_ID || !process.env.PORT_CLIENT_SECRET) {
+    console.error('❌ Missing credentials. Set PORT_CLIENT_ID and PORT_CLIENT_SECRET');
+    process.exit(1);
+  }
+
+  // 2. Create client
+  const client = new PortClient({
+    credentials: {
+      clientId: process.env.PORT_CLIENT_ID,
+      clientSecret: process.env.PORT_CLIENT_SECRET,
+    },
+  });
+
+  try {
+    // 3. Main example code
+    console.log('📝 Starting example...\n');
+    
+    // Example operations here
+    
+    console.log('\n✅ Example completed successfully!');
+  } catch (error) {
+    // 4. Error handling
+    console.error('\n❌ Error:', error);
+    process.exit(1);
+  }
+}
+
+// Run example
+main();
+```
+
+---
+
+## 🔒 Security Rules for Examples
+
+### NEVER Include Credentials
+
+❌ **NEVER do this**:
+```typescript
+const client = new PortClient({
+  credentials: {
+    clientId: 'your-client-id',        // NO!
+    clientSecret: 'your-secret',       // NO!
+  },
+});
+```
+
+✅ **ALWAYS do this**:
+```typescript
+const client = new PortClient({
+  credentials: {
+    clientId: process.env.PORT_CLIENT_ID!,
+    clientSecret: process.env.PORT_CLIENT_SECRET!,
+  },
+});
+```
+
+### Use Placeholders in Documentation
+
+```typescript
+/**
+ * Before running this example, set your credentials:
+ * 
+ * export PORT_CLIENT_ID="your-client-id"
+ * export PORT_CLIENT_SECRET="your-client-secret"
+ * 
+ * Or create a .env file with:
+ * PORT_CLIENT_ID=your-client-id
+ * PORT_CLIENT_SECRET=your-client-secret
+ */
+```
+
+### Validate Environment Variables
+
+```typescript
+// Always check before using
+if (!process.env.PORT_CLIENT_ID || !process.env.PORT_CLIENT_SECRET) {
+  console.error('❌ Error: Missing required environment variables');
+  console.error('Please set PORT_CLIENT_ID and PORT_CLIENT_SECRET');
+  console.error('See examples/.env.example for setup instructions');
+  process.exit(1);
+}
+```
+
+---
+
+## 📖 Documentation Standards for Examples
+
+### Clear Comments
+
+```typescript
+// ✅ GOOD - Clear, explains WHY
+// Filter entities to only production services with high severity
+const productionServices = await client.entities.search({
+  blueprint: 'service',
+  rules: [
+    { property: 'environment', operator: '=', value: 'production' },
+  ],
+});
+
+// ❌ BAD - Vague, explains WHAT (already obvious)
+// Search entities
+const services = await client.entities.search({...});
+```
+
+### Step-by-Step with Output
+
+```typescript
+// Step 1: Create a blueprint
+console.log('Step 1: Creating service blueprint...');
+const blueprint = await client.blueprints.create({
+  identifier: 'service',
+  title: 'Service',
+  // ...
+});
+console.log('✓ Blueprint created:', blueprint.identifier);
+
+// Step 2: Create an entity
+console.log('\nStep 2: Creating service entity...');
+const entity = await client.entities.create({
+  identifier: 'my-service',
+  blueprint: 'service',
+  // ...
+});
+console.log('✓ Entity created:', entity.identifier);
+```
+
+### Show Expected Output
+
+```typescript
+/**
+ * Expected output:
+ * 
+ * Step 1: Creating service blueprint...
+ * ✓ Blueprint created: service
+ * 
+ * Step 2: Creating service entity...
+ * ✓ Entity created: my-service
+ * 
+ * Step 3: Listing all entities...
+ * Found 1 entities:
+ *   - my-service (Service)
+ */
+```
+
+---
+
+## 🧪 Testing Standards
+
+### Test File Structure
+
+```
+tests/
+├── unit/                          # Isolated unit tests
+│   ├── errors.test.ts
+│   ├── logger.test.ts
+│   ├── config.test.ts
+│   ├── http-client.test.ts
+│   └── resources/
+│       ├── entities.test.ts
+│       ├── blueprints.test.ts
+│       ├── actions.test.ts
+│       └── scorecards.test.ts
+├── integration/                   # Real API tests
+│   ├── setup.ts
+│   ├── entities.integration.test.ts
+│   ├── blueprints.integration.test.ts
+│   └── end-to-end.integration.test.ts
+├── fixtures/                      # Test data
+│   ├── entities.ts
+│   ├── blueprints.ts
+│   └── responses.ts
+└── helpers/                       # Test utilities
+    ├── mocks.ts
+    └── assertions.ts
+```
+
+### Unit Test Structure
+
+```typescript
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { EntityResource } from '../../src/resources/entities';
+import { createMockHttpClient } from '../helpers/mocks';
+
+describe('EntityResource', () => {
+  let mockHttpClient: HttpClient;
+  let entityResource: EntityResource;
+
+  beforeEach(() => {
+    mockHttpClient = createMockHttpClient();
+    entityResource = new EntityResource(mockHttpClient);
+  });
+
+  describe('create()', () => {
+    it('should create entity with valid data', async () => {
+      const input = {
+        identifier: 'test-service',
+        blueprint: 'service',
+        title: 'Test Service',
+      };
+
+      const expected = { ...input, createdAt: new Date() };
+      vi.mocked(mockHttpClient.post).mockResolvedValue(expected);
+
+      const result = await entityResource.create(input);
+
+      expect(mockHttpClient.post).toHaveBeenCalledWith(
+        '/v1/entities',
+        input
+      );
+      expect(result).toEqual(expected);
+    });
+
+    it('should throw ValidationError when identifier is missing', async () => {
+      const input = {
+        identifier: '',
+        blueprint: 'service',
+        title: 'Test',
+      };
+
+      await expect(entityResource.create(input))
+        .rejects
+        .toThrow(PortValidationError);
+    });
+
+    it('should handle network errors with retry', async () => {
+      const networkError = new Error('ECONNRESET');
+      
+      vi.mocked(mockHttpClient.post)
+        .mockRejectedValueOnce(networkError)
+        .mockResolvedValue({ identifier: 'test' });
+
+      const result = await entityResource.create(validInput);
+      
+      expect(result.identifier).toBe('test');
+      expect(mockHttpClient.post).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('get()', () => {
+    it('should fetch entity by identifier', async () => {
+      const expected = { identifier: 'test', blueprint: 'service' };
+      vi.mocked(mockHttpClient.get).mockResolvedValue(expected);
+
+      const result = await entityResource.get('test');
+
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/v1/entities/test');
+      expect(result).toEqual(expected);
+    });
+  });
+});
+```
+
+### Integration Test Structure
+
+```typescript
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { PortClient } from '../../src';
+
+// Only run if credentials are available
+const hasCredentials = !!(
+  process.env.PORT_CLIENT_ID && 
+  process.env.PORT_CLIENT_SECRET
+);
+
+describe.skipIf(!hasCredentials)('Entity Integration Tests', () => {
+  let client: PortClient;
+  const testPrefix = `test-${Date.now()}`;
+  const createdEntities: string[] = [];
+
+  beforeAll(() => {
+    client = new PortClient({
+      credentials: {
+        clientId: process.env.PORT_CLIENT_ID!,
+        clientSecret: process.env.PORT_CLIENT_SECRET!,
+      },
+    });
+  });
+
+  afterAll(async () => {
+    // Clean up all test entities
+    for (const id of createdEntities) {
+      try {
+        await client.entities.delete(id);
+      } catch {
+        // Ignore errors during cleanup
+      }
+    }
+  });
+
+  it('should create, get, update, and delete entity', async () => {
+    const identifier = `${testPrefix}-service-1`;
+    
+    // Create
+    const created = await client.entities.create({
+      identifier,
+      blueprint: 'service',
+      title: 'Test Service',
+    });
+    createdEntities.push(identifier);
+    
+    expect(created.identifier).toBe(identifier);
+    
+    // Get
+    const fetched = await client.entities.get(identifier);
+    expect(fetched.identifier).toBe(identifier);
+    
+    // Update
+    const updated = await client.entities.update(identifier, {
+      title: 'Updated Service',
+    });
+    expect(updated.title).toBe('Updated Service');
+    
+    // Delete
+    await client.entities.delete(identifier);
+    
+    // Verify deleted
+    await expect(client.entities.get(identifier))
+      .rejects
+      .toThrow(PortNotFoundError);
+  });
+});
+```
+
+---
+
+## 🎨 Example Quality Checklist
+
+Before committing an example:
+
+- [ ] Runs without errors
+- [ ] No hardcoded credentials
+- [ ] Uses environment variables
+- [ ] Has clear comments
+- [ ] Shows expected output
+- [ ] Handles errors gracefully
+- [ ] Includes prerequisites
+- [ ] Has usage instructions
+- [ ] Follows file naming convention
+- [ ] Uses async/await properly
+- [ ] Cleans up resources (if applicable)
+- [ ] Works on Windows, macOS, and Linux
+
+---
+
+## 🧪 Test Quality Checklist
+
+Before committing tests:
+
+- [ ] All tests pass
+- [ ] Tests are isolated (no shared state)
+- [ ] Tests are deterministic (same result every time)
+- [ ] Mocks are properly configured
+- [ ] Integration tests clean up after themselves
+- [ ] Tests have descriptive names
+- [ ] Edge cases are covered
+- [ ] Error cases are tested
+- [ ] Async code is properly tested
+- [ ] Coverage is >90%
+- [ ] No flaky tests
+- [ ] Tests run quickly (<5s for unit, <30s for integration)
+
+---
+
+## 📂 Example Categories
+
+### 1. Getting Started (Required)
+
+- Basic client initialization
+- Simple CRUD operations
+- Authentication patterns
+
+### 2. Core Features (Required)
+
+- Entities: CRUD, search, batch
+- Blueprints: CRUD, relations, properties
+- Actions: CRUD, execution, monitoring
+- Scorecards: CRUD, rules, levels
+
+### 3. Advanced Features (Nice to Have)
+
+- Complex queries and filtering
+- Batch operations at scale
+- Error handling strategies
+- Custom logging and debugging
+- Proxy configuration
+- Rate limiting handling
+
+### 4. Real-World Examples (Nice to Have)
+
+- Service catalog management
+- Security posture dashboard
+- Automated compliance checking
+- CI/CD integration
+- Incident management workflow
+
+---
+
+## 🚀 Running Examples
+
+### Single Example
+
+```bash
+# With explicit credentials
+PORT_CLIENT_ID=xxx PORT_CLIENT_SECRET=yyy pnpm tsx examples/01-basic-usage.ts
+
+# With .env file
+pnpm tsx examples/01-basic-usage.ts
+```
+
+### All Examples
+
+```bash
+# Run all examples (with validation)
+pnpm run examples
+
+# Run specific category
+pnpm run examples:basic
+pnpm run examples:advanced
+```
+
+### In CI/CD
+
+```yaml
+# .github/workflows/examples.yml
+name: Validate Examples
+
+on: [push, pull_request]
+
+jobs:
+  examples:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+      - name: Install dependencies
+        run: pnpm install
+      - name: Run examples
+        env:
+          PORT_CLIENT_ID: ${{ secrets.PORT_CLIENT_ID }}
+          PORT_CLIENT_SECRET: ${{ secrets.PORT_CLIENT_SECRET }}
+        run: pnpm run examples:validate
+```
+
+---
+
+## 📊 Coverage Requirements
+
+### Example Coverage
+
+Ensure examples cover:
+
+- ✅ 100% of public API methods
+- ✅ All authentication methods
+- ✅ Common error scenarios
+- ✅ Configuration options
+- ✅ Real-world use cases
+
+### Test Coverage
+
+Maintain:
+
+- ✅ >90% code coverage overall
+- ✅ >85% branch coverage
+- ✅ 100% of error classes
+- ✅ 100% of public methods
+
+---
+
+## 🔄 Maintenance
+
+### When Adding New Features
+
+1. Write tests first (TDD)
+2. Implement the feature
+3. Create an example
+4. Update documentation
+5. Run full test suite
+
+### When API Changes
+
+1. Update affected tests
+2. Update affected examples
+3. Add migration guide
+4. Test everything
+5. Update version
+
+---
+
+## 📝 Example Template
+
+Use this template for new examples:
+
+```typescript
+/**
+ * Example: [TITLE]
+ * 
+ * Description: [What this demonstrates]
+ * 
+ * Prerequisites:
+ * - Environment variables: PORT_CLIENT_ID, PORT_CLIENT_SECRET
+ * - [Any other requirements]
+ * 
+ * Usage:
+ *   pnpm tsx examples/[filename].ts
+ * 
+ * Expected output:
+ *   [Show what user should see]
+ */
+
+import { PortClient } from '../src';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
+
+async function main() {
+  // Validate credentials
+  if (!process.env.PORT_CLIENT_ID || !process.env.PORT_CLIENT_SECRET) {
+    console.error('❌ Missing credentials');
+    console.error('Set PORT_CLIENT_ID and PORT_CLIENT_SECRET');
+    process.exit(1);
+  }
+
+  // Initialize client
+  const client = new PortClient({
+    credentials: {
+      clientId: process.env.PORT_CLIENT_ID,
+      clientSecret: process.env.PORT_CLIENT_SECRET,
+    },
+  });
+
+  try {
+    console.log('📝 [Example Name]\n');
+
+    // Your example code here
+    
+    console.log('\n✅ Success!');
+  } catch (error) {
+    console.error('\n❌ Error:', error);
+    process.exit(1);
+  }
+}
+
+main();
+```
+
+---
+
+## Summary
+
+### Key Principles
+
+1. **Security First** - No credentials in code
+2. **Clear Communication** - Comments explain WHY, not WHAT
+3. **Complete Coverage** - Every API feature has an example
+4. **Test Everything** - Examples are tested in CI/CD
+5. **Maintainable** - Easy to update when API changes
+
+### Remember
+
+- Examples are documentation that runs
+- Tests are specifications that execute
+- Both must be maintained with the same care as production code
+- Quality examples = Happy users = Successful SDK
+
+---
+
+**Need help?** See:
+- [Contributing Guide](../CONTRIBUTING.md)
+- [Testing Guide](../docs/TESTING.md)
+- [Security Rules](../.cursorrules)
+

@@ -1,0 +1,4 @@
+# Mark api.ts as generated code
+# This helps GitHub and other tools recognize it shouldn't be reviewed in PRs
+api.ts linguist-generated=true
+
