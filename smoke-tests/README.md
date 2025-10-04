@@ -23,7 +23,7 @@ pnpm smoke
 ### Run individual smoke tests:
 
 ```bash
-# Using npm scripts (recommended)
+# Blueprint Tests
 pnpm smoke:service        # Test 'service' blueprint
 pnpm smoke:team           # Test '_team' blueprint
 pnpm smoke:user           # Test '_user' blueprint
@@ -31,9 +31,14 @@ pnpm smoke:scorecard      # Test '_scorecard' blueprint
 pnpm smoke:rule           # Test '_rule' blueprint
 pnpm smoke:rule-result    # Test '_rule_result' blueprint
 
+# CRUD Operations Tests
+pnpm smoke:entity-crud    # Entity CRUD operations
+pnpm smoke:blueprint-crud # Blueprint CRUD operations
+pnpm smoke:action         # Action creation and execution
+
 # Or directly with tsx
-pnpm tsx smoke-tests/01-get-service-blueprint.ts
-pnpm tsx smoke-tests/02-get-team-blueprint.ts
+pnpm tsx smoke-tests/07-entity-crud.ts
+pnpm tsx smoke-tests/08-blueprint-crud.ts
 # ... etc
 ```
 
@@ -42,21 +47,28 @@ pnpm tsx smoke-tests/02-get-team-blueprint.ts
 These smoke tests verify:
 - ✅ SDK client initialization
 - ✅ Authentication with Port API
-- ✅ Blueprint retrieval operations
+- ✅ Blueprint retrieval and CRUD operations
+- ✅ Entity CRUD operations (Create, Read, Update, Delete)
+- ✅ Entity search and list operations
+- ✅ Action creation and management
 - ✅ Proper error handling
 - ✅ Date transformation
 - ✅ Response parsing
+- ✅ Cleanup and resource management
 
 ## Test Coverage
 
-| Test | Blueprint | Type | Description |
-|------|-----------|------|-------------|
-| 01 | `service` | Custom | User-defined service blueprint |
-| 02 | `_team` | System | Port's team blueprint |
-| 03 | `_user` | System | Port's user blueprint |
-| 04 | `_scorecard` | System | Port's scorecard evaluation blueprint |
-| 05 | `_rule` | System | Port's scorecard rule blueprint |
-| 06 | `_rule_result` | System | Port's rule evaluation result blueprint |
+| Test | Type | Description |
+|------|------|-------------|
+| 01 | Blueprint Read | Get `service` blueprint (custom) |
+| 02 | Blueprint Read | Get `_team` blueprint (system) |
+| 03 | Blueprint Read | Get `_user` blueprint (system) |
+| 04 | Blueprint Read | Get `_scorecard` blueprint (system) |
+| 05 | Blueprint Read | Get `_rule` blueprint (system) |
+| 06 | Blueprint Read | Get `_rule_result` blueprint (system) |
+| 07 | **Entity CRUD** | **Create, Read, Update, Delete, List, Search entities** |
+| 08 | **Blueprint CRUD** | **Create, Read, Update, Delete, List blueprints** |
+| 09 | **Action Operations** | **Create, Read, List, Delete actions** |
 
 ## Expected Output
 

@@ -52,13 +52,29 @@
   "keywords": [
     "port",
     "port.io",
+    "getport",
     "internal-developer-portal",
+    "idp",
+    "developer-portal",
+    "service-catalog",
     "api",
     "sdk",
-    "typescript"
+    "typescript",
+    "javascript",
+    "rest-api",
+    "client",
+    "port-labs"
   ],
-  "author": "",
+  "author": "Port Labs <support@getport.io>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/port-labs/port-js-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/port-labs/port-js-sdk/issues"
+  },
+  "homepage": "https://github.com/port-labs/port-js-sdk#readme",
   "packageManager": "pnpm@10.18.0",
   "engines": {
     "node": ">=20.0.0"
