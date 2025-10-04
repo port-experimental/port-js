@@ -62,6 +62,7 @@ export class HttpClient {
   private readonly logger: Logger;
   private accessToken?: string;
   private tokenExpiry?: Date;
+  private refreshPromise?: Promise<string>;
 
   constructor(config: HttpClientConfig) {
     this.credentials = config.credentials;
@@ -80,9 +81,16 @@ export class HttpClient {
         hasAuth: !!config.proxy.auth 
       });
       
-      const proxyUrl = config.proxy.auth
-        ? `${new URL(config.proxy.url).protocol}//${config.proxy.auth.username}:${config.proxy.auth.password}@${new URL(config.proxy.url).host}`
-        : config.proxy.url;
+      let proxyUrl: string;
+      if (config.proxy.auth) {
+        // Use URL API for proper encoding of credentials
+        const url = new URL(config.proxy.url);
+        url.username = encodeURIComponent(config.proxy.auth.username);
+        url.password = encodeURIComponent(config.proxy.auth.password);
+        proxyUrl = url.toString();
+      } else {
+        proxyUrl = config.proxy.url;
+      }
       
       this.proxyAgent = new ProxyAgent(proxyUrl);
     }
@@ -109,8 +117,24 @@ export class HttpClient {
       return this.accessToken;
     }
 
-    // Refresh token
-    return this.refreshToken();
+    // If a refresh is already in progress, wait for it
+    if (this.refreshPromise) {
+      this.logger.debug('Token refresh already in progress, waiting...');
+      return this.refreshPromise;
+    }
+
+    // Start a new token refresh and store the promise
+    this.refreshPromise = this.refreshToken()
+      .then((token) => {
+        this.refreshPromise = undefined;
+        return token;
+      })
+      .catch((error) => {
+        this.refreshPromise = undefined;
+        throw error;
+      });
+
+    return this.refreshPromise;
   }
 
   /**

@@ -86,6 +86,22 @@ describe('HttpClient', () => {
       expect(client).toBeInstanceOf(HttpClient);
     });
 
+    it('should properly encode special characters in proxy credentials', () => {
+      const proxyConfig = {
+        ...config,
+        proxy: {
+          url: 'http://proxy.example.com:8080',
+          auth: {
+            username: 'user@domain.com',
+            password: 'p@ssw0rd!#$%',
+          },
+        },
+      };
+      // Should not throw and properly encode credentials
+      const client = new HttpClient(proxyConfig);
+      expect(client).toBeInstanceOf(HttpClient);
+    });
+
     it('should initialize logger with custom config', () => {
       const loggerConfig = {
         ...config,
@@ -927,6 +943,152 @@ describe('HttpClient', () => {
       // Check that body is '{}'
       const actualRequestCall = mockFetch.mock.calls[1];
       expect(actualRequestCall[1]).toHaveProperty('body', '{}');
+    });
+  });
+
+  describe('Token Refresh Race Condition', () => {
+    it('should handle concurrent requests without duplicate token refreshes', async () => {
+      let tokenRefreshCount = 0;
+      const testConfig = {
+        credentials: {
+          clientId: 'test-client-id',
+          clientSecret: 'test-client-secret',
+        },
+        baseUrl: 'https://api.port.io',
+        timeout: 5000,
+        maxRetries: 3,
+        retryDelay: 100,
+      };
+
+      // Mock token refresh to track how many times it's called
+      mockFetch.mockImplementation(async (url: string) => {
+        if (url.includes('/auth/access_token')) {
+          tokenRefreshCount++;
+          // Simulate slow token refresh
+          await new Promise(resolve => setTimeout(resolve, 50));
+          return {
+            ok: true,
+            status: 200,
+            json: async () => ({
+              accessToken: 'new_token',
+              expiresIn: 3600,
+              tokenType: 'Bearer',
+            }),
+          };
+        }
+        // Regular API request
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({ data: 'success' }),
+        };
+      });
+
+      const client = new HttpClient(testConfig);
+
+      // Make 5 concurrent requests that all need token refresh
+      const requests = Array.from({ length: 5 }, () =>
+        client.get('/test')
+      );
+
+      await Promise.all(requests);
+
+      // Token should only be refreshed once, not 5 times
+      expect(tokenRefreshCount).toBe(1);
+      // Total fetch calls: 1 token refresh + 5 API requests = 6
+      expect(mockFetch).toHaveBeenCalledTimes(6);
+    });
+
+    it('should allow subsequent requests after initial refresh completes', async () => {
+      let tokenRefreshCount = 0;
+      const testConfig = {
+        credentials: {
+          clientId: 'test-client-id',
+          clientSecret: 'test-client-secret',
+        },
+        baseUrl: 'https://api.port.io',
+        timeout: 5000,
+        maxRetries: 3,
+        retryDelay: 100,
+      };
+
+      mockFetch.mockImplementation(async (url: string) => {
+        if (url.includes('/auth/access_token')) {
+          tokenRefreshCount++;
+          return {
+            ok: true,
+            status: 200,
+            json: async () => ({
+              accessToken: 'new_token',
+              expiresIn: 3600,
+              tokenType: 'Bearer',
+            }),
+          };
+        }
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({ data: 'success' }),
+        };
+      });
+
+      const client = new HttpClient(testConfig);
+
+      // First batch of concurrent requests
+      const firstBatch = Array.from({ length: 3 }, () => client.get('/test'));
+      await Promise.all(firstBatch);
+
+      // Second batch after token is refreshed
+      const secondBatch = Array.from({ length: 3 }, () => client.get('/test'));
+      await Promise.all(secondBatch);
+
+      // Token should still only be refreshed once
+      expect(tokenRefreshCount).toBe(1);
+      // Total: 1 refresh + 6 API requests = 7
+      expect(mockFetch).toHaveBeenCalledTimes(7);
+    });
+
+    it('should handle token refresh failure with concurrent requests', async () => {
+      const testConfig = {
+        credentials: {
+          clientId: 'test-client-id',
+          clientSecret: 'test-client-secret',
+        },
+        baseUrl: 'https://api.port.io',
+        timeout: 5000,
+        maxRetries: 3,
+        retryDelay: 100,
+      };
+
+      mockFetch.mockImplementation(async (url: string) => {
+        if (url.includes('/auth/access_token')) {
+          return {
+            ok: false,
+            status: 401,
+            json: async () => ({
+              message: 'Invalid credentials',
+            }),
+          };
+        }
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({ data: 'success' }),
+        };
+      });
+
+      const client = new HttpClient(testConfig);
+
+      // Make concurrent requests that will all fail auth
+      const requests = Array.from({ length: 3 }, () =>
+        client.get('/test')
+      );
+
+      // All should fail with PortAuthError
+      await expect(Promise.all(requests)).rejects.toThrow(PortAuthError);
+
+      // Token refresh should only be attempted once
+      expect(mockFetch).toHaveBeenCalledTimes(1);
     });
   });
 });
