@@ -199,11 +199,16 @@ describe('EntityResource', () => {
   describe('batchUpdate', () => {
     it('should update multiple entities', async () => {
       const updates = [
-        { identifier: 'entity-1', properties: { stringProps: { status: 'active' } } },
+        { 
+          identifier: 'entity-1',
+          data: {
+            properties: { stringProps: { status: 'active' } }
+          }
+        },
       ];
 
       vi.mocked(mockHttpClient.patch).mockResolvedValue({
-        entities: updates,
+        entities: [{ identifier: 'entity-1', properties: { stringProps: { status: 'active' } } }],
       });
 
       const result = await entityResource.batchUpdate(updates);
