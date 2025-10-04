@@ -28,6 +28,13 @@
     "test:coverage": "vitest run --coverage",
     "test:ui": "vitest --ui",
     "test:integration": "vitest run --config vitest.integration.config.ts",
+    "smoke": "for test in smoke-tests/*.ts; do tsx \"$test\" && echo \"\"; done",
+    "smoke:service": "tsx smoke-tests/01-get-service-blueprint.ts",
+    "smoke:team": "tsx smoke-tests/02-get-team-blueprint.ts",
+    "smoke:user": "tsx smoke-tests/03-get-user-blueprint.ts",
+    "smoke:scorecard": "tsx smoke-tests/04-get-scorecard-blueprint.ts",
+    "smoke:rule": "tsx smoke-tests/05-get-rule-blueprint.ts",
+    "smoke:rule-result": "tsx smoke-tests/06-get-rule-result-blueprint.ts",
     "prepublishOnly": "pnpm types:check && pnpm run type-check && pnpm run test && pnpm run build",
     "precommit": "pnpm run type-check && pnpm run test",
     "example": "tsx examples/basic-usage.ts"
