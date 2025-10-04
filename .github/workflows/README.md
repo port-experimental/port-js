@@ -181,18 +181,22 @@ pnpm type-check
 
 ### Security Audit Failure
 
-**Issue**: Vulnerable dependencies detected
+**Issue**: Vulnerable dependencies detected in production packages
 
 **Solution**:
 ```bash
-# Check locally
-pnpm audit
+# Check production dependencies locally
+pnpm audit --prod
 
 # Try automatic fix
-pnpm audit fix
+pnpm audit --prod fix
 
 # Or update specific packages
 pnpm update [package-name]
+
+# Note: DevDependencies are NOT checked in CI
+# To check all dependencies locally:
+pnpm audit
 ```
 
 ## Local Testing

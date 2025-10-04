@@ -306,21 +306,234 @@ open coverage/index.html
 
 ## 🔍 Code Review Process
 
+### Pull Request Template
+
+When creating a PR, include:
+
+```markdown
+## Description
+Brief description of changes
+
+## Type of Change
+- [ ] Bug fix (non-breaking change fixing an issue)
+- [ ] New feature (non-breaking change adding functionality)
+- [ ] Breaking change (fix or feature causing existing functionality to not work as expected)
+- [ ] Documentation update
+
+## Motivation
+Why is this change needed?
+
+## Changes Made
+- List of changes
+- With brief descriptions
+
+## Testing
+- [ ] Unit tests added/updated
+- [ ] Integration tests added/updated
+- [ ] All tests passing locally
+- [ ] Coverage maintained/improved
+
+## Security Checklist
+- [ ] No credentials in code
+- [ ] Input validation added
+- [ ] Error messages sanitized
+- [ ] Dependencies audited
+- [ ] Security guidelines followed
+
+## Documentation
+- [ ] README updated (if needed)
+- [ ] CHANGELOG updated
+- [ ] JSDoc comments added
+- [ ] Examples added (if new feature)
+
+## Related Issues
+Closes #XXX
+```
+
 ### For Contributors
 
-- Respond to feedback promptly
-- Be open to suggestions
-- Ask questions if unclear
-- Update PR based on feedback
+#### During Development
+
+1. **Keep PRs focused**
+   - One feature or fix per PR
+   - Avoid mixing refactoring with features
+   - Split large changes into smaller PRs
+
+2. **Write descriptive commits**
+   ```bash
+   # Good
+   feat(entities): add batch update operation
+   fix(http): prevent token refresh race condition
+   
+   # Bad
+   update code
+   fix bug
+   ```
+
+3. **Test thoroughly**
+   ```bash
+   # Before pushing
+   pnpm test
+   pnpm test:coverage
+   pnpm type-check
+   pnpm build
+   pnpm audit --prod
+   ```
+
+#### Responding to Reviews
+
+- **Respond promptly** (within 1-2 days if possible)
+- **Be open to feedback** - reviewers want to help
+- **Ask questions** if feedback is unclear
+- **Request re-review** after addressing feedback
+- **Mark conversations resolved** when addressed
+
+#### Example Response to Feedback
+
+```markdown
+> Consider adding validation for empty strings
+
+Good catch! Added validation in commit abc123.
+
+> This could be simplified using Array.filter()
+
+Refactored in commit def456. Much cleaner now!
+
+> What happens if the API returns a 500 error here?
+
+Added retry logic with exponential backoff. Also added test coverage for this scenario.
+```
 
 ### For Reviewers
 
-Review checklist:
-- [ ] Security: No credentials, proper validation, safe errors
-- [ ] Code quality: Typed, tested, documented
-- [ ] Functionality: Works as intended, handles edge cases
-- [ ] Performance: No obvious bottlenecks
-- [ ] Documentation: Clear and complete
+#### Review Priorities
+
+1. **Security** (Critical)
+   - No hardcoded credentials
+   - Proper input validation
+   - Safe error handling
+   - No sensitive data in logs
+
+2. **Correctness** (Critical)
+   - Logic is correct
+   - Edge cases handled
+   - No breaking changes (unless intentional)
+
+3. **Testing** (High)
+   - Tests exist and are meaningful
+   - Coverage maintained
+   - Tests actually test the right thing
+
+4. **Code Quality** (High)
+   - Follows style guidelines
+   - TypeScript strict mode compliance
+   - Clear naming
+   - Reasonable complexity
+
+5. **Documentation** (Medium)
+   - Public APIs documented
+   - README updated if needed
+   - Examples provided for new features
+
+#### Review Checklist
+
+```markdown
+### Security ⚠️
+- [ ] No credentials or secrets in code
+- [ ] Input validation present
+- [ ] Error messages don't leak sensitive info
+- [ ] Dependencies are from trusted sources
+- [ ] No `eval()` or unsafe code execution
+
+### Functionality ✅
+- [ ] Code works as intended
+- [ ] Edge cases handled
+- [ ] Error paths tested
+- [ ] No obvious bugs
+- [ ] Breaking changes documented
+
+### Code Quality 📝
+- [ ] TypeScript strict mode (no `any`)
+- [ ] Clear naming
+- [ ] Reasonable complexity
+- [ ] No code duplication
+- [ ] Follows existing patterns
+
+### Testing 🧪
+- [ ] Unit tests present
+- [ ] Integration tests if needed
+- [ ] Tests are clear and focused
+- [ ] Coverage maintained (>90%)
+- [ ] Tests actually run and pass
+
+### Documentation 📚
+- [ ] JSDoc for public APIs
+- [ ] README updated if needed
+- [ ] CHANGELOG updated
+- [ ] Examples provided
+- [ ] Clear commit messages
+
+### Performance ⚡
+- [ ] No obvious performance issues
+- [ ] Async operations handled correctly
+- [ ] No memory leaks
+- [ ] Rate limiting respected
+```
+
+#### Providing Feedback
+
+**Be constructive and specific:**
+
+```markdown
+# ✅ Good feedback
+Consider using `Promise.all()` here to parallelize these requests.
+This would reduce the total time from ~5s to ~1s.
+
+# ❌ Vague feedback
+This is slow.
+```
+
+**Distinguish between blocking and non-blocking:**
+
+```markdown
+# Blocking (must fix)
+⚠️ **Blocking**: This exposes the API token in error messages.
+Please sanitize before logging.
+
+# Non-blocking (suggestion)
+💡 **Suggestion**: Consider extracting this logic into a helper function
+for better reusability. Not blocking, but would improve maintainability.
+```
+
+**Recognize good work:**
+
+```markdown
+Nice! This is a much cleaner approach than what we had before.
+
+Great test coverage on this edge case!
+
+Love the detailed JSDoc comments here. 👍
+```
+
+#### Review Timeline
+
+- **Initial review**: Within 2 business days
+- **Follow-up reviews**: Within 1 business day
+- **Small fixes**: Same day if possible
+
+#### Approval Criteria
+
+A PR can be approved when:
+- [ ] All blockers addressed
+- [ ] Tests pass in CI
+- [ ] No security concerns
+- [ ] Code quality meets standards
+- [ ] Documentation complete
+
+At least **2 approvals** required for:
+- Breaking changes
+- Security-related changes
+- Major new features
 
 ## 🐛 Reporting Bugs
 
@@ -351,22 +564,165 @@ Open an issue with:
 
 (For maintainers)
 
+### Semantic Versioning
+
+We follow [Semantic Versioning](https://semver.org/):
+
+- **MAJOR** (x.0.0): Breaking API changes
+- **MINOR** (0.x.0): New features, backward compatible
+- **PATCH** (0.0.x): Bug fixes, backward compatible
+
+### Pre-Release Checklist
+
+Before releasing:
+
+1. **All tests pass**
+   ```bash
+   pnpm test
+   pnpm test:integration
+   pnpm test:coverage
+   ```
+
+2. **No security vulnerabilities**
+   ```bash
+   pnpm audit --prod
+   ```
+
+3. **Build succeeds**
+   ```bash
+   pnpm build
+   ```
+
+4. **Type checking passes**
+   ```bash
+   pnpm type-check
+   pnpm types:check
+   ```
+
+5. **Smoke tests pass**
+   ```bash
+   pnpm smoke
+   ```
+
+6. **Documentation updated**
+   - README.md
+   - CHANGELOG.md
+   - API documentation
+
+### Release Steps
+
+#### 1. Update Version
+
 ```bash
-# Update version
-npm version patch|minor|major
+# Patch release (0.1.0 → 0.1.1)
+pnpm version:patch
 
-# Update CHANGELOG.md
+# Minor release (0.1.0 → 0.2.0)
+pnpm version:minor
 
-# Build and test
-pnpm build
-pnpm test
-pnpm audit
+# Major release (0.1.0 → 1.0.0)
+pnpm version:major
 
-# Publish
-pnpm publish
+# Pre-release (0.1.0 → 0.1.1-beta.0)
+pnpm version:prerelease
+```
 
-# Push tags
-git push --tags
+This will:
+- Update package.json version
+- Create a git commit
+- Create a git tag
+- Push to remote with tags
+
+#### 2. Update CHANGELOG.md
+
+Follow [Keep a Changelog](https://keepachangelog.com/) format:
+
+```markdown
+## [0.2.0] - 2025-10-05
+
+### Added
+- Entity batch operations support
+- Request cancellation with AbortController
+
+### Fixed
+- Token refresh race condition
+- Proxy credential encoding
+
+### Changed
+- Updated vitest to v3.2.4
+
+### Security
+- Fixed credential exposure in error logs
+```
+
+#### 3. Verify Package Contents
+
+```bash
+# Test package creation
+npm pack --dry-run
+
+# Check package size and contents
+npm pack
+tar -tzf port-labs-port-sdk-*.tgz
+
+# Test local installation
+npm install ./port-labs-port-sdk-*.tgz
+```
+
+#### 4. Publish to npm
+
+```bash
+# Login to npm (first time only)
+npm login
+
+# Publish stable release
+npm publish --access public
+
+# Or publish beta release
+npm publish --access public --tag beta
+```
+
+#### 5. Create GitHub Release
+
+1. Go to [Releases](https://github.com/port-labs/port-sdk/releases)
+2. Click "Draft a new release"
+3. Select the version tag
+4. Add release notes from CHANGELOG.md
+5. Attach build artifacts (optional)
+6. Mark as pre-release if beta
+7. Publish release
+
+#### 6. Post-Release
+
+```bash
+# Verify on npm
+npm view @port-labs/port-sdk
+
+# Test installation
+npm install @port-labs/port-sdk
+
+# Announce release
+# - Update documentation site
+# - Post in Slack community
+# - Tweet about major releases
+```
+
+### Rollback Strategy
+
+If a release has critical issues:
+
+```bash
+# Deprecate the broken version
+npm deprecate @port-labs/port-sdk@x.x.x "Critical bug, use x.x.y instead"
+
+# Publish a patch release with the fix
+pnpm version:patch
+# Fix the issue
+pnpm build && pnpm test
+npm publish
+
+# If absolutely necessary, unpublish (within 72 hours)
+npm unpublish @port-labs/port-sdk@x.x.x
 ```
 
 ## 🤝 Community
