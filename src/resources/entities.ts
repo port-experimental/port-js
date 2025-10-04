@@ -18,6 +18,9 @@ import type {
   EntitySearchQuery,
   PaginatedResponse,
   BatchUpdateEntityInput,
+  ApiEntity,
+  ApiEntityResponse,
+  ApiEntitiesResponse,
 } from '../types';
 
 /**
@@ -76,7 +79,7 @@ export class EntityResource extends BaseResource {
   async create(data: CreateEntityInput): Promise<Entity> {
     this.validateCreateInput(data);
     
-    const response = await this.httpClient.post<{ entity: Entity }>(
+    const response = await this.httpClient.post<ApiEntityResponse>(
       `${this.basePath}/${data.blueprint}/entities`,
       data
     );
@@ -109,7 +112,7 @@ export class EntityResource extends BaseResource {
       path = `/v1/entities/${identifier}`;
     }
 
-    const response = await this.httpClient.get<{ entity: Entity }>(path);
+    const response = await this.httpClient.get<ApiEntityResponse>(path);
     return this.transformEntity(response.entity);
   }
 
@@ -150,7 +153,7 @@ export class EntityResource extends BaseResource {
       path = `/v1/entities/${identifier}`;
     }
 
-    const response = await this.httpClient.patch<{ entity: Entity }>(
+    const response = await this.httpClient.patch<ApiEntityResponse>(
       path,
       data
     );
@@ -253,7 +256,7 @@ export class EntityResource extends BaseResource {
   async search(query: EntitySearchQuery): Promise<Entity[]> {
     const path = '/v1/entities/search';
     
-    const response = await this.httpClient.post<{ entities: Entity[] }>(
+    const response = await this.httpClient.post<ApiEntitiesResponse>(
       path,
       query
     );
@@ -280,7 +283,7 @@ export class EntityResource extends BaseResource {
   async batchCreate(entities: CreateEntityInput[]): Promise<Entity[]> {
     entities.forEach(entity => this.validateCreateInput(entity));
 
-    const response = await this.httpClient.post<{ entities: Entity[] }>(
+    const response = await this.httpClient.post<ApiEntitiesResponse>(
       '/v1/entities/batch',
       { entities }
     );
@@ -307,7 +310,7 @@ export class EntityResource extends BaseResource {
   async batchUpdate(updates: BatchUpdateEntityInput[]): Promise<Entity[]> {
     updates.forEach(update => this.validateIdentifier(update.identifier));
 
-    const response = await this.httpClient.patch<{ entities: Entity[] }>(
+    const response = await this.httpClient.patch<ApiEntitiesResponse>(
       '/v1/entities/batch',
       { updates }
     );
@@ -363,7 +366,7 @@ export class EntityResource extends BaseResource {
       path = `/v1/entities/${identifier}/relations/${relation}`;
     }
 
-    const response = await this.httpClient.get<{ entities: Entity[] }>(path);
+    const response = await this.httpClient.get<ApiEntitiesResponse>(path);
     return response.entities.map(e => this.transformEntity(e));
   }
 
@@ -425,12 +428,15 @@ export class EntityResource extends BaseResource {
   /**
    * Transform API entity to SDK entity
    */
-  private transformEntity(entity: any): Entity {
-    return {
-      ...entity,
-      createdAt: entity.createdAt ? new Date(entity.createdAt) : undefined,
-      updatedAt: entity.updatedAt ? new Date(entity.updatedAt) : undefined,
-    };
+  private transformEntity(entity: ApiEntity | Entity): Entity {
+    const result: any = { ...entity };
+    if (result.createdAt) {
+      result.createdAt = new Date(result.createdAt);
+    }
+    if (result.updatedAt) {
+      result.updatedAt = new Date(result.updatedAt);
+    }
+    return result as Entity;
   }
 }
 

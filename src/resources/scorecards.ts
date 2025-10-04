@@ -9,6 +9,10 @@ import type {
   CreateScorecardInput,
   UpdateScorecardInput,
 } from '../types/scorecards';
+import type {
+  ApiScorecardsResponse,
+  ApiScorecard,
+} from '../types/responses';
 
 /**
  * Resource for managing Port scorecards
@@ -81,7 +85,7 @@ export class ScorecardResource extends BaseResource {
   async list(blueprint: string): Promise<Scorecard[]> {
     this.validateIdentifier(blueprint, 'blueprint');
 
-    const response = await this.httpClient.get<{ scorecards: Scorecard[] }>(
+    const response = await this.httpClient.get<ApiScorecardsResponse>(
       `${this.basePath}/${blueprint}/scorecards`
     );
 
@@ -133,18 +137,15 @@ export class ScorecardResource extends BaseResource {
   /**
    * Transform scorecard response (convert date strings to Date objects)
    */
-  private transformScorecard(scorecard: Scorecard): Scorecard {
-    return {
-      ...scorecard,
-      createdAt:
-        typeof scorecard.createdAt === 'string'
-          ? new Date(scorecard.createdAt)
-          : scorecard.createdAt,
-      updatedAt:
-        typeof scorecard.updatedAt === 'string'
-          ? new Date(scorecard.updatedAt)
-          : scorecard.updatedAt,
-    };
+  private transformScorecard(scorecard: ApiScorecard | Scorecard): Scorecard {
+    const result: any = { ...scorecard };
+    if (result.createdAt) {
+      result.createdAt = typeof result.createdAt === 'string' ? new Date(result.createdAt) : result.createdAt;
+    }
+    if (result.updatedAt) {
+      result.updatedAt = typeof result.updatedAt === 'string' ? new Date(result.updatedAt) : result.updatedAt;
+    }
+    return result as Scorecard;
   }
 }
 

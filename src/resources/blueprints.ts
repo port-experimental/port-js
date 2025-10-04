@@ -6,6 +6,13 @@
 import { BaseResource } from './base';
 import { PortValidationError } from '../errors';
 import type { Blueprint, CreateBlueprintInput, UpdateBlueprintInput } from '../types/blueprints';
+import type {
+  ApiBlueprintResponse,
+  ApiBlueprintsResponse,
+  ApiBlueprintRelationsResponse,
+  ApiBlueprint,
+} from '../types/responses';
+import type { RequestOptions } from '../http-client';
 
 /**
  * BlueprintResource provides methods for managing Port blueprints
@@ -16,19 +23,20 @@ export class BlueprintResource extends BaseResource {
   /**
    * Create a new blueprint
    */
-  async create(data: CreateBlueprintInput): Promise<Blueprint> {
+  async create(data: CreateBlueprintInput, options?: RequestOptions): Promise<Blueprint> {
     this.validateCreateInput(data);
-    const response = await this.httpClient.post<{ blueprint: any }>(this.basePath, data);
+    const response = await this.httpClient.post<ApiBlueprintResponse>(this.basePath, data, options);
     return this.transformBlueprint(response.blueprint);
   }
 
   /**
    * Get a blueprint by identifier
    */
-  async get(identifier: string): Promise<Blueprint> {
+  async get(identifier: string, options?: RequestOptions): Promise<Blueprint> {
     this.validateIdentifier(identifier);
-    const response = await this.httpClient.get<{ blueprint: any }>(
-      `${this.basePath}/${identifier}`
+    const response = await this.httpClient.get<ApiBlueprintResponse>(
+      `${this.basePath}/${identifier}`,
+      options
     );
     return this.transformBlueprint(response.blueprint);
   }
@@ -36,11 +44,12 @@ export class BlueprintResource extends BaseResource {
   /**
    * Update a blueprint
    */
-  async update(identifier: string, data: UpdateBlueprintInput): Promise<Blueprint> {
+  async update(identifier: string, data: UpdateBlueprintInput, options?: RequestOptions): Promise<Blueprint> {
     this.validateIdentifier(identifier);
-    const response = await this.httpClient.patch<{ blueprint: any }>(
+    const response = await this.httpClient.patch<ApiBlueprintResponse>(
       `${this.basePath}/${identifier}`,
-      data
+      data,
+      options
     );
     return this.transformBlueprint(response.blueprint);
   }
@@ -48,26 +57,27 @@ export class BlueprintResource extends BaseResource {
   /**
    * Delete a blueprint
    */
-  async delete(identifier: string): Promise<void> {
+  async delete(identifier: string, options?: RequestOptions): Promise<void> {
     this.validateIdentifier(identifier);
-    await this.httpClient.delete(`${this.basePath}/${identifier}`);
+    await this.httpClient.delete(`${this.basePath}/${identifier}`, options);
   }
 
   /**
    * List all blueprints
    */
-  async list(): Promise<Blueprint[]> {
-    const response = await this.httpClient.get<{ blueprints: any[] }>(this.basePath);
+  async list(options?: RequestOptions): Promise<Blueprint[]> {
+    const response = await this.httpClient.get<ApiBlueprintsResponse>(this.basePath, options);
     return (response.blueprints || []).map((bp) => this.transformBlueprint(bp));
   }
 
   /**
    * Get relations for a blueprint
    */
-  async getRelations(identifier: string): Promise<any[]> {
+  async getRelations(identifier: string, options?: RequestOptions): Promise<unknown[]> {
     this.validateIdentifier(identifier);
-    const response = await this.httpClient.get<{ relations: any[] }>(
-      `${this.basePath}/${identifier}/relations`
+    const response = await this.httpClient.get<ApiBlueprintRelationsResponse>(
+      `${this.basePath}/${identifier}/relations`,
+      options
     );
     return response.relations;
   }
@@ -116,12 +126,15 @@ export class BlueprintResource extends BaseResource {
   /**
    * Transform API blueprint to SDK blueprint (convert date strings)
    */
-  private transformBlueprint(blueprint: any): Blueprint {
-    return {
-      ...blueprint,
-      createdAt: blueprint.createdAt ? new Date(blueprint.createdAt) : undefined,
-      updatedAt: blueprint.updatedAt ? new Date(blueprint.updatedAt) : undefined,
-    };
+  private transformBlueprint(blueprint: ApiBlueprint | Blueprint): Blueprint {
+    const result: any = { ...blueprint };
+    if (result.createdAt) {
+      result.createdAt = new Date(result.createdAt);
+    }
+    if (result.updatedAt) {
+      result.updatedAt = new Date(result.updatedAt);
+    }
+    return result as Blueprint;
   }
 }
 

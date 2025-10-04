@@ -170,7 +170,9 @@ feat!: drop support for Node 18
 BREAKING CHANGE: Node 20+ is now required
 ```
 
-**See**: `.cursor/rules/changelog-automation.mdc` for complete guidelines.
+**See**: 
+- [Commit Message Cheatsheet](./docs/development/COMMIT_MESSAGES.md) - Quick reference
+- [Complete Guidelines](./.cursor/rules/changelog-automation.mdc) - Full documentation
 
 ## 🔧 Contributing Process
 

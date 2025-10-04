@@ -53,7 +53,7 @@
     "prepare": "husky",
     "prepublishOnly": "pnpm types:check && pnpm run type-check && pnpm run test && pnpm run build",
     "precommit": "pnpm run type-check && pnpm run test",
-    "example": "tsx examples/basic-usage.ts",
+    "example": "tsx examples/01-basic-usage.ts",
     "example:cancel": "tsx examples/19-request-cancellation.ts"
   },
   "keywords": [

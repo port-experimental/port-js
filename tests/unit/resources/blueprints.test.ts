@@ -48,7 +48,8 @@ describe('BlueprintResource', () => {
 
       expect(mockHttpClient.post).toHaveBeenCalledWith(
         '/v1/blueprints',
-        input
+        input,
+        undefined
       );
       expect(result.identifier).toBe('test-blueprint');
       expect(result.title).toBe('Test Blueprint');
@@ -106,7 +107,7 @@ describe('BlueprintResource', () => {
 
       const result = await blueprintResource.get('service');
 
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/v1/blueprints/service');
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/v1/blueprints/service', undefined);
       expect(result.identifier).toBe('service');
     });
 
@@ -148,7 +149,8 @@ describe('BlueprintResource', () => {
 
       expect(mockHttpClient.patch).toHaveBeenCalledWith(
         '/v1/blueprints/service',
-        updates
+        updates,
+        undefined
       );
       expect(result.title).toBe('Updated Title');
     });
@@ -176,7 +178,8 @@ describe('BlueprintResource', () => {
 
       expect(mockHttpClient.patch).toHaveBeenCalledWith(
         '/v1/blueprints/service',
-        updates
+        updates,
+        undefined
       );
     });
   });
@@ -188,7 +191,8 @@ describe('BlueprintResource', () => {
       await blueprintResource.delete('test-blueprint');
 
       expect(mockHttpClient.delete).toHaveBeenCalledWith(
-        '/v1/blueprints/test-blueprint'
+        '/v1/blueprints/test-blueprint',
+        undefined
       );
     });
 
@@ -225,7 +229,7 @@ describe('BlueprintResource', () => {
 
       const result = await blueprintResource.list();
 
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/v1/blueprints');
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/v1/blueprints', undefined);
       expect(result).toHaveLength(2);
       expect(result[0].identifier).toBe('service');
     });
@@ -253,7 +257,8 @@ describe('BlueprintResource', () => {
       const result = await blueprintResource.getRelations('service');
 
       expect(mockHttpClient.get).toHaveBeenCalledWith(
-        '/v1/blueprints/service/relations'
+        '/v1/blueprints/service/relations',
+        undefined
       );
       expect(result).toEqual(relations);
     });

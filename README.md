@@ -17,7 +17,7 @@ A type-safe, feature-rich SDK for interacting with Port.io's API. Built with sec
 - 🔌 **Proxy Support** - Corporate proxy support with authentication
 - 🔑 **Flexible Auth** - OAuth2 and JWT token support
 - ⚙️ **Environment Config** - Load configuration from environment variables or .env files
-- 🧪 **Well Tested** - 87.59% code coverage with 292+ tests
+- 🧪 **Well Tested** - 78.69% code coverage with 296 tests
 
 ## 📦 Installation
 
@@ -47,7 +47,7 @@ const client = new PortClient({
 
 // List all blueprints
 const blueprints = await client.blueprints.list();
-console.log(`Found ${blueprints.data.length} blueprints`);
+console.log(`Found ${blueprints.length} blueprints`);
 
 // Create an entity
 const entity = await client.entities.create({
@@ -68,30 +68,19 @@ console.log(`Created entity: ${entity.identifier}`);
 
 ### Getting Started
 - [Installation & Setup](./docs/getting-started/installation.md)
-- [Authentication](./docs/getting-started/authentication.md)
-- [Configuration](./docs/getting-started/configuration.md)
 - [Quick Start Guide](./docs/getting-started/quickstart.md)
+- [API Documentation](./docs/api/) - Auto-generated TypeDoc documentation
 
-### API Reference
-- [Blueprints](./docs/api/blueprints.md)
-- [Entities](./docs/api/entities.md)
-- [Actions](./docs/api/actions.md)
-- [Scorecards](./docs/api/scorecards.md)
-
-### Guides
-- [Error Handling](./docs/guides/error-handling.md)
-- [Logging & Debugging](./docs/guides/logging.md)
-- [Proxy Configuration](./docs/guides/proxy.md)
-- [Rate Limiting](./docs/guides/rate-limiting.md)
+### Development
+- [Development Guide](./docs/development/README.md)
+- [Contributing Guide](./CONTRIBUTING.md)
+- [Commit Message Cheatsheet](./docs/development/COMMIT_MESSAGES.md)
+- [Security Policy](./SECURITY.md)
+- [Testing Guide](./docs/TESTING.md)
 
 ### Examples
 - [View All Examples](./docs/EXAMPLES.md)
 - [Run Examples Locally](./examples/README.md)
-
-### Development
-- [Contributing Guide](./CONTRIBUTING.md)
-- [Security Policy](./SECURITY.md)
-- [Testing Guide](./docs/TESTING.md)
 
 ## 💡 Common Use Cases
 
@@ -108,11 +97,11 @@ const results = await client.entities.search({
 });
 
 // Update an entity
-await client.entities.update('my-service', 'service', {
+await client.entities.update('my-service', {
   properties: {
     stringProps: { status: 'active' },
   },
-});
+}, 'service');
 
 // Delete an entity
 await client.entities.delete('my-service', 'service');

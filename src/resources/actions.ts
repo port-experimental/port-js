@@ -6,6 +6,14 @@
 import { BaseResource } from './base';
 import { PortValidationError } from '../errors';
 import type { Action, CreateActionInput, UpdateActionInput, ActionRun } from '../types/actions';
+import type {
+  ApiActionResponse,
+  ApiActionsResponse,
+  ApiActionRunResponse,
+  ApiActionRunsResponse,
+  ApiAction,
+  ApiActionRun,
+} from '../types/responses';
 
 export interface ListActionsOptions {
   blueprint?: string;
@@ -27,7 +35,7 @@ export class ActionResource extends BaseResource {
    */
   async create(data: CreateActionInput): Promise<Action> {
     this.validateCreateInput(data);
-    const response = await this.httpClient.post<{ action: any }>(this.basePath, data);
+    const response = await this.httpClient.post<ApiActionResponse>(this.basePath, data);
     return this.transformAction(response.action);
   }
 
@@ -36,7 +44,7 @@ export class ActionResource extends BaseResource {
    */
   async get(identifier: string): Promise<Action> {
     this.validateIdentifier(identifier);
-    const response = await this.httpClient.get<{ action: any }>(
+    const response = await this.httpClient.get<ApiActionResponse>(
       `${this.basePath}/${identifier}`
     );
     return this.transformAction(response.action);
@@ -47,7 +55,7 @@ export class ActionResource extends BaseResource {
    */
   async update(identifier: string, data: UpdateActionInput): Promise<Action> {
     this.validateIdentifier(identifier);
-    const response = await this.httpClient.patch<{ action: any }>(
+    const response = await this.httpClient.patch<ApiActionResponse>(
       `${this.basePath}/${identifier}`,
       data
     );
@@ -75,7 +83,7 @@ export class ActionResource extends BaseResource {
       url = this.basePath;
     }
 
-    const response = await this.httpClient.get<{ actions: any[] }>(url);
+    const response = await this.httpClient.get<ApiActionsResponse>(url);
     return (response.actions || []).map((action) => this.transformAction(action));
   }
 
@@ -88,7 +96,7 @@ export class ActionResource extends BaseResource {
   ): Promise<ActionRun> {
     this.validateIdentifier(actionIdentifier);
 
-    const payload: any = {
+    const payload: Record<string, unknown> = {
       properties: input.properties,
     };
 
@@ -96,7 +104,7 @@ export class ActionResource extends BaseResource {
       payload.entity = input.entityIdentifier;
     }
 
-    const response = await this.httpClient.post<{ run: any }>(
+    const response = await this.httpClient.post<ApiActionRunResponse>(
       `${this.basePath}/${actionIdentifier}/runs`,
       payload
     );
@@ -114,7 +122,7 @@ export class ActionResource extends BaseResource {
       ]);
     }
 
-    const response = await this.httpClient.get<{ run: any }>(
+    const response = await this.httpClient.get<ApiActionRunResponse>(
       `${this.basePath}/runs/${runId}`
     );
 
@@ -127,7 +135,7 @@ export class ActionResource extends BaseResource {
   async listRuns(actionIdentifier: string): Promise<ActionRun[]> {
     this.validateIdentifier(actionIdentifier);
 
-    const response = await this.httpClient.get<{ runs: any[] }>(
+    const response = await this.httpClient.get<ApiActionRunsResponse>(
       `${this.basePath}/${actionIdentifier}/runs`
     );
 
@@ -183,23 +191,29 @@ export class ActionResource extends BaseResource {
   /**
    * Transform API action to SDK action (convert date strings)
    */
-  private transformAction(action: any): Action {
-    return {
-      ...action,
-      createdAt: action.createdAt ? new Date(action.createdAt) : undefined,
-      updatedAt: action.updatedAt ? new Date(action.updatedAt) : undefined,
-    };
+  private transformAction(action: ApiAction | Action): Action {
+    const result: any = { ...action };
+    if (result.createdAt) {
+      result.createdAt = new Date(result.createdAt);
+    }
+    if (result.updatedAt) {
+      result.updatedAt = new Date(result.updatedAt);
+    }
+    return result as Action;
   }
 
   /**
    * Transform API run to SDK run (convert date strings)
    */
-  private transformRun(run: any): ActionRun {
-    return {
-      ...run,
-      createdAt: run.createdAt ? new Date(run.createdAt) : undefined,
-      updatedAt: run.updatedAt ? new Date(run.updatedAt) : undefined,
-    };
+  private transformRun(run: ApiActionRun | ActionRun): ActionRun {
+    const result: any = { ...run };
+    if (result.createdAt) {
+      result.createdAt = new Date(result.createdAt);
+    }
+    if (result.triggeredAt) {
+      result.triggeredAt = new Date(result.triggeredAt);
+    }
+    return result as ActionRun;
   }
 }
 

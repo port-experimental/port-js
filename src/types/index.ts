@@ -14,6 +14,7 @@ export * from './entities';
 export * from './blueprints';
 export * from './actions';
 export * from './scorecards';
+export * from './responses';
 
 /**
  * Note about types/api.ts:

@@ -6,6 +6,7 @@ Documentation for contributing to and maintaining the Port SDK.
 
 ### Getting Started
 - [Contributing Guide](../../CONTRIBUTING.md) - How to contribute
+- [Commit Messages](./COMMIT_MESSAGES.md) - Conventional commit format cheatsheet
 - [Development Setup](#development-setup) - Set up your development environment
 - [Coding Standards](./STANDARDS.md) - Code style and best practices
 
