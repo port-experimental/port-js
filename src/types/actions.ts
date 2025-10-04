@@ -37,7 +37,27 @@ export interface ActionInvocationMethod {
 /**
  * Action trigger types
  */
-export type ActionTrigger = 'CREATE' | 'DAY-2' | 'DELETE';
+export type ActionTrigger = {
+  /**
+   * The type of trigger
+   */
+  type: 'self-service';
+  /**
+   * The operation type of the action
+   */
+  operation: 'CREATE' | 'DAY-2' | 'DELETE';
+  /**
+   * The identifier of the blueprint that the action is associated with
+   */
+  blueprintIdentifier?: string;
+  /**
+   * The user inputs for the action
+   */
+  userInputs: {
+    properties: Record<string, unknown>;
+    required?: string[];
+  };
+};
 
 /**
  * Action user input types

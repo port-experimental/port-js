@@ -8,6 +8,8 @@ import { EntityResource } from './resources/entities';
 import { BlueprintResource } from './resources/blueprints';
 import { ActionResource } from './resources/actions';
 import { ScorecardResource } from './resources/scorecards';
+import { TeamResource } from './resources/teams';
+import { UserResource } from './resources/users';
 
 /**
  * Port SDK Client
@@ -60,6 +62,8 @@ export class PortClient {
   public readonly blueprints: BlueprintResource;
   public readonly actions: ActionResource;
   public readonly scorecards: ScorecardResource;
+  public readonly teams: TeamResource;
+  public readonly users: UserResource;
 
   /**
    * Create a new Port SDK client
@@ -86,6 +90,8 @@ export class PortClient {
     this.blueprints = new BlueprintResource(this.httpClient);
     this.actions = new ActionResource(this.httpClient);
     this.scorecards = new ScorecardResource(this.httpClient);
+    this.teams = new TeamResource(this.httpClient);
+    this.users = new UserResource(this.httpClient);
   }
 
   /**

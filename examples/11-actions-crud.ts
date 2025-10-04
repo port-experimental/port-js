@@ -61,18 +61,24 @@ async function main() {
       description: 'Deploy a service to production',
       icon: 'Deployment',
       blueprint: blueprintId,
-      trigger: 'DAY-2',
-      userInputs: {
-        environment: {
-          type: 'string',
-          title: 'Environment',
-          enum: ['staging', 'production'],
-          default: 'staging',
-        },
-        version: {
-          type: 'string',
-          title: 'Version to deploy',
-        },
+      trigger: {
+        type: 'self-service',
+        operation: 'DAY-2',
+        blueprintIdentifier: blueprintId,
+        userInputs: {
+          properties: {
+            environment: {
+              type: 'string',
+              title: 'Environment',
+              enum: ['staging', 'production'],
+              default: 'staging',
+            },
+            version: {
+              type: 'string',
+              title: 'Version to deploy',
+            },
+          }
+        }
       },
       invocationMethod: {
         type: 'WEBHOOK',

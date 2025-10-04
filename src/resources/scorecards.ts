@@ -11,6 +11,7 @@ import type {
 } from '../types/scorecards';
 import type {
   ApiScorecardsResponse,
+  ApiScorecardResponse,
   ApiScorecard,
 } from '../types/responses';
 import type { RequestOptions } from '../http-client';
@@ -23,17 +24,47 @@ export class ScorecardResource extends BaseResource {
 
   /**
    * Create a new scorecard
+   * 
+   * @param data - Scorecard creation data
+   * @param options - Optional request options (timeout, headers, signal)
+   * @returns The created scorecard
+   * 
+   * @example
+   * ```typescript
+   * const scorecard = await client.scorecards.create({
+   *   identifier: 'production-readiness',
+   *   title: 'Production Readiness',
+   *   blueprint: 'service',
+   *   rules: [
+   *     {
+   *       identifier: 'has-monitoring',
+   *       title: 'Has Monitoring',
+   *       level: 'Gold',
+   *       query: {
+   *         combinator: 'and',
+   *         conditions: [
+   *           { property: 'hasMonitoring', operator: '=', value: true }
+   *         ]
+   *       }
+   *     }
+   *   ]
+   * });
+   * console.log(`Created scorecard: ${scorecard.identifier}`);
+   * ```
    */
   async create(data: CreateScorecardInput, options?: RequestOptions): Promise<Scorecard> {
     this.validateCreateInput(data);
 
-    const response = await this.httpClient.post<Scorecard>(
-      `${this.basePath}/${data.blueprint}/scorecards`,
-      data,
+    // Remove blueprint from request body - API doesn't accept it as a property
+    const { blueprint, ...scorecardData } = data;
+
+    const response = await this.httpClient.post<ApiScorecardResponse>(
+      `${this.basePath}/${blueprint}/scorecards`,
+      scorecardData,
       options
     );
 
-    return this.transformScorecard(response);
+    return this.transformScorecard(response.scorecard);
   }
 
   /**
@@ -43,16 +74,17 @@ export class ScorecardResource extends BaseResource {
     this.validateIdentifier(blueprint, 'blueprint');
     this.validateIdentifier(identifier, 'identifier');
 
-    const response = await this.httpClient.get<Scorecard>(
+    const response = await this.httpClient.get<ApiScorecardResponse>(
       `${this.basePath}/${blueprint}/scorecards/${identifier}`,
       options
     );
 
-    return this.transformScorecard(response);
+    return this.transformScorecard(response.scorecard);
   }
 
   /**
-   * Update a scorecard
+   * Update a scorecard (full replacement)
+   * Note: The Port API uses PUT for scorecard updates, which replaces the entire scorecard
    */
   async update(
     blueprint: string,
@@ -63,13 +95,13 @@ export class ScorecardResource extends BaseResource {
     this.validateIdentifier(blueprint, 'blueprint');
     this.validateIdentifier(identifier, 'identifier');
 
-    const response = await this.httpClient.patch<Scorecard>(
+    const response = await this.httpClient.put<ApiScorecardResponse>(
       `${this.basePath}/${blueprint}/scorecards/${identifier}`,
       data,
       options
     );
 
-    return this.transformScorecard(response);
+    return this.transformScorecard(response.scorecard);
   }
 
   /**

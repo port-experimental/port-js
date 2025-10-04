@@ -199,51 +199,66 @@ export class HttpClient {
   /**
    * Handle API errors and throw appropriate error types
    */
-  private async handleError(response: Response): Promise<never> {
+  private async handleError(response: Response, method: string, path: string): Promise<never> {
     const body = await this.parseErrorResponse(response);
+    
+    // Create request context for debugging
+    const context = {
+      method,
+      url: path,
+      requestId: `${method}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    };
 
     switch (response.status) {
       case 401:
         throw new PortAuthError(
           body.message || 'Authentication failed',
-          body
+          body,
+          context
         );
       case 403:
         throw new PortForbiddenError(
           body.message || 'Forbidden',
-          body
+          undefined,
+          body,
+          context
         );
       case 404:
         throw new PortNotFoundError(
           body.resource || 'Resource',
           body.identifier || 'unknown',
-          body
+          body,
+          context
         );
       case 422:
         throw new PortValidationError(
           body.message || 'Validation failed',
-          (body.errors as ValidationError[]) || []
+          (body.errors as ValidationError[]) || [],
+          context
         );
       case 429:
         const retryAfter = response.headers.get('Retry-After');
         throw new PortRateLimitError(
           body.message || 'Rate limit exceeded',
           retryAfter ? parseInt(retryAfter, 10) : undefined,
-          body
+          body,
+          context
         );
       default:
         if (response.status >= 500) {
           throw new PortServerError(
             body.message || 'Server error',
             response.status,
-            body
+            body,
+            context
           );
         }
         throw new PortError(
           body.message || 'An error occurred',
           body.error,
           response.status,
-          body
+          body,
+          context
         );
     }
   }
@@ -359,7 +374,7 @@ export class HttpClient {
 
         // Handle error responses
         if (!response.ok) {
-          await this.handleError(response);
+          await this.handleError(response, method, path);
         }
 
         // Parse and return response
@@ -384,18 +399,30 @@ export class HttpClient {
             throw error; // Re-throw the cancellation error
           }
           // Otherwise it was a timeout
+          const context = {
+            method,
+            url: path,
+            requestId: `${method}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          };
           const timeoutError = new PortTimeoutError(
             `Request timeout after ${timeout}ms`,
-            timeout
+            timeout,
+            context
           );
           lastError = timeoutError;
         }
 
         // Handle network errors
         if (error instanceof TypeError) {
+          const context = {
+            method,
+            url: path,
+            requestId: `${method}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          };
           lastError = new PortNetworkError(
             'Network error occurred',
-            error
+            error,
+            context
           );
         }
 

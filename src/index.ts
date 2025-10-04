@@ -14,6 +14,8 @@ export { EntityResource } from './resources/entities';
 export { BlueprintResource } from './resources/blueprints';
 export { ActionResource } from './resources/actions';
 export { ScorecardResource } from './resources/scorecards';
+export { TeamResource } from './resources/teams';
+export { UserResource } from './resources/users';
 
 // HTTP Client (for advanced usage)
 export { HttpClient } from './http-client';
@@ -33,6 +35,7 @@ export {
   PortNetworkError,
   PortTimeoutError,
   type ValidationError,
+  type RequestContext,
 } from './errors';
 
 // Configuration
@@ -52,4 +55,16 @@ export {
   parseLogLevel,
   type LoggerConfig,
 } from './logger';
+
+// Validation utilities
+export {
+  validateIdentifier,
+  validateIdentifierFormat,
+  validateRequiredFields,
+  validateIdentifiers,
+  validateCreateInput,
+  validateBlueprintInData,
+  throwIfErrors,
+  type ValidationErrorDetail,
+} from './utils/validation';
 

@@ -22,6 +22,27 @@ export class BlueprintResource extends BaseResource {
 
   /**
    * Create a new blueprint
+   * 
+   * @param data - Blueprint creation data
+   * @param options - Optional request options (timeout, headers, signal)
+   * @returns The created blueprint
+   * 
+   * @example
+   * ```typescript
+   * const blueprint = await client.blueprints.create({
+   *   identifier: 'microservice',
+   *   title: 'Microservice',
+   *   icon: 'Microservice',
+   *   schema: {
+   *     properties: {
+   *       name: { type: 'string', title: 'Name' },
+   *       language: { type: 'string', title: 'Language' }
+   *     },
+   *     required: ['name']
+   *   }
+   * });
+   * console.log(`Created: ${blueprint.identifier}`);
+   * ```
    */
   async create(data: CreateBlueprintInput, options?: RequestOptions): Promise<Blueprint> {
     this.validateCreateInput(data);
@@ -31,6 +52,17 @@ export class BlueprintResource extends BaseResource {
 
   /**
    * Get a blueprint by identifier
+   * 
+   * @param identifier - Blueprint identifier
+   * @param options - Optional request options (timeout, headers, signal)
+   * @returns The blueprint
+   * 
+   * @example
+   * ```typescript
+   * const blueprint = await client.blueprints.get('microservice');
+   * console.log(`Title: ${blueprint.title}`);
+   * console.log(`Properties: ${Object.keys(blueprint.schema?.properties || {}).length}`);
+   * ```
    */
   async get(identifier: string, options?: RequestOptions): Promise<Blueprint> {
     this.validateIdentifier(identifier);
@@ -43,6 +75,26 @@ export class BlueprintResource extends BaseResource {
 
   /**
    * Update a blueprint
+   * 
+   * @param identifier - Blueprint identifier
+   * @param data - Blueprint update data (partial)
+   * @param options - Optional request options (timeout, headers, signal)
+   * @returns The updated blueprint
+   * 
+   * @example
+   * ```typescript
+   * const updated = await client.blueprints.update('microservice', {
+   *   title: 'Microservice (Updated)',
+   *   description: 'A microservice blueprint',
+   *   schema: {
+   *     properties: {
+   *       name: { type: 'string', title: 'Name' },
+   *       version: { type: 'string', title: 'Version' }
+   *     }
+   *   }
+   * });
+   * console.log(`Updated: ${updated.identifier}`);
+   * ```
    */
   async update(identifier: string, data: UpdateBlueprintInput, options?: RequestOptions): Promise<Blueprint> {
     this.validateIdentifier(identifier);
@@ -56,6 +108,15 @@ export class BlueprintResource extends BaseResource {
 
   /**
    * Delete a blueprint
+   * 
+   * @param identifier - Blueprint identifier
+   * @param options - Optional request options (timeout, headers, signal)
+   * 
+   * @example
+   * ```typescript
+   * await client.blueprints.delete('microservice');
+   * console.log('Blueprint deleted');
+   * ```
    */
   async delete(identifier: string, options?: RequestOptions): Promise<void> {
     this.validateIdentifier(identifier);
@@ -64,6 +125,18 @@ export class BlueprintResource extends BaseResource {
 
   /**
    * List all blueprints
+   * 
+   * @param options - Optional request options (timeout, headers, signal)
+   * @returns Array of all blueprints
+   * 
+   * @example
+   * ```typescript
+   * const blueprints = await client.blueprints.list();
+   * console.log(`Found ${blueprints.length} blueprints`);
+   * blueprints.forEach(bp => {
+   *   console.log(`- ${bp.identifier}: ${bp.title}`);
+   * });
+   * ```
    */
   async list(options?: RequestOptions): Promise<Blueprint[]> {
     const response = await this.httpClient.get<ApiBlueprintsResponse>(this.basePath, options);

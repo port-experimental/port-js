@@ -14,6 +14,8 @@ export * from './entities';
 export * from './blueprints';
 export * from './actions';
 export * from './scorecards';
+export * from './teams';
+export * from './users';
 export * from './responses';
 
 /**

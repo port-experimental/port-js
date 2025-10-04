@@ -33,18 +33,35 @@ export class ActionResource extends BaseResource {
 
   /**
    * Create a new action
+   * 
+   * @param data - Action creation data
+   * @param options - Optional request options (timeout, headers, signal)
+   * @returns The created action
+   * 
+   * @example
+   * ```typescript
+   * const action = await client.actions.create({
+   *   identifier: 'deploy-to-prod',
+   *   title: 'Deploy to Production',
+   *   blueprint: 'service',
+   *   trigger: 'DAY-2',
+   *   invocationMethod: {
+   *     type: 'WEBHOOK',
+   *     url: 'https://example.com/deploy',
+   *     agent: false
+   *   }
+   * });
+   * console.log(`Created action: ${action.identifier}`);
+   * ```
    */
   async create(data: CreateActionInput, options?: RequestOptions): Promise<Action> {
     this.validateCreateInput(data);
     
-    // Extract blueprint from data - it goes in the URL, not the body
+    // Remove blueprint from request body - API doesn't accept it as a property
     const { blueprint, ...actionData } = data;
     
-    const url = blueprint 
-      ? `/v1/blueprints/${blueprint}/actions`
-      : this.basePath;
-    
-    const response = await this.httpClient.post<ApiActionResponse>(url, actionData, options);
+    // Always use /v1/actions endpoint (blueprint-specific endpoint is deprecated)
+    const response = await this.httpClient.post<ApiActionResponse>(this.basePath, actionData, options);
     return this.transformAction(response.action);
   }
 
@@ -86,12 +103,11 @@ export class ActionResource extends BaseResource {
    * @param options - Optional filter by blueprint
    */
   async list(options?: ListActionsOptions & { requestOptions?: RequestOptions }): Promise<Action[]> {
-    let url: string;
+    // Always use /v1/actions endpoint, pass blueprint as query parameter
+    let url = this.basePath;
     
     if (options?.blueprint) {
-      url = `/v1/blueprints/${options.blueprint}/actions`;
-    } else {
-      url = this.basePath;
+      url = `${url}?blueprint_identifier=${encodeURIComponent(options.blueprint)}`;
     }
 
     const response = await this.httpClient.get<ApiActionsResponse>(url, options?.requestOptions);
@@ -100,6 +116,31 @@ export class ActionResource extends BaseResource {
 
   /**
    * Execute an action
+   * 
+   * @param actionIdentifier - Action identifier
+   * @param input - Execution input (entityIdentifier and/or properties)
+   * @param options - Optional request options (timeout, headers, signal)
+   * @returns The action run status
+   * 
+   * @example
+   * ```typescript
+   * // Execute action on an entity
+   * const run = await client.actions.execute('deploy-to-prod', {
+   *   entityIdentifier: 'user-service',
+   *   properties: {
+   *     environment: 'production',
+   *     version: 'v1.2.3'
+   *   }
+   * });
+   * console.log(`Run ID: ${run.id}, Status: ${run.status}`);
+   * 
+   * // Execute global action (no entity)
+   * const globalRun = await client.actions.execute('backup-database', {
+   *   properties: {
+   *     timestamp: Date.now()
+   *   }
+   * });
+   * ```
    */
   async execute(
     actionIdentifier: string,
