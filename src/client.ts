@@ -5,8 +5,8 @@
 import { HttpClient } from './http-client';
 import { PortClientConfig, resolveConfig } from './config';
 import { EntityResource } from './resources/entities';
+import { BlueprintResource } from './resources/blueprints';
 // Resources will be imported as we create them
-// import { BlueprintResource } from './resources/blueprints';
 // import { ActionResource } from './resources/actions';
 // import { ScorecardResource } from './resources/scorecards';
 
@@ -58,8 +58,8 @@ export class PortClient {
 
   // Resources
   public readonly entities: EntityResource;
+  public readonly blueprints: BlueprintResource;
   // Resources (will be uncommented as we implement them)
-  // public readonly blueprints: BlueprintResource;
   // public readonly actions: ActionResource;
   // public readonly scorecards: ScorecardResource;
 
@@ -85,8 +85,8 @@ export class PortClient {
 
     // Initialize resources
     this.entities = new EntityResource(this.httpClient);
+    this.blueprints = new BlueprintResource(this.httpClient);
     // Resources (will be uncommented as we implement them)
-    // this.blueprints = new BlueprintResource(this.httpClient);
     // this.actions = new ActionResource(this.httpClient);
     // this.scorecards = new ScorecardResource(this.httpClient);
   }
