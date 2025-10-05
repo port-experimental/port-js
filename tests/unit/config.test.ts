@@ -3,7 +3,13 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { REGION_BASE_URLS, resolveConfig, type PortRegion } from '../../src/config';
+import { 
+  REGION_BASE_URLS, 
+  resolveConfig, 
+  validateEnvironment, 
+  getCurrentConfig,
+  type PortRegion 
+} from '../../src/config';
 import { PortAuthError } from '../../src/errors';
 import type { LogLevel } from '../../src/logger';
 
@@ -369,6 +375,187 @@ describe('Configuration', () => {
         });
 
         expect(config.logger).toBeUndefined();
+      });
+    });
+  });
+
+  describe('validateEnvironment', () => {
+    const originalEnv = { ...process.env };
+
+    beforeEach(() => {
+      // Clean environment before each test
+      delete process.env.PORT_CLIENT_ID;
+      delete process.env.PORT_CLIENT_SECRET;
+      delete process.env.PORT_ACCESS_TOKEN;
+    });
+
+    afterEach(() => {
+      // Restore original environment
+      process.env = { ...originalEnv };
+    });
+
+    it('should return valid true when OAuth credentials are present', () => {
+      process.env.PORT_CLIENT_ID = 'test-id';
+      process.env.PORT_CLIENT_SECRET = 'test-secret';
+
+      const result = validateEnvironment();
+
+      expect(result.valid).toBe(true);
+      expect(result.errors).toEqual([]);
+    });
+
+    it('should return valid true when access token is present', () => {
+      process.env.PORT_ACCESS_TOKEN = 'test-token';
+
+      const result = validateEnvironment();
+
+      expect(result.valid).toBe(true);
+      expect(result.errors).toEqual([]);
+    });
+
+    it('should return valid false when no credentials are present', () => {
+      const result = validateEnvironment();
+
+      expect(result.valid).toBe(false);
+      expect(result.errors).toHaveLength(1);
+      expect(result.errors[0]).toContain('Missing credentials');
+      expect(result.errors[0]).toContain('PORT_CLIENT_ID');
+      expect(result.errors[0]).toContain('PORT_CLIENT_SECRET');
+      expect(result.errors[0]).toContain('PORT_ACCESS_TOKEN');
+    });
+
+    it('should return valid false when only clientId is present', () => {
+      process.env.PORT_CLIENT_ID = 'test-id';
+      // Missing PORT_CLIENT_SECRET
+
+      const result = validateEnvironment();
+
+      expect(result.valid).toBe(false);
+      expect(result.errors).toHaveLength(1);
+    });
+
+    it('should return valid false when only clientSecret is present', () => {
+      process.env.PORT_CLIENT_SECRET = 'test-secret';
+      // Missing PORT_CLIENT_ID
+
+      const result = validateEnvironment();
+
+      expect(result.valid).toBe(false);
+      expect(result.errors).toHaveLength(1);
+    });
+
+    it('should prefer OAuth credentials over access token', () => {
+      process.env.PORT_CLIENT_ID = 'test-id';
+      process.env.PORT_CLIENT_SECRET = 'test-secret';
+      process.env.PORT_ACCESS_TOKEN = 'test-token';
+
+      const result = validateEnvironment();
+
+      expect(result.valid).toBe(true);
+      expect(result.errors).toEqual([]);
+    });
+  });
+
+  describe('getCurrentConfig', () => {
+    const originalEnv = { ...process.env };
+
+    beforeEach(() => {
+      // Clean environment before each test
+      delete process.env.PORT_CLIENT_ID;
+      delete process.env.PORT_CLIENT_SECRET;
+      delete process.env.PORT_ACCESS_TOKEN;
+      delete process.env.PORT_REGION;
+      delete process.env.PORT_BASE_URL;
+    });
+
+    afterEach(() => {
+      // Restore original environment
+      process.env = { ...originalEnv };
+    });
+
+    it('should return oauth credential type when OAuth credentials are present', () => {
+      process.env.PORT_CLIENT_ID = 'test-id';
+      process.env.PORT_CLIENT_SECRET = 'test-secret';
+
+      const result = getCurrentConfig();
+
+      expect(result.hasCredentials).toBe(true);
+      expect(result.credentialType).toBe('oauth');
+    });
+
+    it('should return jwt credential type when access token is present', () => {
+      process.env.PORT_ACCESS_TOKEN = 'test-token';
+
+      const result = getCurrentConfig();
+
+      expect(result.hasCredentials).toBe(true);
+      expect(result.credentialType).toBe('jwt');
+    });
+
+    it('should return none credential type when no credentials are present', () => {
+      const result = getCurrentConfig();
+
+      expect(result.hasCredentials).toBe(false);
+      expect(result.credentialType).toBe('none');
+    });
+
+    it('should prefer OAuth credentials over JWT token', () => {
+      process.env.PORT_CLIENT_ID = 'test-id';
+      process.env.PORT_CLIENT_SECRET = 'test-secret';
+      process.env.PORT_ACCESS_TOKEN = 'test-token';
+
+      const result = getCurrentConfig();
+
+      expect(result.hasCredentials).toBe(true);
+      expect(result.credentialType).toBe('oauth');
+    });
+
+    it('should return EU region by default', () => {
+      const result = getCurrentConfig();
+
+      expect(result.region).toBe('eu');
+      expect(result.baseUrl).toBe('https://api.port.io');
+    });
+
+    it('should detect US region from base URL', () => {
+      process.env.PORT_BASE_URL = 'https://api.us.port.io';
+
+      const result = getCurrentConfig();
+
+      expect(result.region).toBe('us');
+      expect(result.baseUrl).toBe('https://api.us.port.io');
+    });
+
+    it('should use custom base URL when provided', () => {
+      process.env.PORT_BASE_URL = 'https://custom.example.com';
+
+      const result = getCurrentConfig();
+
+      expect(result.baseUrl).toBe('https://custom.example.com');
+      expect(result.region).toBe('eu'); // Default to EU if URL doesn't contain 'us.port.io'
+    });
+
+    it('should handle PORT_REGION environment variable', () => {
+      process.env.PORT_REGION = 'us';
+
+      const result = getCurrentConfig();
+
+      expect(result.region).toBe('us');
+      expect(result.baseUrl).toBe('https://api.us.port.io');
+    });
+
+    it('should show all configuration details together', () => {
+      process.env.PORT_CLIENT_ID = 'test-id';
+      process.env.PORT_CLIENT_SECRET = 'test-secret';
+      process.env.PORT_REGION = 'us';
+
+      const result = getCurrentConfig();
+
+      expect(result).toEqual({
+        hasCredentials: true,
+        credentialType: 'oauth',
+        baseUrl: 'https://api.us.port.io',
+        region: 'us',
       });
     });
   });

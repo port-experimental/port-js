@@ -7,9 +7,12 @@ import { PortClientConfig, resolveConfig } from './config';
 import { EntityResource } from './resources/entities';
 import { BlueprintResource } from './resources/blueprints';
 import { ActionResource } from './resources/actions';
+import { ActionRunResource } from './resources/action-runs';
 import { ScorecardResource } from './resources/scorecards';
 import { TeamResource } from './resources/teams';
 import { UserResource } from './resources/users';
+import { AuditResource } from './resources/audit';
+import { WebhookResource } from './resources/webhooks';
 
 /**
  * Port SDK Client
@@ -61,9 +64,12 @@ export class PortClient {
   public readonly entities: EntityResource;
   public readonly blueprints: BlueprintResource;
   public readonly actions: ActionResource;
+  public readonly actionRuns: ActionRunResource;
   public readonly scorecards: ScorecardResource;
   public readonly teams: TeamResource;
   public readonly users: UserResource;
+  public readonly audit: AuditResource;
+  public readonly webhooks: WebhookResource;
 
   /**
    * Create a new Port SDK client
@@ -89,9 +95,12 @@ export class PortClient {
     this.entities = new EntityResource(this.httpClient);
     this.blueprints = new BlueprintResource(this.httpClient);
     this.actions = new ActionResource(this.httpClient);
+    this.actionRuns = new ActionRunResource(this.httpClient);
     this.scorecards = new ScorecardResource(this.httpClient);
     this.teams = new TeamResource(this.httpClient);
     this.users = new UserResource(this.httpClient);
+    this.audit = new AuditResource(this.httpClient);
+    this.webhooks = new WebhookResource(this.httpClient);
   }
 
   /**

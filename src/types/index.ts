@@ -13,9 +13,12 @@ export * from './common';
 export * from './entities';
 export * from './blueprints';
 export * from './actions';
+export * from './action-runs';
 export * from './scorecards';
 export * from './teams';
 export * from './users';
+export * from './audit';
+export * from './webhooks';
 export * from './responses';
 
 /**

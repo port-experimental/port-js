@@ -153,16 +153,49 @@ export interface ActionRunLog {
 /**
  * Action run
  */
+/**
+ * Reference to an action, blueprint, or entity in run context
+ */
+export interface ActionRunReference {
+  identifier: string;
+  title?: string | null;
+  icon?: string | null;
+  deleted?: boolean;
+}
+
+/**
+ * Action run approval information
+ */
+export interface ActionRunApproval {
+  required: boolean;
+  status?: string;
+  approvers?: string[];
+}
+
+/**
+ * Complete action run with all fields
+ */
 export interface ActionRun {
   id: string;
-  action: string;
-  blueprint?: string;
-  entity?: string;
   status: ActionRunStatus;
+  statusLabel?: string;
+  action: ActionRunReference;
+  blueprint?: ActionRunReference;
+  entity?: ActionRunReference;
   properties?: Record<string, unknown>;
-  logs?: ActionRunLog[];
+  rawProperties?: Record<string, unknown>;
+  payload?: unknown;
+  response?: unknown;
+  summary?: string;
+  link?: string;
+  source?: string;
+  approval?: ActionRunApproval;
+  requiredApproval?: boolean;
+  createdBy?: string;
+  impersonatedBy?: string;
+  updatedBy?: string;
   createdAt: Date;
   updatedAt: Date;
-  createdBy: string;
+  endedAt?: Date;
 }
 

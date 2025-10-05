@@ -13,9 +13,12 @@ export { PortClient } from './client';
 export { EntityResource } from './resources/entities';
 export { BlueprintResource } from './resources/blueprints';
 export { ActionResource } from './resources/actions';
+export { ActionRunResource } from './resources/action-runs';
 export { ScorecardResource } from './resources/scorecards';
 export { TeamResource } from './resources/teams';
 export { UserResource } from './resources/users';
+export { AuditResource } from './resources/audit';
+export { WebhookResource } from './resources/webhooks';
 
 // HTTP Client (for advanced usage)
 export { HttpClient } from './http-client';
