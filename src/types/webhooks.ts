@@ -49,6 +49,8 @@ export interface CreateWebhookInput {
   enabled?: boolean;
   /** Integration type */
   integrationType?: string;
+  /** URL endpoint */
+  url?: string;
   /** Webhook mappings */
   mappings?: unknown[];
   /** Security settings */
@@ -72,6 +74,8 @@ export interface UpdateWebhookInput {
   enabled?: boolean;
   /** Integration type */
   integrationType?: string;
+  /** URL endpoint */
+  url?: string;
   /** Webhook mappings */
   mappings?: unknown[];
   /** Security settings */
