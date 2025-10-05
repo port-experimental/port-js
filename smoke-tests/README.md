@@ -35,10 +35,16 @@ pnpm smoke:rule-result    # Test '_rule_result' blueprint
 pnpm smoke:entity-crud    # Entity CRUD operations
 pnpm smoke:blueprint-crud # Blueprint CRUD operations
 pnpm smoke:action         # Action creation and execution
+pnpm smoke:teams          # Team CRUD operations
+pnpm smoke:users          # User CRUD operations
+pnpm smoke:webhooks       # Webhook CRUD operations
+pnpm smoke:audit          # Audit logs query
+pnpm smoke:action-runs    # Action runs and monitoring
 
 # Or directly with tsx
 pnpm tsx smoke-tests/07-entity-crud.ts
 pnpm tsx smoke-tests/08-blueprint-crud.ts
+pnpm tsx smoke-tests/12-webhooks-crud.ts
 # ... etc
 ```
 
@@ -69,6 +75,11 @@ These smoke tests verify:
 | 07 | **Entity CRUD** | **Create, Read, Update, Delete, List, Search entities** |
 | 08 | **Blueprint CRUD** | **Create, Read, Update, Delete, List blueprints** |
 | 09 | **Action Operations** | **Create, Read, List, Delete actions** |
+| 10 | **Team CRUD** | **Create, Read, Update, Delete, List teams** |
+| 11 | **User CRUD** | **Invite, Read, Update, Delete, List users** |
+| 12 | **Webhook CRUD** | **Create, Read, Update, Delete, List webhooks** |
+| 13 | **Audit Logs** | **Query audit logs with various filters** |
+| 14 | **Action Runs** | **Execute actions, monitor runs, query logs** |
 
 ## Expected Output
 

@@ -8,6 +8,35 @@
 
 A type-safe, feature-rich SDK for interacting with Port.io's API. Built with security, developer experience, and reliability in mind.
 
+---
+
+## ⚠️ **IMPORTANT: Backend/Server-Side Only**
+
+> **🚨 This SDK is designed for backend/server-side use ONLY.**
+>
+> **DO NOT use this SDK in browser/frontend applications** where code is exposed to end users.
+>
+> **Why?**
+> - Requires **client credentials** (Client ID & Secret) that must be kept secure
+> - Credentials in frontend code are **publicly accessible** and pose a **critical security risk**
+> - Designed for Node.js server environments (Express, NestJS, serverless functions, etc.)
+>
+> **Supported Environments:**
+> - ✅ Node.js (v20+)
+> - ✅ Backend servers (Express, Fastify, Koa, etc.)
+> - ✅ Serverless functions (AWS Lambda, Vercel, Netlify, etc.)
+> - ✅ CI/CD pipelines (GitHub Actions, GitLab CI, etc.)
+> - ✅ CLI tools and scripts
+>
+> **NOT Supported:**
+> - ❌ Browser applications (React, Vue, Angular, etc.)
+> - ❌ Client-side JavaScript
+> - ❌ Mobile apps (React Native, Ionic, etc.)
+>
+> For frontend integrations, create a **backend API** that uses this SDK and exposes only necessary data to your frontend.
+
+---
+
 ## ✨ Key Features
 
 - 🔐 **Secure by Default** - Built with security-first principles
@@ -69,13 +98,17 @@ console.log(`Created entity: ${entity.identifier}`);
 ### Getting Started
 - [Installation & Setup](./docs/getting-started/installation.md)
 - [Quick Start Guide](./docs/getting-started/quickstart.md)
+- [⚠️ Backend/Server-Side Only Notice](./docs/BACKEND_ONLY.md) - **Read this first!**
 - [API Documentation](./docs/api/) - Auto-generated TypeDoc documentation
 
 ### Development
 - [Development Guide](./docs/development/README.md)
+- [API Coverage Analysis](./API_COVERAGE_ANALYSIS.md) - What's implemented vs missing
+- [Automated Workflows](./docs/development/AUTOMATED_WORKFLOWS.md) - Daily OpenAPI sync & health checks
 - [Contributing Guide](./CONTRIBUTING.md)
 - [Commit Message Cheatsheet](./docs/development/COMMIT_MESSAGES.md)
 - [Security Policy](./SECURITY.md)
+- [Credential Security](./docs/development/CREDENTIAL_SECURITY.md)
 - [Testing Guide](./docs/TESTING.md)
 
 ### Examples

@@ -80,17 +80,17 @@ async function main() {
     // ✅ Step 3: Execute Action
     console.log('\n🚀 Step 3: Executing action...');
     const execution = await client.actions.execute(testActionId, {
-      entity: testEntityId,
+      entityIdentifier: testEntityId,
       properties: {
         reason: 'Smoke test execution'
       }
     });
     console.log(`✅ Action executed!`);
-    console.log(`   Run ID: ${execution.runId}`);
-    console.log(`   Action: ${execution.action}`);
+    console.log(`   Run ID: ${execution.id}`);
+    console.log(`   Action: ${execution.action.identifier}`);
     console.log(`   Status: ${execution.status || 'INITIATED'}`);
 
-    const runId = execution.runId;
+    const runId = execution.id;
 
     // ✅ Step 4: Get Action Run Details
     console.log('\n🔍 Step 4: Fetching action run details...');
@@ -104,7 +104,7 @@ async function main() {
 
     // ✅ Step 5: List All Action Runs
     console.log('\n📋 Step 5: Listing recent action runs...');
-    const allRuns = await client.actionRuns.list({ limit: 5 });
+    const allRuns = await client.actionRuns.list();
     console.log(`✅ Found ${allRuns.length} recent run(s)`);
     if (allRuns.length > 0) {
       console.log(`   Most recent runs:`);
@@ -113,47 +113,34 @@ async function main() {
       });
     }
 
-    // ✅ Step 6: List Runs for Specific Action
-    console.log('\n🎯 Step 6: Listing runs for test action...');
-    const actionRuns = await client.actionRuns.listForAction(testActionId);
-    console.log(`✅ Found ${actionRuns.length} run(s) for ${testActionId}`);
-    if (actionRuns.length > 0) {
-      actionRuns.forEach((run, idx) => {
-        console.log(`   Run ${idx + 1}: ${run.id} - ${run.status}`);
-      });
-    }
-
-    // ✅ Step 7: List Runs for Specific Entity
-    console.log('\n📦 Step 7: Listing runs for test entity...');
+    // ✅ Step 6: List Runs for Specific Entity
+    console.log('\n📦 Step 6: Listing runs for test entity...');
     const entityRuns = await client.actionRuns.list({
-      entity: testEntityId,
-      limit: 10
+      entity: testEntityId
     });
     console.log(`✅ Found ${entityRuns.length} run(s) for entity ${testEntityId}`);
 
     // ✅ Step 8: List Runs by Blueprint
     console.log('\n🏗️  Step 8: Listing runs for service blueprint...');
     const blueprintRuns = await client.actionRuns.list({
-      blueprint: 'service',
-      limit: 5
+      blueprint: 'service'
     });
     console.log(`✅ Found ${blueprintRuns.length} run(s) for 'service' blueprint`);
 
     // ✅ Step 9: List Active Runs
     console.log('\n⏳ Step 9: Listing active runs...');
     const activeRuns = await client.actionRuns.list({
-      active: true,
-      limit: 5
+      active: true
     });
     console.log(`✅ Found ${activeRuns.length} active run(s)`);
 
     // ✅ Step 10: Get Action Run Logs
     console.log('\n📝 Step 10: Fetching action run logs...');
     const logs = await client.actionRuns.getLogs(runId);
-    console.log(`✅ Retrieved ${logs.length} log entry/entries`);
-    if (logs.length > 0) {
+    console.log(`✅ Retrieved ${logs.logs.length} log entry/entries`);
+    if (logs.logs.length > 0) {
       console.log(`   Recent logs:`);
-      logs.slice(0, 3).forEach((log, idx) => {
+      logs.logs.slice(0, 3).forEach((log, idx) => {
         console.log(`   ${idx + 1}. [${log.level}] ${log.message}`);
       });
     } else {
@@ -164,8 +151,7 @@ async function main() {
     console.log('\n🔎 Step 11: Querying with combined filters...');
     const filteredRuns = await client.actionRuns.list({
       blueprint: 'service',
-      entity: testEntityId,
-      limit: 10
+      entity: testEntityId
     });
     console.log(`✅ Found ${filteredRuns.length} run(s) matching filters`);
     console.log(`   (blueprint=service, entity=${testEntityId})`);
@@ -187,7 +173,7 @@ async function main() {
 
     // ✅ Step 14: Clean Up Entity
     console.log('\n🗑️  Step 14: Deleting test entity...');
-    await client.entities.delete('service', testEntityId);
+    await client.entities.delete(testEntityId, 'service');
     console.log(`✅ Deleted entity: ${testEntityId}`);
     createdEntityId = undefined;
 

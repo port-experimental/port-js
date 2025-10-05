@@ -48,6 +48,21 @@ pnpm tsx examples/06-entities-batch.ts
 pnpm tsx examples/<filename>.ts
 ```
 
+## 🔗 Entity Relations Examples (NEW!)
+
+**Essential concepts for building connected data models:**
+
+```bash
+# Basic relations (start here!)
+pnpm tsx examples/20-entity-relations-basic.ts
+
+# Bidirectional relations (CRITICAL to understand!)
+pnpm tsx examples/21-bidirectional-relations.ts
+
+# Complex dependency graphs
+pnpm tsx examples/22-complex-relations.ts
+```
+
 **With Inline Credentials:**
 ```bash
 PORT_CLIENT_ID=xxx PORT_CLIENT_SECRET=yyy pnpm tsx examples/01-basic-usage.ts

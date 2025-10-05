@@ -1,0 +1,179 @@
+name: Daily Health Check
+
+# Run daily to ensure SDK remains healthy
+on:
+  schedule:
+    # Runs at 08:00 UTC every day (different time than OpenAPI sync)
+    - cron: '0 8 * * *'
+  
+  # Allow manual trigger
+  workflow_dispatch:
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Check for dependency vulnerabilities
+        id: audit
+        run: |
+          echo "🔒 Running security audit..."
+          pnpm audit --audit-level=moderate || true
+          
+          # Store audit results
+          pnpm audit --json > audit-results.json || true
+          
+          # Count vulnerabilities
+          CRITICAL=$(cat audit-results.json | jq '.metadata.vulnerabilities.critical // 0')
+          HIGH=$(cat audit-results.json | jq '.metadata.vulnerabilities.high // 0')
+          MODERATE=$(cat audit-results.json | jq '.metadata.vulnerabilities.moderate // 0')
+          
+          echo "critical=$CRITICAL" >> $GITHUB_OUTPUT
+          echo "high=$HIGH" >> $GITHUB_OUTPUT
+          echo "moderate=$MODERATE" >> $GITHUB_OUTPUT
+          
+          if [ "$CRITICAL" -gt 0 ] || [ "$HIGH" -gt 0 ]; then
+            echo "has_vulnerabilities=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_vulnerabilities=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Check for outdated dependencies
+        id: outdated
+        run: |
+          echo "📦 Checking for outdated dependencies..."
+          pnpm outdated --format json > outdated.json || true
+          
+          OUTDATED_COUNT=$(cat outdated.json | jq 'length')
+          echo "outdated_count=$OUTDATED_COUNT" >> $GITHUB_OUTPUT
+      
+      - name: Run type check
+        id: typecheck
+        run: |
+          echo "🔍 Running type check..."
+          pnpm type-check
+          echo "typecheck_success=true" >> $GITHUB_OUTPUT
+      
+      - name: Run linting
+        id: lint
+        run: |
+          echo "🧹 Running linter..."
+          # Add linting command when configured
+          echo "lint_success=true" >> $GITHUB_OUTPUT
+      
+      - name: Run tests
+        id: test
+        run: |
+          echo "🧪 Running tests..."
+          pnpm test
+          echo "test_success=true" >> $GITHUB_OUTPUT
+      
+      - name: Run test coverage
+        id: coverage
+        run: |
+          echo "📊 Checking test coverage..."
+          pnpm test:coverage
+          
+          # Extract coverage percentage (adjust based on your reporter)
+          # This assumes vitest with v8 coverage
+          if [ -f coverage/coverage-summary.json ]; then
+            COVERAGE=$(cat coverage/coverage-summary.json | jq '.total.lines.pct')
+            echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+          else
+            echo "coverage=0" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Build SDK
+        id: build
+        run: |
+          echo "📦 Building SDK..."
+          pnpm build
+          echo "build_success=true" >> $GITHUB_OUTPUT
+      
+      - name: Create issue for health problems
+        if: |
+          steps.audit.outputs.has_vulnerabilities == 'true' ||
+          steps.typecheck.outputs.typecheck_success != 'true' ||
+          steps.test.outputs.test_success != 'true' ||
+          steps.build.outputs.build_success != 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = '⚠️ Daily Health Check Failed';
+            const critical = '${{ steps.audit.outputs.critical }}';
+            const high = '${{ steps.audit.outputs.high }}';
+            const moderate = '${{ steps.audit.outputs.moderate }}';
+            
+            const body = `## 🏥 SDK Health Check Alert
+            
+            The daily health check detected issues with the SDK.
+            
+            ### Status
+            - Security Audit: ${critical === '0' && high === '0' ? '✅' : '⚠️'} (Critical: ${critical}, High: ${high}, Moderate: ${moderate})
+            - Type Check: ${{ steps.typecheck.outputs.typecheck_success == 'true' ? '✅' : '❌' }}
+            - Tests: ${{ steps.test.outputs.test_success == 'true' ? '✅' : '❌' }}
+            - Build: ${{ steps.build.outputs.build_success == 'true' ? '✅' : '❌' }}
+            - Coverage: ${{ steps.coverage.outputs.coverage }}%
+            
+            ### Action Required
+            ${critical !== '0' || high !== '0' ? '- 🔒 **URGENT:** Fix security vulnerabilities' : ''}
+            ${{ steps.typecheck.outputs.typecheck_success != 'true' ? '- Fix TypeScript errors' : '' }}
+            ${{ steps.test.outputs.test_success != 'true' ? '- Fix failing tests' : '' }}
+            ${{ steps.build.outputs.build_success != 'true' ? '- Fix build errors' : '' }}
+            
+            ### Workflow Run
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            
+            ---
+            **Date:** ${new Date().toISOString()}
+            `;
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['bug', 'health-check', 'automated']
+            });
+      
+      - name: Summary
+        if: always()
+        run: |
+          echo "## 🏥 Daily Health Check Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status | Details |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|---------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Security Audit | ${{ steps.audit.outputs.has_vulnerabilities == 'true' && '⚠️ Issues found' || '✅ Clean' }} | Critical: ${{ steps.audit.outputs.critical }}, High: ${{ steps.audit.outputs.high }}, Moderate: ${{ steps.audit.outputs.moderate }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Outdated Deps | ℹ️ Info | ${{ steps.outdated.outputs.outdated_count }} packages |" >> $GITHUB_STEP_SUMMARY
+          echo "| Type Check | ${{ steps.typecheck.outputs.typecheck_success == 'true' && '✅ Passed' || '❌ Failed' }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tests | ${{ steps.test.outputs.test_success == 'true' && '✅ Passed' || '❌ Failed' }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "| Coverage | ℹ️ ${{ steps.coverage.outputs.coverage }}% | - |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build | ${{ steps.build.outputs.build_success == 'true' && '✅ Success' || '❌ Failed' }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ steps.audit.outputs.has_vulnerabilities }}" = "true" ] || \
+             [ "${{ steps.typecheck.outputs.typecheck_success }}" != "true" ] || \
+             [ "${{ steps.test.outputs.test_success }}" != "true" ] || \
+             [ "${{ steps.build.outputs.build_success }}" != "true" ]; then
+            echo "### ⚠️ Result: Issues Detected" >> $GITHUB_STEP_SUMMARY
+            echo "An issue has been created. Please investigate." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ✅ Result: All Checks Passed" >> $GITHUB_STEP_SUMMARY
+            echo "SDK is healthy!" >> $GITHUB_STEP_SUMMARY
+          fi

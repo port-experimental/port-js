@@ -1,7 +1,7 @@
 {
   "name": "@port-labs/port-sdk",
   "version": "0.1.0",
-  "description": "Type-safe TypeScript SDK for Port.io API",
+  "description": "Type-safe TypeScript SDK for Port.io API (Backend/Server-Side Only)",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -45,6 +45,9 @@
     "smoke:action": "tsx smoke-tests/09-action-execution.ts",
     "smoke:teams": "tsx smoke-tests/10-teams-crud.ts",
     "smoke:users": "tsx smoke-tests/11-users-crud.ts",
+    "smoke:webhooks": "tsx smoke-tests/12-webhooks-crud.ts",
+    "smoke:audit": "tsx smoke-tests/13-audit-logs.ts",
+    "smoke:action-runs": "tsx smoke-tests/14-action-runs.ts",
     "version:patch": "npm version patch -m \"chore: release v%s\"",
     "version:minor": "npm version minor -m \"chore: release v%s\"",
     "version:major": "npm version major -m \"chore: release v%s\"",

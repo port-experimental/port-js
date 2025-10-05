@@ -132,8 +132,10 @@ export type UpdateActionInput = Partial<CreateActionInput>;
  * Execute action input
  */
 export interface ExecuteActionInput {
+  /** Entity identifier for DAY-2 actions */
+  entityIdentifier?: string;
+  /** Action properties */
   properties?: Record<string, unknown>;
-  relatedEntityIdentifier?: string;
 }
 
 /**

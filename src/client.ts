@@ -1,5 +1,12 @@
 /**
  * Main Port SDK client
+ * 
+ * ⚠️ **BACKEND/SERVER-SIDE USE ONLY**
+ * 
+ * This SDK is designed for backend/server-side environments only.
+ * DO NOT use in browser/frontend applications where credentials would be exposed.
+ * 
+ * @see {@link https://github.com/port-labs/port-js-sdk#backend-server-side-only|Security Notice}
  */
 
 import { HttpClient } from './http-client';
@@ -17,13 +24,29 @@ import { WebhookResource } from './resources/webhooks';
 /**
  * Port SDK Client
  * 
+ * ⚠️ **IMPORTANT:** This SDK is for backend/server-side use only.
+ * Never use in browser/frontend applications where credentials would be publicly exposed.
+ * 
  * @example
- * Create client with OAuth credentials
+ * Create client with OAuth credentials (Backend only!)
  * ```typescript
+ * // ✅ GOOD - In Node.js backend (Express, NestJS, etc.)
  * const client = new PortClient({
  *   credentials: {
- *     clientId: 'your-client-id',
- *     clientSecret: 'your-client-secret',
+ *     clientId: process.env.PORT_CLIENT_ID!,
+ *     clientSecret: process.env.PORT_CLIENT_SECRET!,
+ *   },
+ * });
+ * ```
+ * 
+ * @example
+ * ❌ BAD - Never do this in browser/React/Vue/Angular
+ * ```typescript
+ * // ❌ NEVER DO THIS - Credentials exposed to users!
+ * const client = new PortClient({
+ *   credentials: {
+ *     clientId: 'your-client-id',  // ❌ Exposed in browser!
+ *     clientSecret: 'your-client-secret',  // ❌ Major security risk!
  *   },
  * });
  * ```

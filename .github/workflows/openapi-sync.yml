@@ -1,0 +1,311 @@
+name: OpenAPI Sync & Build Check
+
+# Run daily at 2 AM UTC to check for API changes
+on:
+  schedule:
+    # Runs at 02:00 UTC every day
+    - cron: '0 2 * * *'
+  
+  # Allow manual trigger
+  workflow_dispatch:
+  
+  # Also run on pushes to main that modify OpenAPI-related files
+  push:
+    branches:
+      - main
+    paths:
+      - 'openapi.json'
+      - 'scripts/check-types.ts'
+      - '.github/workflows/openapi-sync.yml'
+
+jobs:
+  sync-openapi:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
+      
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+      
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Backup current OpenAPI spec
+        run: |
+          if [ -f openapi.json ]; then
+            cp openapi.json openapi.json.backup
+            echo "Backed up existing OpenAPI spec"
+          fi
+      
+      - name: Download latest OpenAPI spec
+        id: download
+        run: |
+          echo "📥 Downloading latest OpenAPI spec from Port.io..."
+          pnpm types:download
+          
+          if [ $? -eq 0 ]; then
+            echo "✅ Successfully downloaded OpenAPI spec"
+            echo "download_success=true" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Failed to download OpenAPI spec"
+            echo "download_success=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+      
+      - name: Check for OpenAPI changes
+        id: check-changes
+        run: |
+          if [ -f openapi.json.backup ]; then
+            if diff -q openapi.json openapi.json.backup > /dev/null; then
+              echo "No changes detected in OpenAPI spec"
+              echo "has_changes=false" >> $GITHUB_OUTPUT
+            else
+              echo "⚠️ Changes detected in OpenAPI spec"
+              echo "has_changes=true" >> $GITHUB_OUTPUT
+              
+              # Show what changed (first 50 lines of diff)
+              echo "Changes summary:"
+              diff openapi.json openapi.json.backup | head -50
+            fi
+          else
+            echo "First time download - no comparison available"
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Generate TypeScript types
+        if: steps.check-changes.outputs.has_changes == 'true'
+        id: generate
+        run: |
+          echo "🔧 Generating TypeScript types from OpenAPI spec..."
+          pnpm types:generate
+          
+          if [ $? -eq 0 ]; then
+            echo "✅ Successfully generated types"
+            echo "generate_success=true" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Failed to generate types"
+            echo "generate_success=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+      
+      - name: Run type checking
+        if: steps.generate.outputs.generate_success == 'true'
+        id: typecheck
+        run: |
+          echo "🔍 Running TypeScript type check..."
+          pnpm type-check
+          
+          if [ $? -eq 0 ]; then
+            echo "✅ Type check passed"
+            echo "typecheck_success=true" >> $GITHUB_OUTPUT
+          else
+            echo "⚠️ Type check failed - API changes may have introduced breaking changes"
+            echo "typecheck_success=false" >> $GITHUB_OUTPUT
+            # Don't exit - we want to create an issue
+          fi
+      
+      - name: Run tests
+        if: steps.generate.outputs.generate_success == 'true'
+        id: test
+        run: |
+          echo "🧪 Running tests..."
+          pnpm test
+          
+          if [ $? -eq 0 ]; then
+            echo "✅ Tests passed"
+            echo "test_success=true" >> $GITHUB_OUTPUT
+          else
+            echo "⚠️ Tests failed - API changes may have broken functionality"
+            echo "test_success=false" >> $GITHUB_OUTPUT
+            # Don't exit - we want to create an issue
+          fi
+      
+      - name: Build SDK
+        if: steps.generate.outputs.generate_success == 'true'
+        id: build
+        run: |
+          echo "📦 Building SDK..."
+          pnpm build
+          
+          if [ $? -eq 0 ]; then
+            echo "✅ Build successful"
+            echo "build_success=true" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Build failed"
+            echo "build_success=false" >> $GITHUB_OUTPUT
+            # Don't exit - we want to create an issue
+          fi
+      
+      - name: Generate API coverage report
+        if: steps.check-changes.outputs.has_changes == 'true'
+        run: |
+          echo "📊 API coverage analysis would go here"
+          # This could parse openapi.json and compare with implemented resources
+          # For now, just note that changes were detected
+      
+      - name: Create Pull Request for changes
+        if: |
+          steps.check-changes.outputs.has_changes == 'true' &&
+          steps.typecheck.outputs.typecheck_success == 'true' &&
+          steps.test.outputs.test_success == 'true' &&
+          steps.build.outputs.build_success == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore: update OpenAPI spec and generated types'
+          title: '🔄 Auto-sync: OpenAPI Spec Update'
+          body: |
+            ## 🤖 Automated OpenAPI Sync
+            
+            This PR was automatically generated by the daily OpenAPI sync workflow.
+            
+            ### Changes
+            - ✅ Downloaded latest OpenAPI spec from Port.io
+            - ✅ Regenerated TypeScript types
+            - ✅ Type check passed
+            - ✅ Tests passed
+            - ✅ Build successful
+            
+            ### Verification
+            - [x] OpenAPI spec updated
+            - [x] Types regenerated
+            - [x] Type check passed
+            - [x] All tests passing
+            - [x] Build successful
+            
+            ### Action Required
+            1. Review the changes in `src/types/api.ts`
+            2. Check if any new endpoints were added
+            3. Update `API_COVERAGE_ANALYSIS.md` if needed
+            4. Merge if everything looks good
+            
+            ---
+            
+            **Triggered by:** Daily sync workflow
+            **Date:** ${{ github.event.repository.updated_at }}
+          branch: auto-sync/openapi-${{ github.run_number }}
+          delete-branch: true
+          labels: |
+            automated
+            openapi-sync
+            dependencies
+      
+      - name: Create issue for failures
+        if: |
+          steps.check-changes.outputs.has_changes == 'true' && (
+            steps.typecheck.outputs.typecheck_success == 'false' ||
+            steps.test.outputs.test_success == 'false' ||
+            steps.build.outputs.build_success == 'false'
+          )
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = '⚠️ OpenAPI Sync Failed - Breaking Changes Detected';
+            const body = `## 🚨 OpenAPI Sync Alert
+            
+            The automated OpenAPI sync detected changes that broke the build.
+            
+            ### Status
+            - Download: ${{ steps.download.outputs.download_success == 'true' && '✅' || '❌' }}
+            - Type Generation: ${{ steps.generate.outputs.generate_success == 'true' && '✅' || '❌' }}
+            - Type Check: ${{ steps.typecheck.outputs.typecheck_success == 'true' && '✅' || '⚠️ FAILED' }}
+            - Tests: ${{ steps.test.outputs.test_success == 'true' && '✅' || '⚠️ FAILED' }}
+            - Build: ${{ steps.build.outputs.build_success == 'true' && '✅' || '❌ FAILED' }}
+            
+            ### Likely Causes
+            - Port.io API introduced breaking changes
+            - New required fields added to existing types
+            - Endpoints were removed or renamed
+            - Response schema changes
+            
+            ### Action Required
+            1. Review the workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            2. Check the OpenAPI diff for breaking changes
+            3. Update SDK code to handle API changes
+            4. Update tests if needed
+            5. Manually trigger workflow after fixes
+            
+            ### Files to Check
+            - \`openapi.json\` - See what changed in the API
+            - \`src/types/api.ts\` - Generated types that may have changed
+            - Resources in \`src/resources/\` - May need updates
+            
+            ---
+            
+            **Workflow Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            **Date:** ${new Date().toISOString()}
+            `;
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['bug', 'openapi-sync', 'breaking-change', 'urgent']
+            });
+      
+      - name: Notify on Slack (if configured)
+        if: |
+          steps.check-changes.outputs.has_changes == 'true' &&
+          steps.typecheck.outputs.typecheck_success == 'false'
+        run: |
+          echo "⚠️ Would send Slack notification about breaking changes"
+          # Add Slack webhook integration here if needed
+          # curl -X POST -H 'Content-type: application/json' \
+          #   --data '{"text":"OpenAPI sync detected breaking changes!"}' \
+          #   ${{ secrets.SLACK_WEBHOOK_URL }}
+      
+      - name: Summary
+        if: always()
+        run: |
+          echo "## 📊 OpenAPI Sync Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Step | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Download OpenAPI | ${{ steps.download.outputs.download_success == 'true' && '✅ Success' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Detect Changes | ${{ steps.check-changes.outputs.has_changes == 'true' && '⚠️ Changes detected' || '✅ No changes' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Generate Types | ${{ steps.generate.outputs.generate_success == 'true' && '✅ Success' || '➖ Skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Type Check | ${{ steps.typecheck.outputs.typecheck_success == 'true' && '✅ Passed' || steps.typecheck.outputs.typecheck_success == 'false' && '❌ Failed' || '➖ Skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tests | ${{ steps.test.outputs.test_success == 'true' && '✅ Passed' || steps.test.outputs.test_success == 'false' && '❌ Failed' || '➖ Skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build | ${{ steps.build.outputs.build_success == 'true' && '✅ Success' || steps.build.outputs.build_success == 'false' && '❌ Failed' || '➖ Skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ steps.check-changes.outputs.has_changes }}" = "true" ]; then
+            if [ "${{ steps.typecheck.outputs.typecheck_success }}" = "true" ] && \
+               [ "${{ steps.test.outputs.test_success }}" = "true" ] && \
+               [ "${{ steps.build.outputs.build_success }}" = "true" ]; then
+              echo "### ✅ Result: Pull Request Created" >> $GITHUB_STEP_SUMMARY
+              echo "A PR has been created with the updated OpenAPI types." >> $GITHUB_STEP_SUMMARY
+            else
+              echo "### ⚠️ Result: Issue Created" >> $GITHUB_STEP_SUMMARY
+              echo "Breaking changes detected. An issue has been created for investigation." >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "### ✅ Result: No Action Needed" >> $GITHUB_STEP_SUMMARY
+            echo "OpenAPI spec is up to date." >> $GITHUB_STEP_SUMMARY
+          fi

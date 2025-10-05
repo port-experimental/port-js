@@ -1,0 +1,468 @@
+name: Publish to npm
+
+# Trigger on new releases or version tags
+on:
+  release:
+    types: [published]
+  
+  # Also support manual tag-based publishing
+  push:
+    tags:
+      - 'v*.*.*'
+  
+  # Allow manual trigger with version input
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (e.g., 0.1.0, 1.0.0-beta.1)'
+        required: true
+        type: string
+      dry_run:
+        description: 'Dry run (test without publishing)'
+        required: false
+        type: boolean
+        default: false
+      tag:
+        description: 'npm dist-tag (latest, beta, next, etc.)'
+        required: false
+        type: string
+        default: 'latest'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    
+    # Only run on main branch for safety
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+    
+    permissions:
+      contents: write
+      id-token: write  # Required for npm provenance
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for changelog generation
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
+      
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+      
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Determine version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            # Manual trigger with version input
+            VERSION="${{ github.event.inputs.version }}"
+          elif [ "${{ github.event_name }}" = "release" ]; then
+            # Extract version from release tag (remove 'v' prefix)
+            VERSION="${{ github.event.release.tag_name }}"
+            VERSION="${VERSION#v}"
+          elif [[ "${{ github.ref }}" =~ ^refs/tags/v ]]; then
+            # Extract version from git tag (remove 'v' prefix)
+            VERSION="${{ github.ref_name }}"
+            VERSION="${VERSION#v}"
+          else
+            echo "❌ Could not determine version"
+            exit 1
+          fi
+          
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "📦 Publishing version: $VERSION"
+      
+      - name: Determine npm tag
+        id: npm-tag
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.tag }}" ]; then
+            # Use manually specified tag
+            TAG="${{ github.event.inputs.tag }}"
+          elif [[ "$VERSION" =~ -beta ]]; then
+            TAG="beta"
+          elif [[ "$VERSION" =~ -alpha ]]; then
+            TAG="alpha"
+          elif [[ "$VERSION" =~ -rc ]]; then
+            TAG="rc"
+          elif [[ "$VERSION" =~ - ]]; then
+            TAG="next"
+          else
+            TAG="latest"
+          fi
+          
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "📌 npm dist-tag: $TAG"
+      
+      - name: Update package.json version
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          echo "Updating package.json to version $VERSION"
+          npm version $VERSION --no-git-tag-version
+          
+          # Verify version was updated
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          if [ "$PACKAGE_VERSION" != "$VERSION" ]; then
+            echo "❌ Version mismatch: expected $VERSION, got $PACKAGE_VERSION"
+            exit 1
+          fi
+          
+          echo "✅ package.json version: $PACKAGE_VERSION"
+      
+      - name: Security audit
+        id: audit
+        run: |
+          echo "🔒 Running security audit..."
+          pnpm audit --audit-level=high || true
+          
+          # Get audit results
+          pnpm audit --json > audit-results.json || true
+          CRITICAL=$(cat audit-results.json | jq '.metadata.vulnerabilities.critical // 0')
+          HIGH=$(cat audit-results.json | jq '.metadata.vulnerabilities.high // 0')
+          
+          echo "critical=$CRITICAL" >> $GITHUB_OUTPUT
+          echo "high=$HIGH" >> $GITHUB_OUTPUT
+          
+          if [ "$CRITICAL" -gt 0 ] || [ "$HIGH" -gt 0 ]; then
+            echo "⚠️ Security vulnerabilities detected: Critical=$CRITICAL, High=$HIGH"
+            echo "⚠️ Consider fixing before publishing!"
+            # Don't fail, but warn
+          else
+            echo "✅ No critical or high vulnerabilities"
+          fi
+      
+      - name: Run type check
+        run: |
+          echo "🔍 Running type check..."
+          pnpm type-check
+          echo "✅ Type check passed"
+      
+      - name: Run tests
+        run: |
+          echo "🧪 Running tests..."
+          pnpm test
+          echo "✅ Tests passed"
+      
+      - name: Run test coverage
+        id: coverage
+        run: |
+          echo "📊 Checking test coverage..."
+          pnpm test:coverage
+          
+          if [ -f coverage/coverage-summary.json ]; then
+            COVERAGE=$(cat coverage/coverage-summary.json | jq '.total.lines.pct')
+            echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+            echo "📊 Coverage: $COVERAGE%"
+            
+            # Warn if coverage is below 80%
+            if (( $(echo "$COVERAGE < 80" | bc -l) )); then
+              echo "⚠️ Warning: Coverage below 80%"
+            fi
+          fi
+      
+      - name: Build SDK
+        run: |
+          echo "📦 Building SDK..."
+          pnpm build
+          echo "✅ Build successful"
+      
+      - name: Verify build artifacts
+        run: |
+          echo "🔍 Verifying build artifacts..."
+          
+          # Check that dist directory exists
+          if [ ! -d "dist" ]; then
+            echo "❌ dist directory not found"
+            exit 1
+          fi
+          
+          # Check for required files
+          REQUIRED_FILES=(
+            "dist/index.js"
+            "dist/index.mjs"
+            "dist/index.d.ts"
+          )
+          
+          for file in "${REQUIRED_FILES[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "❌ Required file missing: $file"
+              exit 1
+            fi
+            echo "✅ Found: $file"
+          done
+          
+          # Check package.json exports
+          node -e "
+            const pkg = require('./package.json');
+            if (!pkg.exports || !pkg.exports['.']) {
+              console.error('❌ package.json exports not configured');
+              process.exit(1);
+            }
+            console.log('✅ package.json exports configured');
+          "
+      
+      - name: Generate changelog for this version
+        id: changelog
+        run: |
+          echo "📝 Generating changelog..."
+          
+          # Get the previous tag
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          
+          if [ -z "$PREV_TAG" ]; then
+            echo "First release - no previous tag"
+            CHANGELOG="First release of Port SDK"
+          else
+            echo "Generating changelog from $PREV_TAG to HEAD"
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)" $PREV_TAG..HEAD)
+          fi
+          
+          # Save to file for later use
+          echo "$CHANGELOG" > RELEASE_CHANGELOG.txt
+          echo "changelog_file=RELEASE_CHANGELOG.txt" >> $GITHUB_OUTPUT
+      
+      - name: Dry run check
+        if: github.event.inputs.dry_run == 'true'
+        run: |
+          echo "🧪 DRY RUN MODE - Not publishing to npm"
+          echo ""
+          echo "Would publish:"
+          echo "  Package: $(node -p 'require(\"./package.json\").name')"
+          echo "  Version: ${{ steps.version.outputs.version }}"
+          echo "  Tag: ${{ steps.npm-tag.outputs.tag }}"
+          echo ""
+          echo "Build artifacts:"
+          ls -lh dist/
+          echo ""
+          echo "Package contents:"
+          npm pack --dry-run
+      
+      - name: Publish to npm
+        if: github.event.inputs.dry_run != 'true'
+        run: |
+          echo "🚀 Publishing to npm..."
+          echo ""
+          echo "Package: $(node -p 'require(\"./package.json\").name')"
+          echo "Version: ${{ steps.version.outputs.version }}"
+          echo "Tag: ${{ steps.npm-tag.outputs.tag }}"
+          echo ""
+          
+          # Publish with provenance (supply chain security)
+          npm publish --access public --tag ${{ steps.npm-tag.outputs.tag }} --provenance
+          
+          echo "✅ Published successfully!"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      
+      - name: Verify published package
+        if: github.event.inputs.dry_run != 'true'
+        run: |
+          echo "🔍 Verifying published package..."
+          sleep 10  # Wait for npm registry to update
+          
+          PACKAGE_NAME=$(node -p 'require("./package.json").name')
+          VERSION="${{ steps.version.outputs.version }}"
+          
+          # Check if version exists on npm
+          NPM_VERSION=$(npm view $PACKAGE_NAME@$VERSION version 2>/dev/null || echo "")
+          
+          if [ "$NPM_VERSION" = "$VERSION" ]; then
+            echo "✅ Package verified on npm registry"
+            echo "📦 $PACKAGE_NAME@$VERSION"
+            echo "🔗 https://www.npmjs.com/package/$PACKAGE_NAME/v/$VERSION"
+          else
+            echo "⚠️ Package not yet visible on npm (may take a few minutes)"
+          fi
+      
+      - name: Create GitHub Release (if tag-based)
+        if: |
+          github.event_name == 'push' && 
+          startsWith(github.ref, 'refs/tags/v') &&
+          github.event.inputs.dry_run != 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const version = '${{ steps.version.outputs.version }}';
+            const tag = '${{ github.ref_name }}';
+            
+            // Read changelog
+            let changelog = 'Release v' + version;
+            try {
+              changelog = fs.readFileSync('RELEASE_CHANGELOG.txt', 'utf8');
+            } catch (e) {
+              console.log('No changelog file found');
+            }
+            
+            // Create release
+            await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: tag,
+              name: `v${version}`,
+              body: `## Changes\n\n${changelog}\n\n## Installation\n\n\`\`\`bash\nnpm install @port-labs/port-sdk@${version}\n\`\`\`\n\n## Links\n\n- 📦 [npm Package](https://www.npmjs.com/package/@port-labs/port-sdk/v/${version})\n- 📚 [Documentation](https://github.com/${context.repo.owner}/${context.repo.repo}#readme)\n- 📋 [Changelog](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/CHANGELOG.md)`,
+              draft: false,
+              prerelease: '${{ steps.npm-tag.outputs.tag }}' !== 'latest'
+            });
+            
+            console.log('✅ GitHub release created');
+      
+      - name: Update package.json to next dev version
+        if: |
+          github.event.inputs.dry_run != 'true' &&
+          steps.npm-tag.outputs.tag == 'latest'
+        run: |
+          echo "📝 Updating package.json to next dev version..."
+          
+          # Increment patch version and add -dev suffix
+          VERSION="${{ steps.version.outputs.version }}"
+          IFS='.' read -ra VERSION_PARTS <<< "$VERSION"
+          MAJOR=${VERSION_PARTS[0]}
+          MINOR=${VERSION_PARTS[1]}
+          PATCH=${VERSION_PARTS[2]}
+          NEXT_PATCH=$((PATCH + 1))
+          NEXT_DEV_VERSION="$MAJOR.$MINOR.$NEXT_PATCH-dev"
+          
+          npm version $NEXT_DEV_VERSION --no-git-tag-version
+          echo "📝 Updated to $NEXT_DEV_VERSION for development"
+      
+      - name: Commit version bump
+        if: |
+          github.event.inputs.dry_run != 'true' &&
+          steps.npm-tag.outputs.tag == 'latest'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package.json
+          git commit -m "chore: bump version to $(node -p 'require(\"./package.json\").version') [skip ci]" || true
+          git push origin main || true
+      
+      - name: Post-publish notifications
+        if: github.event.inputs.dry_run != 'true'
+        run: |
+          echo "📢 Post-publish tasks..."
+          echo ""
+          echo "✅ Published: ${{ steps.version.outputs.version }}"
+          echo "📦 npm: https://www.npmjs.com/package/@port-labs/port-sdk"
+          echo "🔖 Tag: ${{ steps.npm-tag.outputs.tag }}"
+          echo ""
+          
+          # Optional: Add Slack/Discord notification here
+          # curl -X POST ${{ secrets.SLACK_WEBHOOK_URL }} \
+          #   -H 'Content-Type: application/json' \
+          #   -d '{"text":"🚀 Port SDK v${{ steps.version.outputs.version }} published!"}'
+      
+      - name: Create issue on publish failure
+        if: failure() && github.event.inputs.dry_run != 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '❌ npm Publish Failed for v${{ steps.version.outputs.version }}',
+              body: `## 🚨 Publish Failure Alert
+              
+              The automated npm publish workflow failed.
+              
+              ### Details
+              - **Version:** ${{ steps.version.outputs.version }}
+              - **Tag:** ${{ steps.npm-tag.outputs.tag }}
+              - **Workflow Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+              - **Triggered By:** ${{ github.event_name }}
+              
+              ### Possible Causes
+              - npm authentication failed
+              - Version already exists on npm
+              - Build or test failures
+              - Network issues
+              
+              ### Action Required
+              1. Review the workflow logs
+              2. Fix the issue
+              3. Re-run the workflow or publish manually
+              
+              ### Manual Publish
+              If urgent, publish manually:
+              \`\`\`bash
+              pnpm install
+              pnpm type-check
+              pnpm test
+              pnpm build
+              npm version ${{ steps.version.outputs.version }} --no-git-tag-version
+              npm publish --access public --tag ${{ steps.npm-tag.outputs.tag }}
+              \`\`\`
+              
+              ---
+              **Date:** ${new Date().toISOString()}
+              `,
+              labels: ['bug', 'publish-failure', 'urgent']
+            });
+      
+      - name: Summary
+        if: always()
+        run: |
+          echo "## 📦 npm Publish Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Step | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Version | ${{ steps.version.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| npm Tag | ${{ steps.npm-tag.outputs.tag }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security Audit | ${{ steps.audit.outputs.critical == '0' && steps.audit.outputs.high == '0' && '✅ Clean' || '⚠️ Issues found' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Type Check | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tests | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          echo "| Coverage | ${{ steps.coverage.outputs.coverage }}% |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build | ✅ Success |" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            echo "| Publish | 🧪 Dry Run |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Publish | ${{ job.status == 'success' && '✅ Published' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            echo "### 🧪 Dry Run Complete" >> $GITHUB_STEP_SUMMARY
+            echo "All checks passed. Ready to publish." >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ job.status }}" = "success" ]; then
+            echo "### ✅ Successfully Published!" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "📦 **Package:** @port-labs/port-sdk@${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "🔗 **Links:**" >> $GITHUB_STEP_SUMMARY
+            echo "- [npm Package](https://www.npmjs.com/package/@port-labs/port-sdk)" >> $GITHUB_STEP_SUMMARY
+            echo "- [Release Notes](https://github.com/${{ github.repository }}/releases)" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "📥 **Install:**" >> $GITHUB_STEP_SUMMARY
+            echo '```bash' >> $GITHUB_STEP_SUMMARY
+            echo "npm install @port-labs/port-sdk@${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ❌ Publish Failed" >> $GITHUB_STEP_SUMMARY
+            echo "See logs for details." >> $GITHUB_STEP_SUMMARY
+          fi
