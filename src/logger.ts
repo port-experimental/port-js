@@ -86,6 +86,9 @@ export interface LoggerConfig {
 
 /**
  * Sensitive keys to redact from logs
+ * 
+ * SECURITY: These keys are considered sensitive and will be replaced with [REDACTED]
+ * when logging. This prevents credential leakage in logs.
  */
 const SENSITIVE_KEYS = [
   'password',
@@ -97,12 +100,16 @@ const SENSITIVE_KEYS = [
   'access_token',
   'clientsecret',
   'client_secret',
+  'clientid',         // Port SDK client ID
+  'client_id',        // Port SDK client ID
   'authorization',
   'auth',
   'bearer',
   'credentials',
   'private_key',
   'privatekey',
+  'refresh_token',
+  'refreshtoken',
 ];
 
 /**
