@@ -352,10 +352,8 @@ describe('Logger', () => {
     it('should sanitize Port SDK OAuth credentials completely', () => {
       const logger = createLogger({ level: LogLevel.ERROR });
       const fullCredentials = {
-        credentials: {
-          clientId: 'my-client-id',
-          clientSecret: 'my-client-secret',
-        },
+        clientId: 'my-client-id',
+        clientSecret: 'my-client-secret',
         accessToken: 'current-access-token',
         refreshToken: 'refresh-token-123',
       };
@@ -368,11 +366,14 @@ describe('Logger', () => {
       const redactedCount = (call.match(/\[REDACTED\]/g) || []).length;
       expect(redactedCount).toBeGreaterThanOrEqual(4); // At least 4 sensitive fields
       
-      // Ensure actual values are NOT present
+      // CRITICAL: Ensure actual credential values are NEVER present in logs
       expect(call).not.toContain('my-client-id');
       expect(call).not.toContain('my-client-secret');
       expect(call).not.toContain('current-access-token');
       expect(call).not.toContain('refresh-token-123');
+      
+      // Should contain [REDACTED] placeholder
+      expect(call).toContain('[REDACTED]');
     });
 
     it('should sanitize nested sensitive data', () => {
