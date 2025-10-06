@@ -107,6 +107,16 @@ console.log(`Created entity: ${entity.identifier}`);
 - [Automated Workflows](./docs/development/AUTOMATED_WORKFLOWS.md) - Daily OpenAPI sync & health checks
 - [Contributing Guide](./CONTRIBUTING.md)
 - [Commit Message Cheatsheet](./docs/development/COMMIT_MESSAGES.md)
+
+**Type Generation:**
+```bash
+# Download latest OpenAPI spec and regenerate types
+pnpm types:update
+
+# Or run separately
+pnpm types:download  # Download from https://api.port.io/swagger/json
+pnpm types:generate  # Generate src/types/api.ts
+```
 - [Security Policy](./SECURITY.md)
 - [Credential Security](./docs/development/CREDENTIAL_SECURITY.md)
 - [Testing Guide](./docs/TESTING.md)

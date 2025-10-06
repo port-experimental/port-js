@@ -20,7 +20,7 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "type-check": "tsc --noEmit",
-    "types:download": "curl -o openapi.json https://api.port.io/static/openapi.json",
+    "types:download": "curl -o openapi.json https://api.port.io/swagger/json",
     "types:generate": "openapi-typescript openapi.json -o src/types/api.ts",
     "types:update": "pnpm types:download && pnpm types:generate",
     "types:check": "tsx scripts/check-types.ts",
