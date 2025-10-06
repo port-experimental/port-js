@@ -270,7 +270,7 @@ port-js/
 │   └── helpers/        # Test utilities
 ├── CHANGELOG.md        # Version history
 ├── CONTRIBUTING.md     # Contribution guide
-├── LICENSE            # MIT license
+├── LICENSE            # Apache-2.0 license
 ├── package.json       # Package config
 ├── README.md          # Main documentation
 ├── SECURITY.md        # Security policy

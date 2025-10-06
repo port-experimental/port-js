@@ -29,7 +29,7 @@ Complete documentation for the Port TypeScript/JavaScript SDK.
 ### Community
 - [Contributing Guide](../CONTRIBUTING.md) - How to contribute
 - [Security Policy](../SECURITY.md) - Security practices
-- [License](../LICENSE) - MIT License
+- [License](../LICENSE) - Apache-2.0 License
 
 ## 🔍 Quick Links
 

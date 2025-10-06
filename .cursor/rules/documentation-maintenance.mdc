@@ -1,0 +1,591 @@
+# Documentation Maintenance Rules
+
+**CRITICAL**: Documentation must ALWAYS be kept in sync with code changes.
+
+---
+
+## Core Principle
+
+**Every code change that affects user-facing functionality MUST include corresponding documentation updates.**
+
+Outdated documentation is worse than no documentation - it actively misleads users.
+
+---
+
+## Required Documentation Updates
+
+### When Adding New Features
+
+✅ **MUST update:**
+
+1. **README.md**
+   - Add feature to "Key Features" section
+   - Add usage example if it's a major feature
+   - Update any relevant sections (Configuration, Usage, etc.)
+   - Update coverage stats if test coverage changed significantly
+
+2. **CHANGELOG.md**
+   - Add entry under `[Unreleased]` or current version
+   - Use conventional commit format
+   - Include example of new feature usage
+
+3. **Examples Directory**
+   - Create example file demonstrating the feature
+   - Update `examples/README.md` with new example
+   - Ensure example has proper error handling and cleanup
+
+4. **API Documentation**
+   - Add JSDoc comments to all public methods
+   - Include `@example` blocks with code samples
+   - Document all parameters with `@param`
+   - Document return types with `@returns`
+   - Document exceptions with `@throws`
+
+5. **Type Documentation**
+   - Export new types from `src/types/index.ts`
+   - Add JSDoc comments to complex types
+   - Document type relationships
+
+6. **Smoke Tests**
+   - Create smoke test for the feature
+   - Update `smoke-tests/README.md`
+   - Add npm script in `package.json` for smoke test
+
+---
+
+### When Modifying Features
+
+✅ **MUST update:**
+
+1. **README.md**
+   - Update affected examples
+   - Update configuration sections if config changed
+   - Update feature descriptions if behavior changed
+
+2. **CHANGELOG.md**
+   - Add entry describing the change
+   - Mark as `Changed` or `Fixed` appropriately
+
+3. **Existing Examples**
+   - Update examples that use the modified feature
+   - Ensure examples still work correctly
+
+4. **API Documentation**
+   - Update JSDoc comments for modified methods
+   - Update `@example` blocks to reflect new behavior
+
+5. **Migration Guide** (if breaking change)
+   - Create or update `docs/MIGRATION.md`
+   - Document how to migrate from old to new API
+   - Provide before/after examples
+
+---
+
+### When Deprecating Features
+
+✅ **MUST update:**
+
+1. **README.md**
+   - Remove or mark as deprecated
+   - Add migration path to new feature
+
+2. **CHANGELOG.md**
+   - Add `Deprecated` entry
+   - Explain replacement or alternative
+
+3. **API Documentation**
+   - Add `@deprecated` JSDoc tag
+   - Reference replacement method/feature
+   - Add timeline for removal
+
+4. **Examples**
+   - Update to use new feature
+   - Move deprecated examples to `examples/deprecated/`
+
+---
+
+## Documentation File Structure
+
+### Core Documentation
+
+```
+docs/
+├── getting-started/
+│   ├── installation.md       ✅ Keep updated with package changes
+│   ├── quickstart.md          ✅ Keep updated with API changes
+│   └── authentication.md      ✅ Keep updated with auth changes
+├── guides/
+│   ├── error-handling.md      ✅ Update when adding error types
+│   └── advanced-usage.md      ✅ Update with advanced features
+├── development/
+│   ├── README.md              ✅ Developer onboarding
+│   ├── TESTING_PRACTICES.md  ✅ Testing guidelines
+│   └── CREDENTIAL_SECURITY.md ✅ Security best practices
+└── api/                       ✅ Auto-generated TypeDoc
+```
+
+### Root Documentation
+
+```
+README.md              ✅ Primary user-facing documentation
+CHANGELOG.md           ✅ Version history (update with every change)
+CONTRIBUTING.md        ✅ Contribution guidelines
+API_COVERAGE_ANALYSIS.md ✅ API implementation status
+```
+
+---
+
+## Documentation Quality Checklist
+
+Before committing code, verify:
+
+### README.md
+- [ ] Coverage stats are accurate (run `pnpm test:coverage`)
+- [ ] All features are listed in "Key Features"
+- [ ] Examples work and are executable
+- [ ] Installation instructions are current
+- [ ] Links are not broken
+- [ ] Version badges are correct
+
+### CHANGELOG.md
+- [ ] All changes documented under correct version/unreleased
+- [ ] Follows [Keep a Changelog](https://keepachangelog.com/) format
+- [ ] Breaking changes clearly marked
+- [ ] Migration guides referenced for breaking changes
+
+### Examples
+- [ ] All examples run without errors
+- [ ] Examples use current API syntax
+- [ ] Examples have proper cleanup
+- [ ] Examples handle errors gracefully
+- [ ] New features have example files
+- [ ] `examples/README.md` lists all examples
+
+### API Documentation
+- [ ] All public methods have JSDoc comments
+- [ ] All parameters documented
+- [ ] All exceptions documented
+- [ ] At least one `@example` per public method
+- [ ] Complex types explained
+
+### Types
+- [ ] All public types exported
+- [ ] Complex types have JSDoc explanations
+- [ ] Type relationships documented
+
+---
+
+## Automated Checks
+
+### Pre-commit Hook
+
+```bash
+#!/bin/bash
+# Check documentation consistency
+
+# 1. Check if README coverage stat matches actual coverage
+COVERAGE=$(pnpm -s test:coverage --reporter=json | jq -r '.total.lines.pct')
+README_COVERAGE=$(grep -o '[0-9.]*% code coverage' README.md | grep -o '[0-9.]*')
+
+if [ "$COVERAGE" != "$README_COVERAGE" ]; then
+  echo "❌ README coverage ($README_COVERAGE%) doesn't match actual ($COVERAGE%)"
+  exit 1
+fi
+
+# 2. Check if CHANGELOG has unreleased entries
+if ! grep -q "## \[Unreleased\]" CHANGELOG.md; then
+  echo "⚠️  Warning: No [Unreleased] section in CHANGELOG.md"
+fi
+
+# 3. Check if examples README is in sync
+EXAMPLE_FILES=$(ls examples/*.ts 2>/dev/null | wc -l)
+DOCUMENTED_EXAMPLES=$(grep -c "pnpm tsx examples/" examples/README.md)
+
+if [ "$EXAMPLE_FILES" -ne "$DOCUMENTED_EXAMPLES" ]; then
+  echo "❌ examples/README.md may be out of sync (files: $EXAMPLE_FILES, documented: $DOCUMENTED_EXAMPLES)"
+  exit 1
+fi
+
+echo "✅ Documentation checks passed"
+```
+
+---
+
+## Documentation Workflow
+
+### For New Features
+
+1. **Before writing code:**
+   - Plan what documentation will be needed
+   - Create issue/task for documentation
+
+2. **While writing code:**
+   - Write JSDoc comments as you write functions
+   - Note any configuration changes needed
+
+3. **After code is working:**
+   - Write/update examples
+   - Update README if user-facing
+   - Update CHANGELOG
+   - Create smoke test
+   - Generate TypeDoc: `pnpm docs:generate`
+
+4. **Before PR:**
+   - Run documentation checklist (above)
+   - Test all examples: `pnpm tsx examples/*.ts`
+   - Verify TypeDoc builds without errors
+   - Check for broken links
+
+5. **In PR description:**
+   - List all documentation files changed
+   - Explain why each doc was updated
+   - Link to rendered docs if applicable
+
+---
+
+## Common Documentation Mistakes
+
+### ❌ DON'T
+
+```markdown
+<!-- Vague, no example -->
+## Usage
+Use the client to interact with Port.
+
+<!-- Outdated example -->
+const client = new PortClient(config); // Old API
+
+<!-- Missing cleanup -->
+await client.entities.create(data);
+// Example ends, entity left behind
+
+<!-- Incorrect coverage -->
+- 🧪 **Well Tested** - 78.69% code coverage
+// But actual coverage is 86.6%
+```
+
+### ✅ DO
+
+```markdown
+<!-- Clear, with working example -->
+## Usage
+Create a client and list blueprints:
+
+\`\`\`typescript
+import { PortClient } from '@port-labs/port-sdk';
+
+const client = new PortClient({
+  credentials: {
+    clientId: process.env.PORT_CLIENT_ID,
+    clientSecret: process.env.PORT_CLIENT_SECRET,
+  },
+});
+
+const blueprints = await client.blueprints.list();
+console.log(`Found ${blueprints.length} blueprints`);
+\`\`\`
+
+<!-- Current API -->
+const client = new PortClient({
+  credentials: { clientId, clientSecret }
+});
+
+<!-- With cleanup -->
+const entity = await client.entities.create(data);
+try {
+  // Use entity
+} finally {
+  await client.entities.delete(entity.identifier, 'service');
+}
+
+<!-- Accurate coverage -->
+- 🧪 **Well Tested** - 86.6% code coverage with comprehensive test suite
+```
+
+---
+
+## Documentation Review Checklist
+
+When reviewing PRs, check:
+
+### Code Changes
+- [ ] Do new public methods have JSDoc?
+- [ ] Do JSDoc comments include examples?
+- [ ] Are all parameters and returns documented?
+
+### README
+- [ ] Is the feature mentioned if user-facing?
+- [ ] Are examples syntactically correct?
+- [ ] Are stats (coverage, version) accurate?
+
+### CHANGELOG
+- [ ] Is change documented?
+- [ ] Is category correct (Added/Changed/Fixed/etc)?
+- [ ] Is breaking change clearly marked?
+
+### Examples
+- [ ] Do examples demonstrate the new feature?
+- [ ] Do examples run without errors?
+- [ ] Are examples added to examples/README.md?
+
+### Tests
+- [ ] Is there a smoke test for new features?
+- [ ] Is smoke test added to package.json?
+
+---
+
+## Documentation Maintenance Schedule
+
+### On Every Commit
+- Update JSDoc comments for changed code
+- Update inline code examples in docs
+
+### On Every PR
+- Update README if user-facing change
+- Update CHANGELOG.md
+- Update/add examples if needed
+- Run documentation checklist
+
+### On Every Release
+- Move CHANGELOG `[Unreleased]` to version number
+- Update version in README badges
+- Generate and publish TypeDoc
+- Verify all examples work
+- Update API_COVERAGE_ANALYSIS.md
+
+### Monthly
+- Review all documentation for accuracy
+- Check for broken links
+- Update outdated examples
+- Review and update FAQ
+- Check for missing JSDoc comments
+
+### Quarterly
+- Review entire documentation structure
+- Identify gaps in documentation
+- Update getting started guides
+- Review and update migration guides
+
+---
+
+## Examples of Good Documentation
+
+### Good JSDoc
+
+```typescript
+/**
+ * Create a new entity in Port
+ * 
+ * @param data - Entity data conforming to its blueprint schema
+ * @param options - Optional request configuration
+ * @returns The created entity with server-assigned fields
+ * 
+ * @throws {PortAuthError} If authentication fails
+ * @throws {PortValidationError} If entity data is invalid
+ * @throws {PortNotFoundError} If blueprint doesn't exist
+ * 
+ * @example
+ * Create a service entity
+ * ```typescript
+ * const service = await client.entities.create({
+ *   identifier: 'user-service',
+ *   blueprint: 'service',
+ *   title: 'User Service',
+ *   properties: {
+ *     stringProps: {
+ *       environment: 'production',
+ *       language: 'typescript',
+ *     },
+ *   },
+ * });
+ * console.log(`Created: ${service.identifier}`);
+ * ```
+ * 
+ * @example
+ * Create with relations
+ * ```typescript
+ * const service = await client.entities.create({
+ *   identifier: 'payment-service',
+ *   blueprint: 'service',
+ *   title: 'Payment Service',
+ *   relations: {
+ *     singleRelations: {
+ *       team: 'backend-team',
+ *     },
+ *     manyRelations: {
+ *       dependencies: ['user-service', 'database'],
+ *     },
+ *   },
+ * });
+ * ```
+ */
+async create(
+  data: CreateEntityInput,
+  options?: RequestOptions
+): Promise<Entity> {
+  // Implementation
+}
+```
+
+### Good README Section
+
+```markdown
+## 📦 Installation
+
+\`\`\`bash
+# Using pnpm (recommended)
+pnpm add @port-labs/port-sdk
+
+# Using npm
+npm install @port-labs/port-sdk
+
+# Using yarn
+yarn add @port-labs/port-sdk
+\`\`\`
+
+### Requirements
+
+- Node.js >= 20.0.0
+- TypeScript >= 5.0.0 (if using TypeScript)
+
+### Verify Installation
+
+\`\`\`bash
+pnpm list @port-labs/port-sdk
+\`\`\`
+
+You should see the installed version.
+```
+
+### Good Example File
+
+```typescript
+/**
+ * Example: Webhook CRUD Operations
+ * 
+ * This example demonstrates how to:
+ * - Create webhooks for external integrations
+ * - Get webhook information
+ * - Update webhook configuration
+ * - List all webhooks
+ * - Delete webhooks
+ * 
+ * Prerequisites:
+ * - PORT_CLIENT_ID and PORT_CLIENT_SECRET in .env
+ * - 'service' blueprint must exist
+ * 
+ * Run with: pnpm tsx examples/23-webhooks-crud.ts
+ */
+
+import { PortClient } from '../src';
+
+async function main() {
+  const client = new PortClient();
+  
+  // Use timestamp for unique IDs
+  const webhookId = `example-${Date.now()}`;
+  
+  try {
+    // Create webhook
+    const webhook = await client.webhooks.create({
+      identifier: webhookId,
+      title: 'Example Webhook',
+      url: 'https://example.com/webhook',
+      enabled: true,
+      integrationType: 'custom',
+      mappings: [/* ... */]
+    });
+    
+    console.log(`Created: ${webhook.identifier}`);
+    
+    // ... more examples ...
+    
+  } catch (error) {
+    console.error('Error:', error);
+    process.exit(1);
+  } finally {
+    // Always cleanup
+    await client.webhooks.delete(webhookId).catch(() => {});
+  }
+}
+
+main();
+```
+
+---
+
+## Documentation Debt
+
+### Track Documentation Debt
+
+When you can't update documentation immediately:
+
+1. **Create issue** with label `documentation`
+2. **Add TODO comment** in code:
+   ```typescript
+   // TODO(docs): Document new batch operation in README
+   ```
+3. **Note in CHANGELOG** under `[Unreleased] - Known Issues`
+
+### Reduce Documentation Debt
+
+- Allocate time each sprint for documentation
+- Review documentation TODOs in code
+- Close documentation issues promptly
+- Never ship with critical docs missing
+
+---
+
+## Summary: Golden Rules
+
+1. ✅ **Code without documentation is incomplete** - Don't mark PR as ready until docs are updated
+2. ✅ **Examples must work** - Test every example before committing
+3. ✅ **CHANGELOG always** - Every user-facing change goes in CHANGELOG
+4. ✅ **README accuracy** - Coverage stats, versions, examples must be correct
+5. ✅ **JSDoc required** - All public APIs must have JSDoc with examples
+6. ✅ **Links must work** - Check all documentation links before PR
+7. ✅ **Cleanup examples** - Examples must not leave test data behind
+8. ✅ **Document breaking changes** - Always provide migration path
+
+---
+
+## Quick Reference
+
+### Before Every Commit
+```bash
+# 1. Run tests and check coverage
+pnpm test:coverage
+
+# 2. Update README coverage if changed
+# Edit README.md line with coverage percentage
+
+# 3. Update CHANGELOG
+# Add entry under [Unreleased]
+
+# 4. If examples changed, test them
+pnpm tsx examples/*.ts
+
+# 5. Type check
+pnpm type-check
+
+# 6. Generate docs
+pnpm docs:generate
+```
+
+### Adding New Feature Checklist
+- [ ] JSDoc with @example on all new methods
+- [ ] Create example file in `examples/`
+- [ ] Update `examples/README.md`
+- [ ] Add to README.md "Key Features" if major
+- [ ] Add usage example in README if major
+- [ ] Update CHANGELOG.md under [Unreleased]
+- [ ] Create smoke test
+- [ ] Add smoke test script to package.json
+- [ ] Export new types from `src/types/index.ts`
+- [ ] Generate TypeDoc: `pnpm docs:generate`
+
+---
+
+**Remember: Documentation is part of the feature, not an afterthought.**
+
+If documentation isn't updated, the feature isn't done.

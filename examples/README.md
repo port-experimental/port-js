@@ -29,6 +29,13 @@ Complete, runnable examples demonstrating all features of the Port SDK.
 - [16 - Logging & Debugging](./16-logging-debugging.ts) - Enable detailed logging
 - [17 - Proxy Configuration](./17-proxy-config.ts) - Use corporate proxies
 
+### 🪝 Working with Webhooks
+- [23 - Webhook CRUD](./23-webhooks-crud.ts) - Create and manage webhooks
+
+### 📋 Monitoring & Auditing
+- [24 - Audit Logs](./24-audit-logs.ts) - Query and filter audit logs
+- [25 - Action Runs](./25-action-runs.ts) - Monitor action execution runs
+
 ### 🎯 Complete Workflow
 - [18 - End-to-End](./18-end-to-end.ts) - Complete Port.io setup from scratch
 
@@ -80,6 +87,13 @@ pnpm tsx examples/13-scorecards-crud.ts
 pnpm tsx examples/15-error-handling.ts
 pnpm tsx examples/16-logging-debugging.ts
 pnpm tsx examples/17-proxy-config.ts
+
+# Webhook examples
+pnpm tsx examples/23-webhooks-crud.ts
+
+# Monitoring and auditing
+pnpm tsx examples/24-audit-logs.ts
+pnpm tsx examples/25-action-runs.ts
 
 # Complete workflow
 pnpm tsx examples/18-end-to-end.ts
@@ -271,7 +285,7 @@ When creating an example, ensure:
 Need help with examples?
 
 - Check the [FAQ](../docs/FAQ.md)
-- Open an [issue](https://github.com/port-labs/port-sdk/issues)
+- Open an [issue](https://github.com/port-labs/port-js/issues)
 - Join [Port Community](https://port.io/community)
 - Email: support@getport.io
 

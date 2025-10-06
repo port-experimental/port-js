@@ -1,7 +1,7 @@
 # Port SDK for TypeScript/JavaScript
 
 [![npm version](https://badge.fury.io/js/@port-labs%2Fport-sdk.svg)](https://www.npmjs.com/package/@port-labs/port-sdk)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
 
 > **Official TypeScript/JavaScript SDK for [Port.io](https://getport.io)** - The Internal Developer Portal Platform
@@ -46,7 +46,7 @@ A type-safe, feature-rich SDK for interacting with Port.io's API. Built with sec
 - 🔌 **Proxy Support** - Corporate proxy support with authentication
 - 🔑 **Flexible Auth** - OAuth2 and JWT token support
 - ⚙️ **Environment Config** - Load configuration from environment variables or .env files
-- 🧪 **Well Tested** - 78.69% code coverage with 296 tests
+- 🧪 **Well Tested** - 86.6% code coverage with comprehensive test suite
 
 ## 📦 Installation
 
@@ -157,6 +157,36 @@ await client.blueprints.create({
 
 // Get a blueprint
 const blueprint = await client.blueprints.get('microservice');
+```
+
+### Working with Webhooks
+
+```typescript
+// Create a webhook
+await client.webhooks.create({
+  identifier: 'github-webhook',
+  title: 'GitHub Integration',
+  url: 'https://api.github.com/webhook',
+  enabled: true,
+  integrationType: 'custom',
+  mappings: [
+    {
+      blueprint: 'service',
+      filter: {
+        combinator: 'and',
+        rules: [{ property: '$identifier', operator: '=', value: 'my-service' }]
+      }
+    }
+  ]
+});
+
+// List all webhooks
+const webhooks = await client.webhooks.list();
+
+// Update a webhook
+await client.webhooks.update('github-webhook', {
+  enabled: false
+});
 ```
 
 ## 🔧 Configuration
@@ -290,13 +320,13 @@ We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md)
 
 ## 📄 License
 
-[MIT](./LICENSE)
+[Apache-2.0](./LICENSE)
 
 ## 🔗 Links
 
 - [Port.io Documentation](https://docs.port.io)
-- [Port.io API Reference](https://docs.port.io/api-reference)
-- [GitHub Repository](https://github.com/port-labs/port-sdk)
+- [Port.io API Reference](https://docs.port.io/api-reference/port-api)
+- [GitHub Repository](https://github.com/port-labs/port-js)
 - [npm Package](https://www.npmjs.com/package/@port-labs/port-sdk)
 - [Changelog](./CHANGELOG.md)
 

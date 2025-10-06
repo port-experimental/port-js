@@ -11,6 +11,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Smoke tests for system blueprints (_team, _user, _scorecard, _rule, _rule_result)
 - Version management scripts (version:patch, version:minor, version:major, version:prerelease)
 - Comprehensive version management cursor rules
+- Documentation maintenance cursor rules (`documentation-maintenance.mdc`)
+- Example files for webhooks (23-webhooks-crud.ts), audit logs (24-audit-logs.ts), and action runs (25-action-runs.ts)
+- API Implementation Roadmap (`docs/API_IMPLEMENTATION_ROADMAP.md`) - Complete plan for 100% API coverage
+- Expanded integration tests: Actions, Teams, Users
+- Performance benchmarking suite (`tests/performance/`) with comprehensive metrics
+- Security audit checklist (`docs/SECURITY_AUDIT_CHECKLIST.md`) for release preparation
+- `test:benchmark` script to run performance tests
+
+### Changed
+- **BREAKING**: License changed from MIT to Apache-2.0
+- Updated README coverage stats from 78.69% to 86.6%
+- Added webhook usage examples to README
+- Enhanced cursor rules README with better organization
+
+### Documentation
+- Updated all license references across documentation
+- Added comprehensive performance testing guide
+- Added security audit process documentation
+- Created implementation roadmap for missing API resources
 
 ## [0.1.0] - 2025-10-04
 

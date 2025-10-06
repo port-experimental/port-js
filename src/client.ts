@@ -6,7 +6,7 @@
  * This SDK is designed for backend/server-side environments only.
  * DO NOT use in browser/frontend applications where credentials would be exposed.
  * 
- * @see {@link https://github.com/port-labs/port-js-sdk#backend-server-side-only|Security Notice}
+ * @see {@link https://github.com/port-labs/port-js#backend-server-side-only|Security Notice}
  */
 
 import { HttpClient } from './http-client';

@@ -33,6 +33,7 @@
     "test:coverage": "vitest run --coverage",
     "test:ui": "vitest --ui",
     "test:integration": "vitest run --config vitest.integration.config.ts",
+    "test:benchmark": "vitest run --config vitest.performance.config.ts",
     "smoke": "for test in smoke-tests/*.ts; do tsx \"$test\" && echo \"\"; done",
     "smoke:service": "tsx smoke-tests/01-get-service-blueprint.ts",
     "smoke:team": "tsx smoke-tests/02-get-team-blueprint.ts",
@@ -78,15 +79,15 @@
     "port-labs"
   ],
   "author": "Port Labs <support@getport.io>",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/port-labs/port-js-sdk.git"
+    "url": "git+https://github.com/port-labs/port-js.git"
   },
   "bugs": {
-    "url": "https://github.com/port-labs/port-js-sdk/issues"
+    "url": "https://github.com/port-labs/port-js/issues"
   },
-  "homepage": "https://github.com/port-labs/port-js-sdk#readme",
+  "homepage": "https://github.com/port-labs/port-js#readme",
   "packageManager": "pnpm@10.18.0",
   "engines": {
     "node": ">=20.0.0"
