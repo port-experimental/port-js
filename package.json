@@ -1,5 +1,5 @@
 {
-  "name": "@port-labs/port-sdk",
+  "name": "@udayk_port/port-sdk",
   "version": "0.1.0",
   "description": "Type-safe TypeScript SDK for Port.io API (Backend/Server-Side Only)",
   "main": "./dist/index.js",
