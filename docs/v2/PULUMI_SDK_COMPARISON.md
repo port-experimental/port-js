@@ -83,7 +83,7 @@ export const serviceBlueprint = new port.Blueprint("service", {
 #### SDK v0.1.0 (Current - DIFFERENT STRUCTURE)
 
 ```typescript
-import { PortClient } from '@udayk_port/port-sdk';
+import { PortClient } from '@port-experimental/port-sdk';
 
 const client = new PortClient({ credentials: { /* ... */ } });
 
@@ -136,7 +136,7 @@ const serviceBlueprint = await client.blueprints.create({
 #### SDK v2.0.0 (Proposed - MATCHES PULUMI)
 
 ```typescript
-import { PortClient } from '@udayk_port/port-sdk';
+import { PortClient } from '@port-experimental/port-sdk';
 
 const client = new PortClient({ credentials: { /* ... */ } });
 
@@ -254,7 +254,7 @@ export const customerPortal = new port.Entity("customer-portal-prod", {
 #### SDK v0.1.0 (Current)
 
 ```typescript
-import { PortClient } from '@udayk_port/port-sdk';
+import { PortClient } from '@port-experimental/port-sdk';
 
 const client = new PortClient({ credentials: { /* ... */ } });
 
@@ -342,7 +342,7 @@ export const autoAssignVulnerability = new port.Action("auto-assign-vulnerabilit
 #### SDK v0.1.0 (Current - LIMITED)
 
 ```typescript
-import { PortClient } from '@udayk_port/port-sdk';
+import { PortClient } from '@port-experimental/port-sdk';
 
 const client = new PortClient({ credentials: { /* ... */ } });
 
@@ -365,7 +365,7 @@ const autoAssignVulnerability = await client.actions.create({
 #### SDK v2.0.0 (Proposed - MATCHES PULUMI)
 
 ```typescript
-import { PortClient } from '@udayk_port/port-sdk';
+import { PortClient } from '@port-experimental/port-sdk';
 
 const client = new PortClient({ credentials: { /* ... */ } });
 
@@ -460,7 +460,7 @@ export const securityMaturityScorecard = new port.Scorecard("security-program-ma
 #### SDK v0.1.0 (Current - DIFFERENT)
 
 ```typescript
-import { PortClient } from '@udayk_port/port-sdk';
+import { PortClient } from '@port-experimental/port-sdk';
 
 const client = new PortClient({ credentials: { /* ... */ } });
 
@@ -488,7 +488,7 @@ const securityMaturityScorecard = await client.scorecards.create({
 #### SDK v2.0.0 (Proposed - MATCHES PULUMI)
 
 ```typescript
-import { PortClient } from '@udayk_port/port-sdk';
+import { PortClient } from '@port-experimental/port-sdk';
 
 const client = new PortClient({ credentials: { /* ... */ } });
 
