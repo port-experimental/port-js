@@ -34,7 +34,7 @@ Documentation for contributing to and maintaining the Port SDK.
 
 ```bash
 # Clone the repository
-git clone https://github.com/port-labs/port-sdk.git
+git clone https://github.com/port-experimental/port-sdk.git
 cd port-sdk
 
 # Install dependencies
@@ -216,7 +216,7 @@ pnpm build
 
 # Test installation locally
 npm pack
-npm install port-labs-port-sdk-0.1.0.tgz -g
+npm install port-experimental-port-sdk-0.1.0.tgz -g
 ```
 
 ### 3. Publish to npm
@@ -312,8 +312,8 @@ See [Standards Guide](./STANDARDS.md) for details.
 
 - Check the [FAQ](../FAQ.md)
 - Read existing [documentation](../README.md)
-- Ask in [GitHub Discussions](https://github.com/port-labs/port-sdk/discussions)
-- Contact Port support: support@getport.io
+- Ask in [GitHub Discussions](https://github.com/port-experimental/port-sdk/discussions)
+
 
 ## Contributing
 

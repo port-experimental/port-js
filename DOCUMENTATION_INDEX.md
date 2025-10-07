@@ -142,8 +142,8 @@ port-js/
 - [Port.io Website](https://getport.io)
 - [Port.io Documentation](https://docs.getport.io)
 - [Port.io API Reference](https://docs.getport.io/api-reference)
-- [GitHub Repository](https://github.com/port-labs/port-sdk)
-- [npm Package](https://www.npmjs.com/package/@port-labs/port-sdk)
+- [GitHub Repository](https://github.com/port-experimental/port-sdk)
+- [npm Package](https://www.npmjs.com/package/@port-experimental/port-sdk)
 
 ## 📝 Document Status
 
@@ -161,5 +161,5 @@ port-js/
 
 ---
 
-**Need help finding something?** Open an [issue](https://github.com/port-labs/port-sdk/issues) or check the [FAQ](./docs/FAQ.md).
+**Need help finding something?** Open an [issue](https://github.com/port-experimental/port-sdk/issues) or check the [FAQ](./docs/FAQ.md).
 

@@ -415,7 +415,7 @@ const client = new PortClient({
 ### Enable verbose logging
 
 ```typescript
-import { PortClient, LogLevel } from '@port-labs/port-sdk';
+import { PortClient, LogLevel } from '@port-experimental/port-sdk';
 
 const client = new PortClient({
   credentials: { /* ... */ },
@@ -453,7 +453,7 @@ node my-script.js
 
 If you're still experiencing issues:
 
-1. **Check GitHub Issues**: [github.com/port-labs/port-js/issues](https://github.com/port-labs/port-js/issues)
+1. **Check GitHub Issues**: [github.com/port-experimental/port-js/issues](https://github.com/port-experimental/port-js/issues)
 2. **Review Examples**: Check the `examples/` directory
 3. **Run Smoke Tests**: Use `pnpm smoke` to verify SDK functionality
 4. **Enable Debug Logging**: Set `LogLevel.DEBUG` to see detailed information

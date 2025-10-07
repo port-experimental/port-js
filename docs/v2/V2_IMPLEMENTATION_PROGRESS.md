@@ -312,8 +312,7 @@ All tests passing, no known bugs.
 ## 📞 Contact
 
 For questions or feedback:
-- GitHub Issues: https://github.com/port-labs/port-js/issues
-- Email: support@getport.io
+- GitHub Issues: https://github.com/port-experimental/port-js/issues
 
 ---
 

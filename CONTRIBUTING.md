@@ -17,7 +17,7 @@ Be respectful, inclusive, and professional. We're all here to build great softwa
 
 ```bash
 # Clone the repository
-git clone https://github.com/port-labs/port-sdk.git
+git clone https://github.com/port-experimental/port-sdk.git
 cd port-sdk
 
 # Install dependencies
@@ -193,7 +193,7 @@ Before starting work:
 git clone https://github.com/YOUR_USERNAME/port-sdk.git
 
 # Add upstream remote
-git remote add upstream https://github.com/port-labs/port-sdk.git
+git remote add upstream https://github.com/port-experimental/port-sdk.git
 
 # Create a feature branch
 git checkout -b feature/your-feature-name
@@ -679,10 +679,10 @@ npm pack --dry-run
 
 # Check package size and contents
 npm pack
-tar -tzf port-labs-port-sdk-*.tgz
+tar -tzf port-experimental-port-sdk-*.tgz
 
 # Test local installation
-npm install ./port-labs-port-sdk-*.tgz
+npm install ./port-experimental-port-sdk-*.tgz
 ```
 
 #### 4. Publish to npm
@@ -700,7 +700,7 @@ npm publish --access public --tag beta
 
 #### 5. Create GitHub Release
 
-1. Go to [Releases](https://github.com/port-labs/port-sdk/releases)
+1. Go to [Releases](https://github.com/port-experimental/port-sdk/releases)
 2. Click "Draft a new release"
 3. Select the version tag
 4. Add release notes from CHANGELOG.md
@@ -712,10 +712,10 @@ npm publish --access public --tag beta
 
 ```bash
 # Verify on npm
-npm view @port-labs/port-sdk
+npm view @port-experimental/port-sdk
 
 # Test installation
-npm install @port-labs/port-sdk
+npm install @port-experimental/port-sdk
 
 # Announce release
 # - Update documentation site
@@ -729,7 +729,7 @@ If a release has critical issues:
 
 ```bash
 # Deprecate the broken version
-npm deprecate @port-labs/port-sdk@x.x.x "Critical bug, use x.x.y instead"
+npm deprecate @port-experimental/port-sdk@x.x.x "Critical bug, use x.x.y instead"
 
 # Publish a patch release with the fix
 pnpm version:patch
@@ -738,13 +738,13 @@ pnpm build && pnpm test
 npm publish
 
 # If absolutely necessary, unpublish (within 72 hours)
-npm unpublish @port-labs/port-sdk@x.x.x
+npm unpublish @port-experimental/port-sdk@x.x.x
 ```
 
 ## 🤝 Community
 
 - 💬 [Slack Community](https://www.getport.io/community)
-- 🐛 [GitHub Issues](https://github.com/port-labs/port-sdk/issues)
+- 🐛 [GitHub Issues](https://github.com/port-experimental/port-sdk/issues)
 - 📖 [Documentation](https://docs.getport.io)
 
 ## 📄 License

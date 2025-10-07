@@ -77,7 +77,7 @@ logger.error('Config error', {
 
 ```typescript
 // ✅ GOOD - Credentials automatically sanitized
-import { createLogger, LogLevel } from '@port-labs/port-sdk';
+import { createLogger, LogLevel } from '@port-experimental/port-sdk';
 
 const logger = createLogger({ level: LogLevel.INFO });
 logger.info('User authenticated', { 

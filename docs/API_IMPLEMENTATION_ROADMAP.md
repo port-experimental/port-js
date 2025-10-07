@@ -464,7 +464,6 @@ After completing all resources:
 For questions or suggestions about this roadmap:
 - Open a GitHub Discussion
 - Create a GitHub Issue with label `roadmap`
-- Contact: support@getport.io
 
 ---
 

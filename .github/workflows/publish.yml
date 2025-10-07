@@ -324,7 +324,7 @@ jobs:
               repo: context.repo.repo,
               tag_name: tag,
               name: `v${version}`,
-              body: `## Changes\n\n${changelog}\n\n## Installation\n\n\`\`\`bash\nnpm install @port-labs/port-sdk@${version}\n\`\`\`\n\n## Links\n\n- 📦 [npm Package](https://www.npmjs.com/package/@port-labs/port-sdk/v/${version})\n- 📚 [Documentation](https://github.com/${context.repo.owner}/${context.repo.repo}#readme)\n- 📋 [Changelog](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/CHANGELOG.md)`,
+              body: `## Changes\n\n${changelog}\n\n## Installation\n\n\`\`\`bash\nnpm install @port-experimental/port-sdk@${version}\n\`\`\`\n\n## Links\n\n- 📦 [npm Package](https://www.npmjs.com/package/@port-experimental/port-sdk/v/${version})\n- 📚 [Documentation](https://github.com/${context.repo.owner}/${context.repo.repo}#readme)\n- 📋 [Changelog](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/CHANGELOG.md)`,
               draft: false,
               prerelease: '${{ steps.npm-tag.outputs.tag }}' !== 'latest'
             });
@@ -367,7 +367,7 @@ jobs:
           echo "📢 Post-publish tasks..."
           echo ""
           echo "✅ Published: ${{ steps.version.outputs.version }}"
-          echo "📦 npm: https://www.npmjs.com/package/@port-labs/port-sdk"
+          echo "📦 npm: https://www.npmjs.com/package/@port-experimental/port-sdk"
           echo "🔖 Tag: ${{ steps.npm-tag.outputs.tag }}"
           echo ""
           
@@ -452,15 +452,15 @@ jobs:
           elif [ "${{ job.status }}" = "success" ]; then
             echo "### ✅ Successfully Published!" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "📦 **Package:** @port-labs/port-sdk@${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+            echo "📦 **Package:** @port-experimental/port-sdk@${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "🔗 **Links:**" >> $GITHUB_STEP_SUMMARY
-            echo "- [npm Package](https://www.npmjs.com/package/@port-labs/port-sdk)" >> $GITHUB_STEP_SUMMARY
+            echo "- [npm Package](https://www.npmjs.com/package/@port-experimental/port-sdk)" >> $GITHUB_STEP_SUMMARY
             echo "- [Release Notes](https://github.com/${{ github.repository }}/releases)" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "📥 **Install:**" >> $GITHUB_STEP_SUMMARY
             echo '```bash' >> $GITHUB_STEP_SUMMARY
-            echo "npm install @port-labs/port-sdk@${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+            echo "npm install @port-experimental/port-sdk@${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
           else
             echo "### ❌ Publish Failed" >> $GITHUB_STEP_SUMMARY

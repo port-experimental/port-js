@@ -76,18 +76,18 @@
     "javascript",
     "rest-api",
     "client",
-    "port-labs"
+    "port-experimental"
   ],
-  "author": "Port Labs <support@getport.io>",
+  "author": "Uday Korlimarla <222185270+udayk-port@users.noreply.github.com>",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/port-labs/port-js.git"
+    "url": "git+https://github.com/port-experimental/port-js.git"
   },
   "bugs": {
-    "url": "https://github.com/port-labs/port-js/issues"
+    "url": "https://github.com/port-experimental/port-js/issues"
   },
-  "homepage": "https://github.com/port-labs/port-js#readme",
+  "homepage": "https://github.com/port-experimental/port-js#readme",
   "packageManager": "pnpm@10.18.0",
   "engines": {
     "node": ">=20.0.0"

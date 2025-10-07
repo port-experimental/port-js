@@ -7,7 +7,7 @@ Get up and running with the Port SDK in minutes!
 ### 1. Install the SDK
 
 ```bash
-pnpm add @port-labs/port-sdk
+pnpm add @port-experimental/port-sdk
 ```
 
 ### 2. Set Up Credentials
@@ -22,7 +22,7 @@ echo "PORT_CLIENT_SECRET=your_client_secret" >> .env
 
 ```typescript
 // index.ts
-import { PortClient } from '@port-labs/port-sdk';
+import { PortClient } from '@port-experimental/port-sdk';
 
 const client = new PortClient({
   credentials: {
@@ -167,7 +167,7 @@ await client.blueprints.delete('microservice');
 ## Error Handling
 
 ```typescript
-import { PortNotFoundError, PortAuthError } from '@port-labs/port-sdk';
+import { PortNotFoundError, PortAuthError } from '@port-experimental/port-sdk';
 
 try {
   const entity = await client.entities.get('unknown-id', 'service');
@@ -240,7 +240,7 @@ Now that you have the basics, explore:
 Here's a complete example that demonstrates common operations:
 
 ```typescript
-import { PortClient, PortNotFoundError } from '@port-labs/port-sdk';
+import { PortClient, PortNotFoundError } from '@port-experimental/port-sdk';
 
 async function main() {
   // Initialize client
@@ -372,5 +372,5 @@ npx tsx demo.ts
 - Check the [FAQ](../FAQ.md)
 - Browse [Examples](../EXAMPLES.md)
 - Read the [API Reference](../api/)
-- Open an [issue on GitHub](https://github.com/port-labs/port-sdk/issues)
+- Open an [issue on GitHub](https://github.com/port-experimental/port-sdk/issues)
 

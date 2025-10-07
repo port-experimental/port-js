@@ -285,7 +285,7 @@ const client = new PortClient();
 client.entities.create(/* ... */);
 
 // ❌ Not supported
-import { EntityResource } from '@port-labs/port-sdk';
+import { EntityResource } from '@port-experimental/port-sdk';
 ```
 
 ### Missing Documentation
