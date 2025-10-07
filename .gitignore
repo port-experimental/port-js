@@ -1,7 +1,11 @@
 # Dependencies
 node_modules/
 
+# Cursor
 .cursor/
+
+# Ignore publish script
+publish.sh
 
 # Build output
 dist/
