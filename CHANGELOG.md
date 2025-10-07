@@ -112,6 +112,6 @@ We follow [Semantic Versioning](https://semver.org/):
 ---
 
 For more information, see:
-- [GitHub Releases](https://github.com/port-labs/port-sdk/releases)
-- [npm Package](https://www.npmjs.com/package/@port-labs/port-sdk)
+- [GitHub Releases](https://github.com/port-experimental/port-sdk/releases)
+- [npm Package](https://www.npmjs.com/package/@port-experimental/port-sdk)
 

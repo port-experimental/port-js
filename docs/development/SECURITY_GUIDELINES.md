@@ -38,7 +38,7 @@ npm view <package-name>
 
 ### Approved Sources
 
-✅ Official packages (@types, @port-labs, etc.)
+✅ Official packages (@types, @port-experimental, etc.)
 ✅ Well-established packages (> 1 year, > 100k downloads/week)
 ✅ Active maintenance and security track record
 

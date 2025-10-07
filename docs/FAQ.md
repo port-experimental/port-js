@@ -9,10 +9,10 @@
 1. **Import from organized files**, not `api.ts`:
    ```typescript
    // ✅ Good
-   import { Entity } from '@port-labs/port-sdk';
+   import { Entity } from '@port-experimental/port-sdk';
    
    // ❌ Don't do this
-   import { Entity } from '@port-labs/port-sdk/types/api';
+   import { Entity } from '@port-experimental/port-sdk/types/api';
    ```
 
 2. **Edit hand-written types** in `src/types/`:

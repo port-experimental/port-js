@@ -30,7 +30,7 @@ If these credentials are included in frontend code:
 // ❌ CRITICAL SECURITY VULNERABILITY
 // File: src/components/Dashboard.tsx (React)
 
-import { PortClient } from '@port-labs/port-sdk';
+import { PortClient } from '@port-experimental/port-sdk';
 
 const client = new PortClient({
   credentials: {
@@ -63,7 +63,7 @@ This SDK is designed for and fully supports:
 ```typescript
 // ✅ Express.js
 import express from 'express';
-import { PortClient } from '@port-labs/port-sdk';
+import { PortClient } from '@port-experimental/port-sdk';
 
 const app = express();
 
@@ -85,7 +85,7 @@ app.get('/api/services', async (req, res) => {
 ```typescript
 // ✅ NestJS
 import { Injectable } from '@nestjs/common';
-import { PortClient } from '@port-labs/port-sdk';
+import { PortClient } from '@port-experimental/port-sdk';
 
 @Injectable()
 export class PortService {
@@ -110,7 +110,7 @@ export class PortService {
 
 ```typescript
 // ✅ AWS Lambda
-import { PortClient } from '@port-labs/port-sdk';
+import { PortClient } from '@port-experimental/port-sdk';
 
 const client = new PortClient({
   credentials: {
@@ -130,7 +130,7 @@ export const handler = async (event: any) => {
 
 ```typescript
 // ✅ Vercel Functions (API Routes)
-import { PortClient } from '@port-labs/port-sdk';
+import { PortClient } from '@port-experimental/port-sdk';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 const client = new PortClient();
@@ -146,7 +146,7 @@ export default async function handler(
 
 ```typescript
 // ✅ Netlify Functions
-import { PortClient } from '@port-labs/port-sdk';
+import { PortClient } from '@port-experimental/port-sdk';
 
 const client = new PortClient();
 
@@ -182,7 +182,7 @@ jobs:
 
 ```typescript
 // scripts/sync-to-port.js
-import { PortClient } from '@port-labs/port-sdk';
+import { PortClient } from '@port-experimental/port-sdk';
 
 const client = new PortClient(); // Reads from env vars
 
@@ -202,7 +202,7 @@ sync();
 ```typescript
 // ✅ CLI Tool
 #!/usr/bin/env node
-import { PortClient } from '@port-labs/port-sdk';
+import { PortClient } from '@port-experimental/port-sdk';
 
 const client = new PortClient();
 
@@ -219,7 +219,7 @@ main();
 ```typescript
 // ✅ Bull Queue Worker (Redis)
 import Queue from 'bull';
-import { PortClient } from '@port-labs/port-sdk';
+import { PortClient } from '@port-experimental/port-sdk';
 
 const portClient = new PortClient();
 const syncQueue = new Queue('port-sync');
@@ -241,7 +241,7 @@ syncQueue.process(async (job) => {
 ### 1. Browser Applications
 ```typescript
 // ❌ React, Vue, Angular, Svelte, etc.
-import { PortClient } from '@port-labs/port-sdk';
+import { PortClient } from '@port-experimental/port-sdk';
 
 function Dashboard() {
   const client = new PortClient({ ... }); // ❌ NEVER!
@@ -253,7 +253,7 @@ function Dashboard() {
 ```html
 <!-- ❌ Never in <script> tags -->
 <script type="module">
-  import { PortClient } from '@port-labs/port-sdk';
+  import { PortClient } from '@port-experimental/port-sdk';
   const client = new PortClient({ ... }); // ❌ Exposed to users!
 </script>
 ```
@@ -261,7 +261,7 @@ function Dashboard() {
 ### 3. Mobile Applications
 ```typescript
 // ❌ React Native, Ionic, Flutter Web, etc.
-import { PortClient } from '@port-labs/port-sdk';
+import { PortClient } from '@port-experimental/port-sdk';
 
 export default function App() {
   const client = new PortClient({ ... }); // ❌ Credentials in app bundle!
@@ -271,7 +271,7 @@ export default function App() {
 ### 4. Browser Extensions
 ```typescript
 // ❌ Chrome/Firefox extensions
-import { PortClient } from '@port-labs/port-sdk';
+import { PortClient } from '@port-experimental/port-sdk';
 
 chrome.runtime.onInstalled.addListener(() => {
   const client = new PortClient({ ... }); // ❌ Extractable from extension!
@@ -288,7 +288,7 @@ Your React frontend needs to display Port entities.
 ### ❌ Wrong Solution
 ```typescript
 // Frontend (React)
-import { PortClient } from '@port-labs/port-sdk';
+import { PortClient } from '@port-experimental/port-sdk';
 
 function ServiceList() {
   const [services, setServices] = useState([]);
@@ -316,7 +316,7 @@ function ServiceList() {
 ```typescript
 // Backend (Express.js - server/api/services.ts)
 import express from 'express';
-import { PortClient } from '@port-labs/port-sdk';
+import { PortClient } from '@port-experimental/port-sdk';
 
 const router = express.Router();
 
@@ -470,7 +470,7 @@ The SDK does not automatically detect or prevent use in browsers. It's your resp
 
 ```typescript
 // ✅ GOOD - Next.js API Route (pages/api/services.ts)
-import { PortClient } from '@port-labs/port-sdk';
+import { PortClient } from '@port-experimental/port-sdk';
 
 export default async function handler(req, res) {
   const client = new PortClient();
@@ -479,7 +479,7 @@ export default async function handler(req, res) {
 }
 
 // ✅ GOOD - Server Component (app/services/page.tsx)
-import { PortClient } from '@port-labs/port-sdk';
+import { PortClient } from '@port-experimental/port-sdk';
 
 export default async function ServicesPage() {
   const client = new PortClient();
@@ -489,7 +489,7 @@ export default async function ServicesPage() {
 
 // ❌ BAD - Client Component
 'use client';
-import { PortClient } from '@port-labs/port-sdk';
+import { PortClient } from '@port-experimental/port-sdk';
 
 export default function ServicesPage() {
   const client = new PortClient(); // ❌ Runs in browser!

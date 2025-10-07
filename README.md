@@ -336,15 +336,14 @@ We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md)
 
 - [Port.io Documentation](https://docs.port.io)
 - [Port.io API Reference](https://docs.port.io/api-reference/port-api)
-- [GitHub Repository](https://github.com/port-labs/port-js)
+- [GitHub Repository](https://github.com/port-experimental/port-js)
 - [npm Package](https://www.npmjs.com/package/@udayk_port/port-sdk)
 - [Changelog](./CHANGELOG.md)
 
 ## 💬 Support
 
-- 📧 Email: support@getport.io
 - 💬 Slack: [Port Community](https://port.io/community)
-- 🐛 Issues: [GitHub Issues](https://github.com/port-labs/port-sdk/issues)
+- 🐛 Issues: [GitHub Issues](https://github.com/port-experimental/port-sdk/issues)
 - 📖 Docs: [docs.port.io](https://docs.port.io)
 
 ---

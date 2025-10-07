@@ -215,7 +215,7 @@ function compareTypes() {
 
 ```typescript
 // Just use the clean SDK types
-import { Entity, CreateEntityInput } from '@port-labs/port-sdk';
+import { Entity, CreateEntityInput } from '@port-experimental/port-sdk';
 
 const entity: Entity = {
   identifier: 'my-service',

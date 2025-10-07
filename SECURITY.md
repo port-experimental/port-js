@@ -211,10 +211,7 @@ This SDK is designed to support compliance with:
 
 ## Contact
 
-For security concerns, contact: **security@getport.io**
-
-For general support: **support@getport.io**
-
+- Ask in [GitHub Discussions](https://github.com/port-experimental/port-sdk/discussions)
 ---
 
 Thank you for helping keep Port SDK secure! 🔐

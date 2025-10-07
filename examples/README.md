@@ -285,9 +285,8 @@ When creating an example, ensure:
 Need help with examples?
 
 - Check the [FAQ](../docs/FAQ.md)
-- Open an [issue](https://github.com/port-labs/port-js/issues)
+- Open an [issue](https://github.com/port-experimental/port-js/issues)
 - Join [Port Community](https://port.io/community)
-- Email: support@getport.io
 
 ---
 

@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-This document outlines a plan to restructure the Port TypeScript SDK to match the developer-friendly patterns established by the [Port Pulumi Provider](https://github.com/port-labs/pulumi-port) and successfully implemented in the beskar-protocol project.
+This document outlines a plan to restructure the Port TypeScript SDK to match the developer-friendly patterns established by the [Port Pulumi Provider](https://github.com/port-experimental/pulumi-port) and successfully implemented in the beskar-protocol project.
 
 **Goal**: Make the SDK's API surface match the Pulumi provider's structure so developers can easily copy patterns between Pulumi (IaC) and the SDK (programmatic access).
 
@@ -639,8 +639,8 @@ Would only make sense if:
 
 ## References
 
-- [Port Pulumi Provider](https://github.com/port-labs/pulumi-port)
-- [Beskar Protocol Implementation](https://github.com/port-labs/beskar-protocol)
+- [Port Pulumi Provider](https://github.com/port-experimental/pulumi-port)
+- [Beskar Protocol Implementation](https://github.com/port-experimental/beskar-protocol)
 - [Port API Documentation](https://docs.port.io/api-reference)
 - [TypeScript Best Practices](https://www.typescriptlang.org/docs/handbook/intro.html)
 

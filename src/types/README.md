@@ -29,17 +29,17 @@ import {
   CreateEntityInput,
   EntityProperties,
   EntityRelations,
-} from '@port-labs/port-sdk';
+} from '@port-experimental/port-sdk';
 
 // Or import from specific domain
-import { Entity } from '@port-labs/port-sdk/types/entities';
+import { Entity } from '@port-experimental/port-sdk/types/entities';
 ```
 
 ### ❌ Not Recommended: Import from api.ts
 
 ```typescript
 // Don't do this - api.ts is for internal use
-import { SomeType } from '@port-labs/port-sdk/types/api';
+import { SomeType } from '@port-experimental/port-sdk/types/api';
 ```
 
 ## About api.ts
@@ -203,5 +203,5 @@ export function isEntity(value: unknown): value is Entity {
 
 ## Questions?
 
-See the main [README.md](../../README.md) for more information or [open an issue](https://github.com/port-labs/port-sdk/issues).
+See the main [README.md](../../README.md) for more information or [open an issue](https://github.com/port-experimental/port-sdk/issues).
 

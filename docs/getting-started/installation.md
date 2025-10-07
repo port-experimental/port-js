@@ -13,19 +13,19 @@ This guide will help you install and set up the Port SDK in your project.
 ### Using pnpm (Recommended)
 
 ```bash
-pnpm add @port-labs/port-sdk
+pnpm add @port-experimental/port-sdk
 ```
 
 ### Using npm
 
 ```bash
-npm install @port-labs/port-sdk
+npm install @port-experimental/port-sdk
 ```
 
 ### Using yarn
 
 ```bash
-yarn add @port-labs/port-sdk
+yarn add @port-experimental/port-sdk
 ```
 
 ## Getting API Credentials
@@ -71,7 +71,7 @@ import 'dotenv/config';
 ### 3. Initialize the Client
 
 ```typescript
-import { PortClient } from '@port-labs/port-sdk';
+import { PortClient } from '@port-experimental/port-sdk';
 
 const client = new PortClient({
   credentials: {
@@ -87,7 +87,7 @@ Test your setup with a simple script:
 
 ```typescript
 // test-connection.ts
-import { PortClient } from '@port-labs/port-sdk';
+import { PortClient } from '@port-experimental/port-sdk';
 
 const client = new PortClient({
   credentials: {
@@ -142,9 +142,9 @@ The SDK is written in TypeScript and includes type definitions. Ensure your `tsc
 
 ### Module not found
 
-If you see `Cannot find module '@port-labs/port-sdk'`:
+If you see `Cannot find module '@port-experimental/port-sdk'`:
 
-1. Verify installation: `pnpm list @port-labs/port-sdk`
+1. Verify installation: `pnpm list @port-experimental/port-sdk`
 2. Clear cache: `pnpm store prune`
 3. Reinstall: `pnpm install`
 
@@ -169,6 +169,6 @@ If you see type errors:
 
 Need help? Check out:
 - [FAQ](../FAQ.md)
-- [GitHub Issues](https://github.com/port-labs/port-sdk/issues)
+- [GitHub Issues](https://github.com/port-experimental/port-sdk/issues)
 - [Port Documentation](https://docs.port.io)
 

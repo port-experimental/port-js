@@ -19,7 +19,7 @@ This document shows real examples from the beskar-protocol (using Pulumi) and ho
 #### Pulumi (beskar-protocol/src/blueprints/security/service.ts)
 
 ```typescript
-import * as port from "@port-labs/port";
+import * as port from "@port-experimental/port";
 
 export const serviceBlueprint = new port.Blueprint("service", {
   identifier: "service",
@@ -211,7 +211,7 @@ const serviceBlueprint = await client.blueprints.create({
 #### Pulumi (beskar-protocol/src/entities/security/services.ts)
 
 ```typescript
-import * as port from "@port-labs/port";
+import * as port from "@port-experimental/port";
 
 export const customerPortal = new port.Entity("customer-portal-prod", {
   blueprint: "service",
@@ -307,7 +307,7 @@ const customerPortal = await client.entities.create({
 #### Pulumi (beskar-protocol/src/actions/security/vulnerability-management-actions.ts)
 
 ```typescript
-import * as port from "@port-labs/port";
+import * as port from "@port-experimental/port";
 
 export const autoAssignVulnerability = new port.Action("auto-assign-vulnerability", {
   identifier: "auto_assign_vulnerability",
@@ -411,7 +411,7 @@ const autoAssignVulnerability = await client.actions.create({
 #### Pulumi (beskar-protocol/src/scorecards/security/security-program-maturity.ts)
 
 ```typescript
-import * as port from "@port-labs/port";
+import * as port from "@port-experimental/port";
 
 export const securityMaturityScorecard = new port.Scorecard("security-program-maturity", {
   identifier: "sec_prog_maturity",
@@ -642,6 +642,6 @@ The benefits significantly outweigh the migration effort:
 **Document Version**: 1.0  
 **Last Updated**: 2025-10-06  
 **References**:
-- [Port Pulumi Provider](https://github.com/port-labs/pulumi-port)
-- [Beskar Protocol](https://github.com/port-labs/beskar-protocol)
-- [Port SDK](https://github.com/port-labs/port-js)
+- [Port Pulumi Provider](https://github.com/port-experimental/pulumi-port)
+- [Beskar Protocol](https://github.com/port-experimental/beskar-protocol)
+- [Port SDK](https://github.com/port-experimental/port-js)

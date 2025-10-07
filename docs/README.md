@@ -68,9 +68,11 @@ docs/
 
 ## 🤝 Getting Help
 
-- 📧 Email: support@getport.io
+- For support on this SDK, reach out to your account manager on Slack.
+- For freemium accounts, reach out on [Port Community](https://port.io/community)
+- For security concerns, contact: **security@getport.io**
 - 💬 [Community Slack](https://www.getport.io/community)
-- 🐛 [GitHub Issues](https://github.com/port-labs/port-sdk/issues)
+- 🐛 [GitHub Issues](https://github.com/port-experimental/port-sdk/issues)
 - 📖 [Port Documentation](https://docs.getport.io)
 
 ## 🔗 External Resources
