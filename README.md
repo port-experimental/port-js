@@ -1,6 +1,6 @@
 # Port SDK for TypeScript/JavaScript
 
-[![npm version](https://badge.fury.io/js/@udayk_port%2Fport-sdk.svg)](https://www.npmjs.com/package/@udayk_port/port-sdk)
+[![npm version](https://badge.fury.io/js/@port-experimental%2Fport-sdk.svg)](https://www.npmjs.com/package/@port-experimental/port-sdk)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
 
@@ -52,19 +52,19 @@ A type-safe, feature-rich SDK for interacting with Port.io's API. Built with sec
 
 ```bash
 # Using pnpm (recommended)
-pnpm add @udayk_port/port-sdk
+pnpm add @port-experimental/port-sdk
 
 # Using npm
-npm install @udayk_port/port-sdk
+npm install @port-experimental/port-sdk
 
 # Using yarn
-yarn add @udayk_port/port-sdk
+yarn add @port-experimental/port-sdk
 ```
 
 ## 🚀 Quick Start
 
 ```typescript
-import { PortClient } from '@udayk_port/port-sdk';
+import { PortClient } from '@port-experimental/port-sdk';
 
 // Initialize the client
 const client = new PortClient({
@@ -267,7 +267,7 @@ import {
   PortNotFoundError, 
   PortValidationError,
   PortRateLimitError 
-} from '@udayk_port/port-sdk';
+} from '@port-experimental/port-sdk';
 
 try {
   await client.entities.get('unknown-id', 'service');
@@ -337,7 +337,7 @@ We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md)
 - [Port.io Documentation](https://docs.port.io)
 - [Port.io API Reference](https://docs.port.io/api-reference/port-api)
 - [GitHub Repository](https://github.com/port-experimental/port-js)
-- [npm Package](https://www.npmjs.com/package/@udayk_port/port-sdk)
+- [npm Package](https://www.npmjs.com/package/@port-experimental/port-sdk)
 - [Changelog](./CHANGELOG.md)
 
 ## 💬 Support
