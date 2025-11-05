@@ -4,133 +4,93 @@
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
 
-> **Official TypeScript/JavaScript SDK for [Port.io](https://getport.io)** - The Internal Developer Portal Platform
+Type-safe SDK for the Port.io API. Built for Node.js backend environments.
 
-A type-safe, feature-rich SDK for interacting with Port.io's API. Built with security, developer experience, and reliability in mind.
+## ⚠️ Backend Only
 
----
+**This SDK is for backend/server use only.** Do not use in browser applications.
 
-## ⚠️ **IMPORTANT: Backend/Server-Side Only**
-
-> **🚨 This SDK is designed for backend/server-side use ONLY.**
->
-> **DO NOT use this SDK in browser/frontend applications** where code is exposed to end users.
->
-> **Why?**
-> - Requires **client credentials** (Client ID & Secret) that must be kept secure
-> - Credentials in frontend code are **publicly accessible** and pose a **critical security risk**
-> - Designed for Node.js server environments (Express, NestJS, serverless functions, etc.)
->
-> **Supported Environments:**
-> - ✅ Node.js (v20+)
-> - ✅ Backend servers (Express, Fastify, Koa, etc.)
-> - ✅ Serverless functions (AWS Lambda, Vercel, Netlify, etc.)
-> - ✅ CI/CD pipelines (GitHub Actions, GitLab CI, etc.)
-> - ✅ CLI tools and scripts
->
-> **NOT Supported:**
-> - ❌ Browser applications (React, Vue, Angular, etc.)
-> - ❌ Client-side JavaScript
-> - ❌ Mobile apps (React Native, Ionic, etc.)
->
-> For frontend integrations, create a **backend API** that uses this SDK and exposes only necessary data to your frontend.
+✅ Node.js, Express, NestJS, serverless functions  
+❌ React, Vue, Angular, browser apps
 
 ---
 
-## ✨ Key Features
-
-- 🔐 **Secure by Default** - Built with security-first principles
-- 📘 **Fully Typed** - Complete TypeScript support with auto-generated types
-- 🌍 **Multi-Region** - Support for EU and US instances
-- 🔄 **Auto-Retry** - Intelligent retry logic with exponential backoff
-- 🔌 **Proxy Support** - Corporate proxy support with authentication
-- 🔑 **Flexible Auth** - OAuth2 and JWT token support
-- ⚙️ **Environment Config** - Load configuration from environment variables or .env files
-- 🧪 **Well Tested** - 86.6% code coverage with comprehensive test suite
-
-## 📦 Installation
+## Installation
 
 ```bash
-# Using pnpm (recommended)
-pnpm add @port-experimental/port-sdk
-
-# Using npm
 npm install @port-experimental/port-sdk
-
-# Using yarn
-yarn add @port-experimental/port-sdk
 ```
 
-## 🚀 Quick Start
+---
+
+## Quick Start
 
 ```typescript
 import { PortClient } from '@port-experimental/port-sdk';
 
-// Initialize the client
+// Initialize
 const client = new PortClient({
   credentials: {
-    clientId: 'your-client-id',
-    clientSecret: 'your-client-secret',
+    clientId: process.env.PORT_CLIENT_ID!,
+    clientSecret: process.env.PORT_CLIENT_SECRET!,
   },
 });
 
-// List all blueprints
+// Use
 const blueprints = await client.blueprints.list();
-console.log(`Found ${blueprints.length} blueprints`);
-
-// Create an entity
 const entity = await client.entities.create({
   identifier: 'my-service',
   blueprint: 'service',
   title: 'My Service',
   properties: {
-    stringProps: {
-      environment: 'production',
-    },
+    stringProps: { environment: 'production' },
+  },
+});
+```
+
+---
+
+## API Overview
+
+The SDK provides resource-based access:
+
+```typescript
+client.entities    // Create, read, update, delete entities
+client.blueprints  // Manage blueprints
+client.actions     // Execute actions
+client.teams       // Manage teams
+client.users       // Manage users
+client.webhooks    // Configure webhooks
+client.scorecards  // Work with scorecards
+client.audit       // Query audit logs
+```
+
+---
+
+## Common Operations
+
+### Entities
+
+```typescript
+// Create
+const entity = await client.entities.create({
+  identifier: 'my-service',
+  blueprint: 'service',
+  title: 'My Service',
+  properties: {
+    stringProps: { environment: 'production' },
   },
 });
 
-console.log(`Created entity: ${entity.identifier}`);
-```
+// Get
+const service = await client.entities.get('my-service', 'service');
 
-## 📚 Documentation
+// Update
+await client.entities.update('my-service', 'service', {
+  properties: { stringProps: { status: 'active' } },
+});
 
-### Getting Started
-- [Installation & Setup](./docs/getting-started/installation.md)
-- [Quick Start Guide](./docs/getting-started/quickstart.md)
-- [⚠️ Backend/Server-Side Only Notice](./docs/BACKEND_ONLY.md) - **Read this first!**
-- [API Documentation](./docs/api/) - Auto-generated TypeDoc documentation
-
-### Development
-- [Development Guide](./docs/development/README.md)
-- [API Coverage Analysis](./API_COVERAGE_ANALYSIS.md) - What's implemented vs missing
-- [Automated Workflows](./docs/development/AUTOMATED_WORKFLOWS.md) - Daily OpenAPI sync & health checks
-- [Contributing Guide](./CONTRIBUTING.md)
-- [Commit Message Cheatsheet](./docs/development/COMMIT_MESSAGES.md)
-
-**Type Generation:**
-```bash
-# Download latest OpenAPI spec and regenerate types
-pnpm types:update
-
-# Or run separately
-pnpm types:download  # Download from https://api.port.io/swagger/json
-pnpm types:generate  # Generate src/types/api.ts
-```
-- [Security Policy](./SECURITY.md)
-- [Credential Security](./docs/development/CREDENTIAL_SECURITY.md)
-- [Testing Guide](./docs/TESTING.md)
-
-### Examples
-- [View All Examples](./docs/EXAMPLES.md)
-- [Run Examples Locally](./examples/README.md)
-
-## 💡 Common Use Cases
-
-### Working with Entities
-
-```typescript
-// Search entities
+// Search
 const results = await client.entities.search({
   combinator: 'and',
   rules: [
@@ -139,80 +99,45 @@ const results = await client.entities.search({
   ],
 });
 
-// Update an entity
-await client.entities.update('my-service', {
-  properties: {
-    stringProps: { status: 'active' },
-  },
-}, 'service');
-
-// Delete an entity
+// Delete
 await client.entities.delete('my-service', 'service');
 ```
 
-### Managing Blueprints
+### Blueprints
 
 ```typescript
-// Create a blueprint
+// List all
+const blueprints = await client.blueprints.list();
+
+// Get one
+const blueprint = await client.blueprints.get('service');
+
+// Create
 await client.blueprints.create({
   identifier: 'microservice',
   title: 'Microservice',
   schema: {
     properties: {
       name: { type: 'string', title: 'Name' },
-      version: { type: 'string', title: 'Version' },
     },
   },
 });
-
-// Get a blueprint
-const blueprint = await client.blueprints.get('microservice');
 ```
 
-### Working with Webhooks
+---
 
-```typescript
-// Create a webhook
-await client.webhooks.create({
-  identifier: 'github-webhook',
-  title: 'GitHub Integration',
-  url: 'https://api.github.com/webhook',
-  enabled: true,
-  integrationType: 'custom',
-  mappings: [
-    {
-      blueprint: 'service',
-      filter: {
-        combinator: 'and',
-        rules: [{ property: '$identifier', operator: '=', value: 'my-service' }]
-      }
-    }
-  ]
-});
-
-// List all webhooks
-const webhooks = await client.webhooks.list();
-
-// Update a webhook
-await client.webhooks.update('github-webhook', {
-  enabled: false
-});
-```
-
-## 🔧 Configuration
+## Configuration
 
 ### Environment Variables
 
 ```bash
-# .env file
 PORT_CLIENT_ID=your_client_id
 PORT_CLIENT_SECRET=your_client_secret
-PORT_BASE_URL=https://api.port.io  # Optional, defaults to EU
-PORT_LOG_LEVEL=info                # Optional: error, warn, info, debug, trace
-HTTP_PROXY=http://proxy:8080       # Optional
+PORT_REGION=eu              # Optional: eu or us (default: eu)
+PORT_LOG_LEVEL=info        # Optional: error, warn, info, debug, trace
 ```
 
-### Programmatic Configuration
+### Programmatic
 
 ```typescript
 const client = new PortClient({
@@ -220,53 +145,37 @@ const client = new PortClient({
     clientId: 'your-client-id',
     clientSecret: 'your-client-secret',
   },
-  region: 'eu', // or 'us'
-  timeout: 30000,
-  maxRetries: 3,
-  logger: {
-    level: 3, // 0=ERROR, 1=WARN, 2=INFO, 3=DEBUG, 4=TRACE
-    enabled: true,
-  },
+  region: 'eu',           // or 'us'
+  timeout: 30000,         // Request timeout in ms
+  maxRetries: 3,          // Retry attempts
 });
 ```
 
-See [Configuration Guide](./docs/getting-started/configuration.md) for all options.
+### Authentication Methods
 
-## 🔐 Authentication
-
-The SDK supports multiple authentication methods:
-
-**OAuth2 (Client Credentials)**
 ```typescript
-const client = new PortClient({
-  credentials: {
-    clientId: process.env.PORT_CLIENT_ID,
-    clientSecret: process.env.PORT_CLIENT_SECRET,
-  },
-});
+// OAuth2 (recommended)
+credentials: {
+  clientId: process.env.PORT_CLIENT_ID!,
+  clientSecret: process.env.PORT_CLIENT_SECRET!,
+}
+
+// JWT token
+credentials: {
+  accessToken: 'your-jwt-token',
+}
 ```
 
-**JWT Token**
-```typescript
-const client = new PortClient({
-  credentials: {
-    accessToken: 'your-jwt-token',
-  },
-});
-```
+---
 
-See [Authentication Guide](./docs/getting-started/authentication.md) for more details.
-
-## 🛡️ Error Handling
-
-The SDK provides specific error types for different scenarios:
+## Error Handling
 
 ```typescript
-import { 
-  PortAuthError, 
-  PortNotFoundError, 
+import {
+  PortAuthError,
+  PortNotFoundError,
   PortValidationError,
-  PortRateLimitError 
+  PortRateLimitError,
 } from '@port-experimental/port-sdk';
 
 try {
@@ -276,76 +185,122 @@ try {
     console.log('Entity not found');
   } else if (error instanceof PortAuthError) {
     console.log('Authentication failed');
-  } else {
-    console.log('Unexpected error:', error);
+  } else if (error instanceof PortRateLimitError) {
+    console.log('Rate limited');
   }
 }
 ```
 
-See [Error Handling Guide](./docs/guides/error-handling.md) for comprehensive error handling patterns.
+---
 
-## 🌍 Multi-Region Support
+## Examples
 
-```typescript
-// EU region (default)
-const euClient = new PortClient({ 
-  credentials,
-  region: 'eu' 
-});
+See the [`examples/`](./examples/) directory for complete examples:
 
-// US region
-const usClient = new PortClient({ 
-  credentials,
-  region: 'us' 
-});
+- Basic usage
+- Entity CRUD operations
+- Search and filtering
+- Batch operations
+- Error handling
 
-// Custom base URL
-const customClient = new PortClient({ 
-  credentials,
-  baseUrl: 'https://custom.port.io' 
-});
-```
-
-## 📊 Testing
-
+Run an example:
 ```bash
-# Run unit tests
-pnpm test
-
-# Run unit tests with coverage
-pnpm test:coverage
-
-# Run integration tests (requires credentials)
-pnpm test:integration
-
-# Run smoke tests (manual verification)
-pnpm smoke
+pnpm tsx examples/01-basic-usage.ts
 ```
-
-See [Testing Guide](./docs/TESTING.md) for more information.
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md) for details.
-
-## 📄 License
-
-[Apache-2.0](./LICENSE)
-
-## 🔗 Links
-
-- [Port.io Documentation](https://docs.port.io)
-- [Port.io API Reference](https://docs.port.io/api-reference/port-api)
-- [GitHub Repository](https://github.com/port-experimental/port-js)
-- [npm Package](https://www.npmjs.com/package/@port-experimental/port-sdk)
-- [Changelog](./CHANGELOG.md)
-
-## 💬 Support
-
-- 💬 Slack: [Port Community](https://port.io/community)
-- 🐛 Issues: [GitHub Issues](https://github.com/port-experimental/port-sdk/issues)
-- 📖 Docs: [docs.port.io](https://docs.port.io)
 
 ---
 
-**Made with ❤️ by the Port team**
+## Troubleshooting
+
+### Authentication Issues
+
+**Error**: `PortAuthError: Authentication failed`
+
+- Verify credentials in Port.io Settings
+- Check environment variables: `PORT_CLIENT_ID`, `PORT_CLIENT_SECRET`
+- Ensure `.env` file is loaded correctly
+
+**Error**: `PortAuthError: Token refresh failed`
+
+- Generate new API credentials in your Port account
+
+### Network Issues
+
+**Error**: `PortNetworkError: Network request failed`
+
+- Check internet connectivity
+- Verify Port API accessibility: `curl https://api.port.io/v1/health`
+- Check firewall rules (allow HTTPS port 443)
+
+**Error**: `PortTimeoutError: Request timeout`
+
+- Increase timeout: `timeout: 60000` (60 seconds)
+- Check network latency
+
+### Rate Limiting
+
+**Error**: `PortRateLimitError: Rate limit exceeded`
+
+- SDK automatically retries with `Retry-After` header
+- Implement custom rate limiting between requests
+- Use batch operations when available
+
+### Entity Operations
+
+**Error**: `PortNotFoundError: Entity not found`
+
+- Verify entity exists: `await client.entities.list({ blueprint: 'service' })`
+- Check blueprint parameter matches
+- Use search to find entities by partial name
+
+**Error**: `PortValidationError: Validation failed`
+
+- Check blueprint schema: `await client.blueprints.get('service')`
+- Verify property types match (string, number, boolean, array)
+- Ensure related entities exist before creating relations
+
+### Debug Mode
+
+Enable verbose logging:
+
+```typescript
+const client = new PortClient({
+  credentials: { /* ... */ },
+  logger: {
+    level: LogLevel.DEBUG,
+    enabled: true,
+  },
+});
+```
+
+Or set environment variable:
+```bash
+export PORT_LOG_LEVEL=debug
+```
+
+---
+
+## Documentation
+
+- [Getting Started Guide](./docs/getting-started.md) - Install and use the SDK
+- [API Reference](./docs/api/) - Auto-generated TypeDoc documentation
+
+---
+
+## Support
+
+- 📖 [Port.io Documentation](https://docs.port.io)
+- 💬 [Community Slack](https://port.io/community)
+- 🐛 [GitHub Issues](https://github.com/port-experimental/port-js/issues)
+
+---
+
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+
+---
+
+## License
+
+[Apache-2.0](./LICENSE)

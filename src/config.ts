@@ -8,9 +8,30 @@ import { PortAuthError } from './errors';
 import { LoggerConfig } from './logger';
 
 /**
+ * Cache for dotenv loading to avoid repeated parsing
+ */
+let dotenvLoaded = false;
+
+/**
+ * Port API regions
+ * 
+ * @internal
+ */
+const VALID_REGIONS = ['eu', 'us'] as const;
+
+/**
  * Port API regions
  */
-export type PortRegion = 'eu' | 'us';
+export type PortRegion = typeof VALID_REGIONS[number];
+
+/**
+ * Validate that a region string is a valid Port region
+ * 
+ * @internal
+ */
+function isValidRegion(region: string): region is PortRegion {
+  return VALID_REGIONS.includes(region as PortRegion);
+}
 
 /**
  * Base URLs for different regions
@@ -162,7 +183,7 @@ function loadBaseUrlFromEnv(): string | undefined {
   }
 
   const region = process.env[ENV_VARS.REGION];
-  if (region && (region === 'eu' || region === 'us')) {
+  if (region && isValidRegion(region)) {
     return REGION_BASE_URLS[region];
   }
 
@@ -261,18 +282,25 @@ export interface ResolvedConfig {
 }
 
 /**
- * Resolve configuration from multiple sources with precedence:
- * 1. Explicit config object
- * 2. Environment variables
- * 3. Defaults (EU region, 30s timeout, 3 retries)
+ * Load and cache .env file (only loads once)
+ * 
+ * @internal
  */
-export function resolveConfig(config?: PortClientConfig): ResolvedConfig {
-  // Load .env file if requested (default: true)
-  const shouldLoadEnv = config?.loadEnv !== false;
-  if (shouldLoadEnv) {
-    loadDotenv({ path: config?.envPath || '.env' });
+function loadDotenvOnce(envPath?: string): void {
+  if (dotenvLoaded) {
+    return;
   }
 
+  loadDotenv({ path: envPath || '.env' });
+  dotenvLoaded = true;
+}
+
+/**
+ * Resolve credentials from config or environment
+ * 
+ * @internal
+ */
+function resolveCredentials(config?: PortClientConfig): PortCredentials {
   // Resolve credentials with precedence: config > env
   let credentials = config?.credentials;
   if (!credentials) {
@@ -288,10 +316,19 @@ export function resolveConfig(config?: PortClientConfig): ResolvedConfig {
     );
   }
 
+  return credentials;
+}
+
+/**
+ * Resolve base URL and region from config or environment
+ * 
+ * @internal
+ */
+function resolveBaseUrlAndRegion(config?: PortClientConfig): { baseUrl: string; region: PortRegion } {
   // Resolve base URL and region with precedence: config.baseUrl > config.region > env > default (EU)
   let baseUrl: string;
   let region: PortRegion;
-  
+
   if (config?.baseUrl) {
     baseUrl = config.baseUrl;
     // Infer region from base URL
@@ -311,11 +348,43 @@ export function resolveConfig(config?: PortClientConfig): ResolvedConfig {
     }
   }
 
-  // Resolve proxy with precedence: config > env
+  return { baseUrl, region };
+}
+
+/**
+ * Resolve proxy configuration from config or environment
+ * 
+ * @internal
+ */
+function resolveProxy(config?: PortClientConfig, baseUrl?: string): ProxyConfig | undefined {
   let proxy = config?.proxy;
-  if (!proxy) {
+  if (!proxy && baseUrl) {
     proxy = loadProxyFromEnv(baseUrl);
   }
+  return proxy;
+}
+
+/**
+ * Resolve configuration from multiple sources with precedence:
+ * 1. Explicit config object
+ * 2. Environment variables
+ * 3. Defaults (EU region, 30s timeout, 3 retries)
+ */
+export function resolveConfig(config?: PortClientConfig): ResolvedConfig {
+  // Load .env file if requested (default: true) - cached after first load
+  const shouldLoadEnv = config?.loadEnv !== false;
+  if (shouldLoadEnv) {
+    loadDotenvOnce(config?.envPath);
+  }
+
+  // Resolve credentials
+  const credentials = resolveCredentials(config);
+
+  // Resolve base URL and region
+  const { baseUrl, region } = resolveBaseUrlAndRegion(config);
+
+  // Resolve proxy
+  const proxy = resolveProxy(config, baseUrl);
 
   // Resolve other config options
   const timeout = config?.timeout 

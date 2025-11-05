@@ -606,9 +606,9 @@ export interface paths {
                 query?: {
                     /** @description If `true`, [calculated properties](https://docs.getport.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/calculation-property/) will be excluded from the entities. */
                     exclude_calculated_properties?: boolean;
-                    /** @description An array of values from the [entity JSON](${DOCS_URL}/build-your-software-catalog/sync-data-to-catalog/#json-structure). Only these values will be returned in the response.<br/>For example: `{ "properties.propertyIdentifier","identifier"}` */
+                    /** @description An array of values from the [entity JSON](https://docs.port.io/build-your-software-catalog/sync-data-to-catalog/#json-structure). Only these values will be returned in the response.<br/>For example: `{ "properties.propertyIdentifier","identifier"}`. */
                     include?: string[];
-                    /** @description An array of values from the [entity JSON](${DOCS_URL}/build-your-software-catalog/sync-data-to-catalog/#json-structure) to be ommitted from the response.<br/>For example: `{ "properties.propertyIdentifier","identifier"}` */
+                    /** @description An array of values from the [entity JSON](https://docs.port.io/build-your-software-catalog/sync-data-to-catalog/#json-structure) to be ommitted from the response.<br/>For example: `{ "properties.propertyIdentifier","identifier"}` */
                     exclude?: string[];
                     attach_title_to_relation?: boolean;
                     attach_identifier_to_title_mirror_properties?: boolean;
@@ -1019,9 +1019,9 @@ export interface paths {
                 query?: {
                     /** @description If `true`, [calculated properties](https://docs.getport.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/calculation-property/) will be excluded from the entities. */
                     exclude_calculated_properties?: boolean;
-                    /** @description An array of values from the [entity JSON](${DOCS_URL}/build-your-software-catalog/sync-data-to-catalog/#json-structure). Only these values will be returned in the response.<br/>For example: `{ "properties.propertyIdentifier","identifier"}` */
+                    /** @description An array of values from the [entity JSON](https://docs.port.io/build-your-software-catalog/sync-data-to-catalog/#json-structure). Only these values will be returned in the response.<br/>For example: `{ "properties.propertyIdentifier","identifier"}`. */
                     include?: string[];
-                    /** @description An array of values from the [entity JSON](${DOCS_URL}/build-your-software-catalog/sync-data-to-catalog/#json-structure) to be ommitted from the response.<br/>For example: `{ "properties.propertyIdentifier","identifier"}` */
+                    /** @description An array of values from the [entity JSON](https://docs.port.io/build-your-software-catalog/sync-data-to-catalog/#json-structure) to be ommitted from the response.<br/>For example: `{ "properties.propertyIdentifier","identifier"}` */
                     exclude?: string[];
                     attach_title_to_relation?: boolean;
                     attach_identifier_to_title_mirror_properties?: boolean;
@@ -1770,9 +1770,9 @@ export interface paths {
                 query?: {
                     /** @description If `true`, [calculated properties](https://docs.getport.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/calculation-property/) will be excluded from the entities. */
                     exclude_calculated_properties?: boolean;
-                    /** @description An array of values from the [entity JSON](${DOCS_URL}/build-your-software-catalog/sync-data-to-catalog/#json-structure). Only these values will be returned in the response.<br/>For example: `{ "properties.propertyIdentifier","identifier"}` */
+                    /** @description An array of values from the [entity JSON](https://docs.port.io/build-your-software-catalog/sync-data-to-catalog/#json-structure). Only these values will be returned in the response.<br/>For example: `{ "properties.propertyIdentifier","identifier"}`. */
                     include?: string[];
-                    /** @description An array of values from the [entity JSON](${DOCS_URL}/build-your-software-catalog/sync-data-to-catalog/#json-structure) to be ommitted from the response.<br/>For example: `{ "properties.propertyIdentifier","identifier"}` */
+                    /** @description An array of values from the [entity JSON](https://docs.port.io/build-your-software-catalog/sync-data-to-catalog/#json-structure) to be ommitted from the response.<br/>For example: `{ "properties.propertyIdentifier","identifier"}` */
                     exclude?: string[];
                     attach_title_to_relation?: boolean;
                     attach_identifier_to_title_mirror_properties?: boolean;
@@ -2584,11 +2584,6 @@ export interface paths {
                                 description?: string;
                                 /** @description The icon of the blueprint. */
                                 icon?: string;
-                                /** @description A relation to another blueprint from which to inherit the team. Can be any blueprint connected to this one via any number of relations. `path` is the path to the desired blueprint via relations, for example: `"relationIdentifier.relationIdentifierInRelatedBlueprint"` */
-                                teamInheritance?: {
-                                    /** @description The path to the desired blueprint via relations. */
-                                    path: string;
-                                };
                                 ownership?: {
                                     /** @enum {string} */
                                     type: "Inherited";
@@ -2604,7 +2599,7 @@ export interface paths {
                                 };
                                 /** @description The schema of the blueprint, see `properties` and `required` below for more information. */
                                 schema: {
-                                    /** @description The properties of the blueprint. */
+                                    /** @description The properties of the blueprint.<br></br> Each property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                                     properties: {
                                         [key: string]: {
                                             /** @description The title of the property. */
@@ -2646,7 +2641,7 @@ export interface paths {
                                     required?: string[];
                                 };
                                 /**
-                                 * @description The [calculation properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/calculation-property/) of the blueprint.
+                                 * @description The [calculation properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/calculation-property/) of the blueprint. <br></br> Each calculation property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`.
                                  * @default {}
                                  */
                                 calculationProperties: {
@@ -2706,7 +2701,7 @@ export interface paths {
                                         };
                                     };
                                 };
-                                /** @description The [mirror properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/mirror-property/) of the blueprint. */
+                                /** @description The [mirror properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/mirror-property/) of the blueprint. <br></br> Each mirror property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                                 mirrorProperties?: {
                                     [key: string]: {
                                         /** @description The path to the property in the related blueprint. This is a string of relation identifiers separated by dots, the last identifier is the property identifier. */
@@ -2716,7 +2711,7 @@ export interface paths {
                                     };
                                 };
                                 /**
-                                 * @description The [aggregation properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/aggregation-property/) of the blueprint.
+                                 * @description The [aggregation properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/aggregation-property/) of the blueprint. <br></br> Each aggregation property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`.
                                  * @default {}
                                  */
                                 aggregationProperties: {
@@ -2802,7 +2797,7 @@ export interface paths {
                                         }[];
                                     };
                                 };
-                                /** @description The [relations](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/relate-blueprints/) of the blueprint. */
+                                /** @description The [relations](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/relate-blueprints/) of the blueprint. <br></br> Each relation identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                                 relations?: {
                                     [key: string]: {
                                         title?: string;
@@ -2896,11 +2891,6 @@ export interface paths {
                         description?: string;
                         /** @description The icon of the blueprint. */
                         icon?: string;
-                        /** @description A relation to another blueprint from which to inherit the team. Can be any blueprint connected to this one via any number of relations. `path` is the path to the desired blueprint via relations, for example: `"relationIdentifier.relationIdentifierInRelatedBlueprint"` */
-                        teamInheritance?: {
-                            /** @description The path to the desired blueprint via relations. */
-                            path: string;
-                        };
                         ownership?: {
                             /** @enum {string} */
                             type: "Inherited";
@@ -2916,7 +2906,7 @@ export interface paths {
                         };
                         /** @description The schema of the blueprint, see `properties` and `required` below for more information. */
                         schema: {
-                            /** @description The properties of the blueprint. */
+                            /** @description The properties of the blueprint.<br></br> Each property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                             properties: {
                                 [key: string]: {
                                     /** @description The title of the property. */
@@ -2958,7 +2948,7 @@ export interface paths {
                             required?: string[];
                         };
                         /**
-                         * @description The [calculation properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/calculation-property/) of the blueprint.
+                         * @description The [calculation properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/calculation-property/) of the blueprint. <br></br> Each calculation property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`.
                          * @default {}
                          */
                         calculationProperties?: {
@@ -3018,7 +3008,7 @@ export interface paths {
                                 };
                             };
                         };
-                        /** @description The [mirror properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/mirror-property/) of the blueprint. */
+                        /** @description The [mirror properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/mirror-property/) of the blueprint. <br></br> Each mirror property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                         mirrorProperties?: {
                             [key: string]: {
                                 /** @description The path to the property in the related blueprint. This is a string of relation identifiers separated by dots, the last identifier is the property identifier. */
@@ -3028,7 +3018,7 @@ export interface paths {
                             };
                         };
                         /**
-                         * @description The [aggregation properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/aggregation-property/) of the blueprint.
+                         * @description The [aggregation properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/aggregation-property/) of the blueprint. <br></br> Each aggregation property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`.
                          * @default {}
                          */
                         aggregationProperties?: {
@@ -3114,7 +3104,7 @@ export interface paths {
                                 }[];
                             };
                         };
-                        /** @description The [relations](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/relate-blueprints/) of the blueprint. */
+                        /** @description The [relations](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/relate-blueprints/) of the blueprint. <br></br> Each relation identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                         relations?: {
                             [key: string]: {
                                 title?: string;
@@ -3166,11 +3156,6 @@ export interface paths {
                                 description?: string;
                                 /** @description The icon of the blueprint. */
                                 icon?: string;
-                                /** @description A relation to another blueprint from which to inherit the team. Can be any blueprint connected to this one via any number of relations. `path` is the path to the desired blueprint via relations, for example: `"relationIdentifier.relationIdentifierInRelatedBlueprint"` */
-                                teamInheritance?: {
-                                    /** @description The path to the desired blueprint via relations. */
-                                    path: string;
-                                };
                                 ownership?: {
                                     /** @enum {string} */
                                     type: "Inherited";
@@ -3186,7 +3171,7 @@ export interface paths {
                                 };
                                 /** @description The schema of the blueprint, see `properties` and `required` below for more information. */
                                 schema: {
-                                    /** @description The properties of the blueprint. */
+                                    /** @description The properties of the blueprint.<br></br> Each property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                                     properties: {
                                         [key: string]: {
                                             /** @description The title of the property. */
@@ -3228,7 +3213,7 @@ export interface paths {
                                     required?: string[];
                                 };
                                 /**
-                                 * @description The [calculation properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/calculation-property/) of the blueprint.
+                                 * @description The [calculation properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/calculation-property/) of the blueprint. <br></br> Each calculation property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`.
                                  * @default {}
                                  */
                                 calculationProperties: {
@@ -3288,7 +3273,7 @@ export interface paths {
                                         };
                                     };
                                 };
-                                /** @description The [mirror properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/mirror-property/) of the blueprint. */
+                                /** @description The [mirror properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/mirror-property/) of the blueprint. <br></br> Each mirror property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                                 mirrorProperties?: {
                                     [key: string]: {
                                         /** @description The path to the property in the related blueprint. This is a string of relation identifiers separated by dots, the last identifier is the property identifier. */
@@ -3298,7 +3283,7 @@ export interface paths {
                                     };
                                 };
                                 /**
-                                 * @description The [aggregation properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/aggregation-property/) of the blueprint.
+                                 * @description The [aggregation properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/aggregation-property/) of the blueprint. <br></br> Each aggregation property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`.
                                  * @default {}
                                  */
                                 aggregationProperties: {
@@ -3384,7 +3369,7 @@ export interface paths {
                                         }[];
                                     };
                                 };
-                                /** @description The [relations](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/relate-blueprints/) of the blueprint. */
+                                /** @description The [relations](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/relate-blueprints/) of the blueprint. <br></br> Each relation identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                                 relations?: {
                                     [key: string]: {
                                         title?: string;
@@ -3527,11 +3512,6 @@ export interface paths {
                                 description?: string;
                                 /** @description The icon of the blueprint. */
                                 icon?: string;
-                                /** @description A relation to another blueprint from which to inherit the team. Can be any blueprint connected to this one via any number of relations. `path` is the path to the desired blueprint via relations, for example: `"relationIdentifier.relationIdentifierInRelatedBlueprint"` */
-                                teamInheritance?: {
-                                    /** @description The path to the desired blueprint via relations. */
-                                    path: string;
-                                };
                                 ownership?: {
                                     /** @enum {string} */
                                     type: "Inherited";
@@ -3547,7 +3527,7 @@ export interface paths {
                                 };
                                 /** @description The schema of the blueprint, see `properties` and `required` below for more information. */
                                 schema: {
-                                    /** @description The properties of the blueprint. */
+                                    /** @description The properties of the blueprint.<br></br> Each property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                                     properties: {
                                         [key: string]: {
                                             /** @description The title of the property. */
@@ -3589,7 +3569,7 @@ export interface paths {
                                     required?: string[];
                                 };
                                 /**
-                                 * @description The [calculation properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/calculation-property/) of the blueprint.
+                                 * @description The [calculation properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/calculation-property/) of the blueprint. <br></br> Each calculation property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`.
                                  * @default {}
                                  */
                                 calculationProperties: {
@@ -3649,7 +3629,7 @@ export interface paths {
                                         };
                                     };
                                 };
-                                /** @description The [mirror properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/mirror-property/) of the blueprint. */
+                                /** @description The [mirror properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/mirror-property/) of the blueprint. <br></br> Each mirror property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                                 mirrorProperties?: {
                                     [key: string]: {
                                         /** @description The path to the property in the related blueprint. This is a string of relation identifiers separated by dots, the last identifier is the property identifier. */
@@ -3659,7 +3639,7 @@ export interface paths {
                                     };
                                 };
                                 /**
-                                 * @description The [aggregation properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/aggregation-property/) of the blueprint.
+                                 * @description The [aggregation properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/aggregation-property/) of the blueprint. <br></br> Each aggregation property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`.
                                  * @default {}
                                  */
                                 aggregationProperties: {
@@ -3745,7 +3725,7 @@ export interface paths {
                                         }[];
                                     };
                                 };
-                                /** @description The [relations](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/relate-blueprints/) of the blueprint. */
+                                /** @description The [relations](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/relate-blueprints/) of the blueprint. <br></br> Each relation identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                                 relations?: {
                                     [key: string]: {
                                         title?: string;
@@ -3838,11 +3818,6 @@ export interface paths {
                         description?: string;
                         /** @description The icon of the blueprint. */
                         icon?: string;
-                        /** @description A relation to another blueprint from which to inherit the team. Can be any blueprint connected to this one via any number of relations. `path` is the path to the desired blueprint via relations, for example: `"relationIdentifier.relationIdentifierInRelatedBlueprint"` */
-                        teamInheritance?: {
-                            /** @description The path to the desired blueprint via relations. */
-                            path: string;
-                        };
                         ownership?: {
                             /** @enum {string} */
                             type: "Inherited";
@@ -3858,7 +3833,7 @@ export interface paths {
                         };
                         /** @description The schema of the blueprint, see `properties` and `required` below for more information. */
                         schema: {
-                            /** @description The properties of the blueprint. */
+                            /** @description The properties of the blueprint.<br></br> Each property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                             properties: {
                                 [key: string]: {
                                     /** @description The title of the property. */
@@ -3900,7 +3875,7 @@ export interface paths {
                             required?: string[];
                         };
                         /**
-                         * @description The [calculation properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/calculation-property/) of the blueprint.
+                         * @description The [calculation properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/calculation-property/) of the blueprint. <br></br> Each calculation property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`.
                          * @default {}
                          */
                         calculationProperties?: {
@@ -3960,7 +3935,7 @@ export interface paths {
                                 };
                             };
                         };
-                        /** @description The [mirror properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/mirror-property/) of the blueprint. */
+                        /** @description The [mirror properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/mirror-property/) of the blueprint. <br></br> Each mirror property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                         mirrorProperties?: {
                             [key: string]: {
                                 /** @description The path to the property in the related blueprint. This is a string of relation identifiers separated by dots, the last identifier is the property identifier. */
@@ -3970,7 +3945,7 @@ export interface paths {
                             };
                         };
                         /**
-                         * @description The [aggregation properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/aggregation-property/) of the blueprint.
+                         * @description The [aggregation properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/aggregation-property/) of the blueprint. <br></br> Each aggregation property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`.
                          * @default {}
                          */
                         aggregationProperties?: {
@@ -4056,7 +4031,7 @@ export interface paths {
                                 }[];
                             };
                         };
-                        /** @description The [relations](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/relate-blueprints/) of the blueprint. */
+                        /** @description The [relations](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/relate-blueprints/) of the blueprint. <br></br> Each relation identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                         relations?: {
                             [key: string]: {
                                 title?: string;
@@ -4108,11 +4083,6 @@ export interface paths {
                                 description?: string;
                                 /** @description The icon of the blueprint. */
                                 icon?: string;
-                                /** @description A relation to another blueprint from which to inherit the team. Can be any blueprint connected to this one via any number of relations. `path` is the path to the desired blueprint via relations, for example: `"relationIdentifier.relationIdentifierInRelatedBlueprint"` */
-                                teamInheritance?: {
-                                    /** @description The path to the desired blueprint via relations. */
-                                    path: string;
-                                };
                                 ownership?: {
                                     /** @enum {string} */
                                     type: "Inherited";
@@ -4128,7 +4098,7 @@ export interface paths {
                                 };
                                 /** @description The schema of the blueprint, see `properties` and `required` below for more information. */
                                 schema: {
-                                    /** @description The properties of the blueprint. */
+                                    /** @description The properties of the blueprint.<br></br> Each property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                                     properties: {
                                         [key: string]: {
                                             /** @description The title of the property. */
@@ -4170,7 +4140,7 @@ export interface paths {
                                     required?: string[];
                                 };
                                 /**
-                                 * @description The [calculation properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/calculation-property/) of the blueprint.
+                                 * @description The [calculation properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/calculation-property/) of the blueprint. <br></br> Each calculation property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`.
                                  * @default {}
                                  */
                                 calculationProperties: {
@@ -4230,7 +4200,7 @@ export interface paths {
                                         };
                                     };
                                 };
-                                /** @description The [mirror properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/mirror-property/) of the blueprint. */
+                                /** @description The [mirror properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/mirror-property/) of the blueprint. <br></br> Each mirror property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                                 mirrorProperties?: {
                                     [key: string]: {
                                         /** @description The path to the property in the related blueprint. This is a string of relation identifiers separated by dots, the last identifier is the property identifier. */
@@ -4240,7 +4210,7 @@ export interface paths {
                                     };
                                 };
                                 /**
-                                 * @description The [aggregation properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/aggregation-property/) of the blueprint.
+                                 * @description The [aggregation properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/aggregation-property/) of the blueprint. <br></br> Each aggregation property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`.
                                  * @default {}
                                  */
                                 aggregationProperties: {
@@ -4326,7 +4296,7 @@ export interface paths {
                                         }[];
                                     };
                                 };
-                                /** @description The [relations](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/relate-blueprints/) of the blueprint. */
+                                /** @description The [relations](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/relate-blueprints/) of the blueprint. <br></br> Each relation identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                                 relations?: {
                                     [key: string]: {
                                         title?: string;
@@ -4539,11 +4509,6 @@ export interface paths {
                         description?: string;
                         /** @description The icon of the blueprint. */
                         icon?: string;
-                        /** @description A relation to another blueprint from which to inherit the team. Can be any blueprint connected to this one via any number of relations. `path` is the path to the desired blueprint via relations, for example: `"relationIdentifier.relationIdentifierInRelatedBlueprint"` */
-                        teamInheritance?: {
-                            /** @description The path to the desired blueprint via relations. */
-                            path: string;
-                        };
                         ownership?: {
                             /** @enum {string} */
                             type: "Inherited";
@@ -4599,7 +4564,7 @@ export interface paths {
                             required?: string[];
                         };
                         /**
-                         * @description The [calculation properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/calculation-property/) of the blueprint.
+                         * @description The [calculation properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/calculation-property/) of the blueprint. <br></br> Each calculation property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`.
                          * @default {}
                          */
                         calculationProperties?: {
@@ -4659,7 +4624,7 @@ export interface paths {
                                 };
                             };
                         };
-                        /** @description The [mirror properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/mirror-property/) of the blueprint. */
+                        /** @description The [mirror properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/mirror-property/) of the blueprint. <br></br> Each mirror property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                         mirrorProperties?: {
                             [key: string]: {
                                 /** @description The path to the property in the related blueprint. This is a string of relation identifiers separated by dots, the last identifier is the property identifier. */
@@ -4669,7 +4634,7 @@ export interface paths {
                             };
                         };
                         /**
-                         * @description The [aggregation properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/aggregation-property/) of the blueprint.
+                         * @description The [aggregation properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/aggregation-property/) of the blueprint. <br></br> Each aggregation property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`.
                          * @default {}
                          */
                         aggregationProperties?: {
@@ -4755,7 +4720,7 @@ export interface paths {
                                 }[];
                             };
                         };
-                        /** @description The [relations](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/relate-blueprints/) of the blueprint. */
+                        /** @description The [relations](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/relate-blueprints/) of the blueprint. <br></br> Each relation identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                         relations?: {
                             [key: string]: {
                                 title?: string;
@@ -4807,11 +4772,6 @@ export interface paths {
                                 description?: string;
                                 /** @description The icon of the blueprint. */
                                 icon?: string;
-                                /** @description A relation to another blueprint from which to inherit the team. Can be any blueprint connected to this one via any number of relations. `path` is the path to the desired blueprint via relations, for example: `"relationIdentifier.relationIdentifierInRelatedBlueprint"` */
-                                teamInheritance?: {
-                                    /** @description The path to the desired blueprint via relations. */
-                                    path: string;
-                                };
                                 ownership?: {
                                     /** @enum {string} */
                                     type: "Inherited";
@@ -4827,7 +4787,7 @@ export interface paths {
                                 };
                                 /** @description The schema of the blueprint, see `properties` and `required` below for more information. */
                                 schema: {
-                                    /** @description The properties of the blueprint. */
+                                    /** @description The properties of the blueprint.<br></br> Each property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                                     properties: {
                                         [key: string]: {
                                             /** @description The title of the property. */
@@ -4869,7 +4829,7 @@ export interface paths {
                                     required?: string[];
                                 };
                                 /**
-                                 * @description The [calculation properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/calculation-property/) of the blueprint.
+                                 * @description The [calculation properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/calculation-property/) of the blueprint. <br></br> Each calculation property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`.
                                  * @default {}
                                  */
                                 calculationProperties: {
@@ -4929,7 +4889,7 @@ export interface paths {
                                         };
                                     };
                                 };
-                                /** @description The [mirror properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/mirror-property/) of the blueprint. */
+                                /** @description The [mirror properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/mirror-property/) of the blueprint. <br></br> Each mirror property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                                 mirrorProperties?: {
                                     [key: string]: {
                                         /** @description The path to the property in the related blueprint. This is a string of relation identifiers separated by dots, the last identifier is the property identifier. */
@@ -4939,7 +4899,7 @@ export interface paths {
                                     };
                                 };
                                 /**
-                                 * @description The [aggregation properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/aggregation-property/) of the blueprint.
+                                 * @description The [aggregation properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/aggregation-property/) of the blueprint. <br></br> Each aggregation property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`.
                                  * @default {}
                                  */
                                 aggregationProperties: {
@@ -5025,7 +4985,7 @@ export interface paths {
                                         }[];
                                     };
                                 };
-                                /** @description The [relations](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/relate-blueprints/) of the blueprint. */
+                                /** @description The [relations](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/relate-blueprints/) of the blueprint. <br></br> Each relation identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                                 relations?: {
                                     [key: string]: {
                                         title?: string;
@@ -5179,11 +5139,6 @@ export interface paths {
                                 description?: string;
                                 /** @description The icon of the blueprint. */
                                 icon?: string;
-                                /** @description A relation to another blueprint from which to inherit the team. Can be any blueprint connected to this one via any number of relations. `path` is the path to the desired blueprint via relations, for example: `"relationIdentifier.relationIdentifierInRelatedBlueprint"` */
-                                teamInheritance?: {
-                                    /** @description The path to the desired blueprint via relations. */
-                                    path: string;
-                                };
                                 ownership?: {
                                     /** @enum {string} */
                                     type: "Inherited";
@@ -5199,7 +5154,7 @@ export interface paths {
                                 };
                                 /** @description The schema of the blueprint, see `properties` and `required` below for more information. */
                                 schema: {
-                                    /** @description The properties of the blueprint. */
+                                    /** @description The properties of the blueprint.<br></br> Each property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                                     properties: {
                                         [key: string]: {
                                             /** @description The title of the property. */
@@ -5241,7 +5196,7 @@ export interface paths {
                                     required?: string[];
                                 };
                                 /**
-                                 * @description The [calculation properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/calculation-property/) of the blueprint.
+                                 * @description The [calculation properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/calculation-property/) of the blueprint. <br></br> Each calculation property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`.
                                  * @default {}
                                  */
                                 calculationProperties: {
@@ -5301,7 +5256,7 @@ export interface paths {
                                         };
                                     };
                                 };
-                                /** @description The [mirror properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/mirror-property/) of the blueprint. */
+                                /** @description The [mirror properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/mirror-property/) of the blueprint. <br></br> Each mirror property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                                 mirrorProperties?: {
                                     [key: string]: {
                                         /** @description The path to the property in the related blueprint. This is a string of relation identifiers separated by dots, the last identifier is the property identifier. */
@@ -5311,7 +5266,7 @@ export interface paths {
                                     };
                                 };
                                 /**
-                                 * @description The [aggregation properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/aggregation-property/) of the blueprint.
+                                 * @description The [aggregation properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/aggregation-property/) of the blueprint. <br></br> Each aggregation property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`.
                                  * @default {}
                                  */
                                 aggregationProperties: {
@@ -5397,7 +5352,7 @@ export interface paths {
                                         }[];
                                     };
                                 };
-                                /** @description The [relations](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/relate-blueprints/) of the blueprint. */
+                                /** @description The [relations](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/relate-blueprints/) of the blueprint. <br></br> Each relation identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                                 relations?: {
                                     [key: string]: {
                                         title?: string;
@@ -5551,11 +5506,6 @@ export interface paths {
                                 description?: string;
                                 /** @description The icon of the blueprint. */
                                 icon?: string;
-                                /** @description A relation to another blueprint from which to inherit the team. Can be any blueprint connected to this one via any number of relations. `path` is the path to the desired blueprint via relations, for example: `"relationIdentifier.relationIdentifierInRelatedBlueprint"` */
-                                teamInheritance?: {
-                                    /** @description The path to the desired blueprint via relations. */
-                                    path: string;
-                                };
                                 ownership?: {
                                     /** @enum {string} */
                                     type: "Inherited";
@@ -5571,7 +5521,7 @@ export interface paths {
                                 };
                                 /** @description The schema of the blueprint, see `properties` and `required` below for more information. */
                                 schema: {
-                                    /** @description The properties of the blueprint. */
+                                    /** @description The properties of the blueprint.<br></br> Each property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                                     properties: {
                                         [key: string]: {
                                             /** @description The title of the property. */
@@ -5613,7 +5563,7 @@ export interface paths {
                                     required?: string[];
                                 };
                                 /**
-                                 * @description The [calculation properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/calculation-property/) of the blueprint.
+                                 * @description The [calculation properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/calculation-property/) of the blueprint. <br></br> Each calculation property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`.
                                  * @default {}
                                  */
                                 calculationProperties: {
@@ -5673,7 +5623,7 @@ export interface paths {
                                         };
                                     };
                                 };
-                                /** @description The [mirror properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/mirror-property/) of the blueprint. */
+                                /** @description The [mirror properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/mirror-property/) of the blueprint. <br></br> Each mirror property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                                 mirrorProperties?: {
                                     [key: string]: {
                                         /** @description The path to the property in the related blueprint. This is a string of relation identifiers separated by dots, the last identifier is the property identifier. */
@@ -5683,7 +5633,7 @@ export interface paths {
                                     };
                                 };
                                 /**
-                                 * @description The [aggregation properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/aggregation-property/) of the blueprint.
+                                 * @description The [aggregation properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/aggregation-property/) of the blueprint. <br></br> Each aggregation property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`.
                                  * @default {}
                                  */
                                 aggregationProperties: {
@@ -5769,7 +5719,7 @@ export interface paths {
                                         }[];
                                     };
                                 };
-                                /** @description The [relations](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/relate-blueprints/) of the blueprint. */
+                                /** @description The [relations](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/relate-blueprints/) of the blueprint. <br></br> Each relation identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                                 relations?: {
                                     [key: string]: {
                                         title?: string;
@@ -5923,11 +5873,6 @@ export interface paths {
                                 description?: string;
                                 /** @description The icon of the blueprint. */
                                 icon?: string;
-                                /** @description A relation to another blueprint from which to inherit the team. Can be any blueprint connected to this one via any number of relations. `path` is the path to the desired blueprint via relations, for example: `"relationIdentifier.relationIdentifierInRelatedBlueprint"` */
-                                teamInheritance?: {
-                                    /** @description The path to the desired blueprint via relations. */
-                                    path: string;
-                                };
                                 ownership?: {
                                     /** @enum {string} */
                                     type: "Inherited";
@@ -5943,7 +5888,7 @@ export interface paths {
                                 };
                                 /** @description The schema of the blueprint, see `properties` and `required` below for more information. */
                                 schema: {
-                                    /** @description The properties of the blueprint. */
+                                    /** @description The properties of the blueprint.<br></br> Each property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                                     properties: {
                                         [key: string]: {
                                             /** @description The title of the property. */
@@ -5985,7 +5930,7 @@ export interface paths {
                                     required?: string[];
                                 };
                                 /**
-                                 * @description The [calculation properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/calculation-property/) of the blueprint.
+                                 * @description The [calculation properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/calculation-property/) of the blueprint. <br></br> Each calculation property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`.
                                  * @default {}
                                  */
                                 calculationProperties: {
@@ -6045,7 +5990,7 @@ export interface paths {
                                         };
                                     };
                                 };
-                                /** @description The [mirror properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/mirror-property/) of the blueprint. */
+                                /** @description The [mirror properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/mirror-property/) of the blueprint. <br></br> Each mirror property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                                 mirrorProperties?: {
                                     [key: string]: {
                                         /** @description The path to the property in the related blueprint. This is a string of relation identifiers separated by dots, the last identifier is the property identifier. */
@@ -6055,7 +6000,7 @@ export interface paths {
                                     };
                                 };
                                 /**
-                                 * @description The [aggregation properties](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/aggregation-property/) of the blueprint.
+                                 * @description The [aggregation properties](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/aggregation-property/) of the blueprint. <br></br> Each aggregation property identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`.
                                  * @default {}
                                  */
                                 aggregationProperties: {
@@ -6141,7 +6086,7 @@ export interface paths {
                                         }[];
                                     };
                                 };
-                                /** @description The [relations](${DOCS_URL}/build-your-software-catalog/customize-integrations/configure-data-model/relate-blueprints/) of the blueprint. */
+                                /** @description The [relations](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/relate-blueprints/) of the blueprint. <br></br> Each relation identifier can be `<= 100 characters` long, values must match the following pattern: `^[A-Za-z0-9@_=\\-]+$`. */
                                 relations?: {
                                     [key: string]: {
                                         title?: string;
@@ -6248,7 +6193,7 @@ export interface paths {
         };
         /**
          * Get actions/automations
-         * @description This route allows you to fetch one or more self-service actions and/or automations in your Port account.<br/><br/>The call will perform a logical `AND` between all query parameters below, and return all actions and automations that match the criteria.<br/><br/>To learn more about actions and automations, check out the [documentation](https://docs.port.io/actions-and-automations/).
+         * @description This route allows you to fetch one or more self-service actions and/or automations in your Port account.<br/><br/>The call will perform a logical `AND` between all query parameters below, and return all actions and automations that match the criteria.<br/><br/>To learn more about actions and automations, check out the [documentation](https://docs.port.io/actions-and-automations/).<br/><br/>:::info Version parameter<br/>Set the `version` parameter to `v2` for the latest version of the API.:::
          */
         get: {
             parameters: {
@@ -6265,6 +6210,7 @@ export interface paths {
                     /** @description The event/s that triggered the automation/s you want to fetch. Relevant only for automations. */
                     trigger_event?: ("ENTITY_CREATED" | "ENTITY_UPDATED" | "ENTITY_DELETED" | "TIMER_PROPERTY_EXPIRED" | "ANY_ENTITY_CHANGE" | "RUN_CREATED" | "RUN_UPDATED" | "ANY_RUN_CHANGE")[];
                     trigger_event_action_identifier?: string[];
+                    /** @description Specifies the API version to use. Please use `v2` for the latest version of the API. */
                     version?: "v1" | "v2";
                 };
                 header?: never;
@@ -6548,6 +6494,11 @@ export interface paths {
                                     title: string;
                                     /** @description The order of the properties in the step - an array of property identifiers. */
                                     order?: string[];
+                                    /**
+                                     * Visible
+                                     * @description The visibility of the step. Resolves to a boolean value (`true` = visible).
+                                     */
+                                    visible?: components["schemas"]["def-0"] | boolean;
                                 }[];
                             };
                             actionCardButtonText?: string;
@@ -6868,6 +6819,11 @@ export interface paths {
                                     title: string;
                                     /** @description The order of the properties in the step - an array of property identifiers. */
                                     order?: string[];
+                                    /**
+                                     * Visible
+                                     * @description The visibility of the step. Resolves to a boolean value (`true` = visible).
+                                     */
+                                    visible?: components["schemas"]["def-0"] | boolean;
                                 }[];
                             };
                             actionCardButtonText?: string;
@@ -6957,6 +6913,13 @@ export interface paths {
                             workflow: string;
                             workflowInputs?: Record<string, never>;
                             reportWorkflowStatus?: boolean | string;
+                        } | {
+                            /** @enum {string} */
+                            type: "INTEGRATION_ACTION";
+                            installationId: string;
+                            /** @enum {string} */
+                            integrationActionType: "dispatch_workflow";
+                            integrationActionExecutionProperties: Record<string, never>;
                         } | {
                             /** @enum {string} */
                             type: "GITLAB";
@@ -7378,6 +7341,11 @@ export interface paths {
                                     title: string;
                                     /** @description The order of the properties in the step - an array of property identifiers. */
                                     order?: string[];
+                                    /**
+                                     * Visible
+                                     * @description The visibility of the step. Resolves to a boolean value (`true` = visible).
+                                     */
+                                    visible?: components["schemas"]["def-0"] | boolean;
                                 }[];
                             };
                             actionCardButtonText?: string;
@@ -7698,6 +7666,11 @@ export interface paths {
                                     title: string;
                                     /** @description The order of the properties in the step - an array of property identifiers. */
                                     order?: string[];
+                                    /**
+                                     * Visible
+                                     * @description The visibility of the step. Resolves to a boolean value (`true` = visible).
+                                     */
+                                    visible?: components["schemas"]["def-0"] | boolean;
                                 }[];
                             };
                             actionCardButtonText?: string;
@@ -7787,6 +7760,13 @@ export interface paths {
                             workflow: string;
                             workflowInputs?: Record<string, never>;
                             reportWorkflowStatus?: boolean | string;
+                        } | {
+                            /** @enum {string} */
+                            type: "INTEGRATION_ACTION";
+                            installationId: string;
+                            /** @enum {string} */
+                            integrationActionType: "dispatch_workflow";
+                            integrationActionExecutionProperties: Record<string, never>;
                         } | {
                             /** @enum {string} */
                             type: "GITLAB";
@@ -8497,6 +8477,10 @@ export interface paths {
                                     };
                                 } | null;
                                 response?: string | unknown[] | Record<string, never>;
+                                pendingExecution?: boolean;
+                                /** Format: date-time */
+                                claimedUntil?: string;
+                                installationId?: string;
                                 createdBy?: string;
                                 impersonatedBy?: string;
                                 updatedBy?: string;
@@ -8581,11 +8565,12 @@ export interface paths {
         };
         /**
          * Get an action run's details
-         * @description This route allows you to fetch the details of an action run.<br/><br/>To learn more about action runs, check out the [documentation](https://docs.port.io/create-self-service-experiences/reflect-action-progress/).
+         * @description This route allows you to fetch the details of an action run.<br/><br/>To learn more about action runs, check out the [documentation](https://docs.port.io/create-self-service-experiences/reflect-action-progress/).<br/><br/>:::info Version parameter<br/>Set the `version` parameter to `v2` for the latest version of the API.:::
          */
         get: {
             parameters: {
                 query?: {
+                    /** @description Specifies the API version to use. Please use `v2` for the latest version of the API. */
                     version?: "v1" | "v2";
                 };
                 header?: never;
@@ -8661,6 +8646,10 @@ export interface paths {
                                     };
                                 } | null;
                                 response?: string | unknown[] | Record<string, never>;
+                                pendingExecution?: boolean;
+                                /** Format: date-time */
+                                claimedUntil?: string;
+                                installationId?: string;
                                 createdBy?: string;
                                 impersonatedBy?: string;
                                 updatedBy?: string;
@@ -8714,6 +8703,7 @@ export interface paths {
         patch: {
             parameters: {
                 query?: {
+                    /** @description Specifies the API version to use. Please use `v2` for the latest version of the API. */
                     version?: "v1" | "v2";
                 };
                 header?: never;
@@ -8806,6 +8796,10 @@ export interface paths {
                                     };
                                 } | null;
                                 response?: string | unknown[] | Record<string, never>;
+                                pendingExecution?: boolean;
+                                /** Format: date-time */
+                                claimedUntil?: string;
+                                installationId?: string;
                                 createdBy?: string;
                                 impersonatedBy?: string;
                                 updatedBy?: string;
@@ -8897,6 +8891,7 @@ export interface paths {
         patch: {
             parameters: {
                 query?: {
+                    /** @description Specifies the API version to use. Please use `v2` for the latest version of the API. */
                     version?: "v1" | "v2";
                 };
                 header?: never;
@@ -8981,6 +8976,10 @@ export interface paths {
                                     };
                                 } | null;
                                 response?: string | unknown[] | Record<string, never>;
+                                pendingExecution?: boolean;
+                                /** Format: date-time */
+                                claimedUntil?: string;
+                                installationId?: string;
                                 createdBy?: string;
                                 impersonatedBy?: string;
                                 updatedBy?: string;
@@ -9061,7 +9060,7 @@ export interface paths {
         };
         /**
          * Get all action runs
-         * @description This route allows you to fetch all action runs in your Port account. The route will perform a logical `AND` between all query parameters below, and return all action runs that match the criteria.<br/><br/>To learn more about action runs, check out the [documentation](https://docs.port.io/create-self-service-experiences/reflect-action-progress/).
+         * @description This route allows you to fetch all action runs in your Port account. The route will perform a logical `AND` between all query parameters below, and return all action runs that match the criteria.<br/><br/>To learn more about action runs, check out the [documentation](https://docs.port.io/create-self-service-experiences/reflect-action-progress/).<br/><br/>:::info Version parameter<br/>Set the `version` parameter to `v2` for the latest version of the API.:::
          */
         get: {
             parameters: {
@@ -9080,6 +9079,7 @@ export interface paths {
                     limit?: number;
                     /** @description The run id of your backend, for example the id that GitHub gives the workflow. This can be used to identify the action run instead of the `run_id`. */
                     external_run_id?: string;
+                    /** @description Specifies the API version to use. Please use `v2` for the latest version of the API. */
                     version?: "v1" | "v2";
                     action?: string;
                     source?: ("UI" | "API" | "AUTOMATION")[];
@@ -9154,6 +9154,10 @@ export interface paths {
                                     };
                                 } | null;
                                 response?: string | unknown[] | Record<string, never>;
+                                pendingExecution?: boolean;
+                                /** Format: date-time */
+                                claimedUntil?: string;
+                                installationId?: string;
                                 createdBy?: string;
                                 impersonatedBy?: string;
                                 updatedBy?: string;
@@ -9773,8 +9777,8 @@ export interface paths {
                                 origin?: string[];
                                 /** @description Fetch all audit logs related to the specified integration. */
                                 InstallationId?: string;
-                                /** @description Fetch all audit logs related to the specified resource type/s. */
-                                resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action");
+                                /** @description Fetch all audit logs related to the specified resource type/s.<br/>**Possible values**: [`blueprint`, `entity`, `run`, `webhook`, `scorecard`, `action`, `integration`] */
+                                resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration");
                                 /** @description The fields you want to include in the response. If used, only the specified fields will be included in the response. */
                                 includes?: ("action" | "context" | "diff" | "identifier" | "resourceType" | "status" | "trigger" | "additionalData" | "message")[];
                                 /**
@@ -9904,7 +9908,10 @@ export interface paths {
                                 limit?: number;
                                 /** @description The run id of your backend, for example the id that GitHub gives the workflow. This can be used to identify the action run instead of the `run_id`. */
                                 external_run_id?: string;
-                                /** @enum {string} */
+                                /**
+                                 * @description Specifies the API version to use. Please use `v2` for the latest version of the API.
+                                 * @enum {string}
+                                 */
                                 version?: "v1" | "v2";
                                 action?: string;
                                 source?: ("UI" | "API" | "AUTOMATION")[];
@@ -10381,8 +10388,8 @@ export interface paths {
                                         origin?: string[];
                                         /** @description Fetch all audit logs related to the specified integration. */
                                         InstallationId?: string;
-                                        /** @description Fetch all audit logs related to the specified resource type/s. */
-                                        resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action");
+                                        /** @description Fetch all audit logs related to the specified resource type/s.<br/>**Possible values**: [`blueprint`, `entity`, `run`, `webhook`, `scorecard`, `action`, `integration`] */
+                                        resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration");
                                         /** @description The fields you want to include in the response. If used, only the specified fields will be included in the response. */
                                         includes?: ("action" | "context" | "diff" | "identifier" | "resourceType" | "status" | "trigger" | "additionalData" | "message")[];
                                         /**
@@ -10512,7 +10519,10 @@ export interface paths {
                                         limit?: number;
                                         /** @description The run id of your backend, for example the id that GitHub gives the workflow. This can be used to identify the action run instead of the `run_id`. */
                                         external_run_id?: string;
-                                        /** @enum {string} */
+                                        /**
+                                         * @description Specifies the API version to use. Please use `v2` for the latest version of the API.
+                                         * @enum {string}
+                                         */
                                         version?: "v1" | "v2";
                                         action?: string;
                                         source?: ("UI" | "API" | "AUTOMATION")[];
@@ -10990,8 +11000,8 @@ export interface paths {
                                     origin?: string[];
                                     /** @description Fetch all audit logs related to the specified integration. */
                                     InstallationId?: string;
-                                    /** @description Fetch all audit logs related to the specified resource type/s. */
-                                    resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action");
+                                    /** @description Fetch all audit logs related to the specified resource type/s.<br/>**Possible values**: [`blueprint`, `entity`, `run`, `webhook`, `scorecard`, `action`, `integration`] */
+                                    resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration");
                                     /** @description The fields you want to include in the response. If used, only the specified fields will be included in the response. */
                                     includes?: ("action" | "context" | "diff" | "identifier" | "resourceType" | "status" | "trigger" | "additionalData" | "message")[];
                                     /**
@@ -11121,7 +11131,10 @@ export interface paths {
                                     limit?: number;
                                     /** @description The run id of your backend, for example the id that GitHub gives the workflow. This can be used to identify the action run instead of the `run_id`. */
                                     external_run_id?: string;
-                                    /** @enum {string} */
+                                    /**
+                                     * @description Specifies the API version to use. Please use `v2` for the latest version of the API.
+                                     * @enum {string}
+                                     */
                                     version?: "v1" | "v2";
                                     action?: string;
                                     source?: ("UI" | "API" | "AUTOMATION")[];
@@ -11950,8 +11963,8 @@ export interface paths {
                                 origin?: string[];
                                 /** @description Fetch all audit logs related to the specified integration. */
                                 InstallationId?: string;
-                                /** @description Fetch all audit logs related to the specified resource type/s. */
-                                resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action");
+                                /** @description Fetch all audit logs related to the specified resource type/s.<br/>**Possible values**: [`blueprint`, `entity`, `run`, `webhook`, `scorecard`, `action`, `integration`] */
+                                resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration");
                                 /** @description The fields you want to include in the response. If used, only the specified fields will be included in the response. */
                                 includes?: ("action" | "context" | "diff" | "identifier" | "resourceType" | "status" | "trigger" | "additionalData" | "message")[];
                                 /**
@@ -12081,7 +12094,10 @@ export interface paths {
                                 limit?: number;
                                 /** @description The run id of your backend, for example the id that GitHub gives the workflow. This can be used to identify the action run instead of the `run_id`. */
                                 external_run_id?: string;
-                                /** @enum {string} */
+                                /**
+                                 * @description Specifies the API version to use. Please use `v2` for the latest version of the API.
+                                 * @enum {string}
+                                 */
                                 version?: "v1" | "v2";
                                 action?: string;
                                 source?: ("UI" | "API" | "AUTOMATION")[];
@@ -12558,8 +12574,8 @@ export interface paths {
                                         origin?: string[];
                                         /** @description Fetch all audit logs related to the specified integration. */
                                         InstallationId?: string;
-                                        /** @description Fetch all audit logs related to the specified resource type/s. */
-                                        resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action");
+                                        /** @description Fetch all audit logs related to the specified resource type/s.<br/>**Possible values**: [`blueprint`, `entity`, `run`, `webhook`, `scorecard`, `action`, `integration`] */
+                                        resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration");
                                         /** @description The fields you want to include in the response. If used, only the specified fields will be included in the response. */
                                         includes?: ("action" | "context" | "diff" | "identifier" | "resourceType" | "status" | "trigger" | "additionalData" | "message")[];
                                         /**
@@ -12689,7 +12705,10 @@ export interface paths {
                                         limit?: number;
                                         /** @description The run id of your backend, for example the id that GitHub gives the workflow. This can be used to identify the action run instead of the `run_id`. */
                                         external_run_id?: string;
-                                        /** @enum {string} */
+                                        /**
+                                         * @description Specifies the API version to use. Please use `v2` for the latest version of the API.
+                                         * @enum {string}
+                                         */
                                         version?: "v1" | "v2";
                                         action?: string;
                                         source?: ("UI" | "API" | "AUTOMATION")[];
@@ -13167,8 +13186,8 @@ export interface paths {
                                     origin?: string[];
                                     /** @description Fetch all audit logs related to the specified integration. */
                                     InstallationId?: string;
-                                    /** @description Fetch all audit logs related to the specified resource type/s. */
-                                    resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action");
+                                    /** @description Fetch all audit logs related to the specified resource type/s.<br/>**Possible values**: [`blueprint`, `entity`, `run`, `webhook`, `scorecard`, `action`, `integration`] */
+                                    resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration");
                                     /** @description The fields you want to include in the response. If used, only the specified fields will be included in the response. */
                                     includes?: ("action" | "context" | "diff" | "identifier" | "resourceType" | "status" | "trigger" | "additionalData" | "message")[];
                                     /**
@@ -13298,7 +13317,10 @@ export interface paths {
                                     limit?: number;
                                     /** @description The run id of your backend, for example the id that GitHub gives the workflow. This can be used to identify the action run instead of the `run_id`. */
                                     external_run_id?: string;
-                                    /** @enum {string} */
+                                    /**
+                                     * @description Specifies the API version to use. Please use `v2` for the latest version of the API.
+                                     * @enum {string}
+                                     */
                                     version?: "v1" | "v2";
                                     action?: string;
                                     source?: ("UI" | "API" | "AUTOMATION")[];
@@ -13978,8 +14000,8 @@ export interface paths {
                                 origin?: string[];
                                 /** @description Fetch all audit logs related to the specified integration. */
                                 InstallationId?: string;
-                                /** @description Fetch all audit logs related to the specified resource type/s. */
-                                resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action");
+                                /** @description Fetch all audit logs related to the specified resource type/s.<br/>**Possible values**: [`blueprint`, `entity`, `run`, `webhook`, `scorecard`, `action`, `integration`] */
+                                resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration");
                                 /** @description The fields you want to include in the response. If used, only the specified fields will be included in the response. */
                                 includes?: ("action" | "context" | "diff" | "identifier" | "resourceType" | "status" | "trigger" | "additionalData" | "message")[];
                                 /**
@@ -14109,7 +14131,10 @@ export interface paths {
                                 limit?: number;
                                 /** @description The run id of your backend, for example the id that GitHub gives the workflow. This can be used to identify the action run instead of the `run_id`. */
                                 external_run_id?: string;
-                                /** @enum {string} */
+                                /**
+                                 * @description Specifies the API version to use. Please use `v2` for the latest version of the API.
+                                 * @enum {string}
+                                 */
                                 version?: "v1" | "v2";
                                 action?: string;
                                 source?: ("UI" | "API" | "AUTOMATION")[];
@@ -14586,8 +14611,8 @@ export interface paths {
                                         origin?: string[];
                                         /** @description Fetch all audit logs related to the specified integration. */
                                         InstallationId?: string;
-                                        /** @description Fetch all audit logs related to the specified resource type/s. */
-                                        resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action");
+                                        /** @description Fetch all audit logs related to the specified resource type/s.<br/>**Possible values**: [`blueprint`, `entity`, `run`, `webhook`, `scorecard`, `action`, `integration`] */
+                                        resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration");
                                         /** @description The fields you want to include in the response. If used, only the specified fields will be included in the response. */
                                         includes?: ("action" | "context" | "diff" | "identifier" | "resourceType" | "status" | "trigger" | "additionalData" | "message")[];
                                         /**
@@ -14717,7 +14742,10 @@ export interface paths {
                                         limit?: number;
                                         /** @description The run id of your backend, for example the id that GitHub gives the workflow. This can be used to identify the action run instead of the `run_id`. */
                                         external_run_id?: string;
-                                        /** @enum {string} */
+                                        /**
+                                         * @description Specifies the API version to use. Please use `v2` for the latest version of the API.
+                                         * @enum {string}
+                                         */
                                         version?: "v1" | "v2";
                                         action?: string;
                                         source?: ("UI" | "API" | "AUTOMATION")[];
@@ -15195,8 +15223,8 @@ export interface paths {
                                     origin?: string[];
                                     /** @description Fetch all audit logs related to the specified integration. */
                                     InstallationId?: string;
-                                    /** @description Fetch all audit logs related to the specified resource type/s. */
-                                    resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action");
+                                    /** @description Fetch all audit logs related to the specified resource type/s.<br/>**Possible values**: [`blueprint`, `entity`, `run`, `webhook`, `scorecard`, `action`, `integration`] */
+                                    resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration");
                                     /** @description The fields you want to include in the response. If used, only the specified fields will be included in the response. */
                                     includes?: ("action" | "context" | "diff" | "identifier" | "resourceType" | "status" | "trigger" | "additionalData" | "message")[];
                                     /**
@@ -15326,7 +15354,10 @@ export interface paths {
                                     limit?: number;
                                     /** @description The run id of your backend, for example the id that GitHub gives the workflow. This can be used to identify the action run instead of the `run_id`. */
                                     external_run_id?: string;
-                                    /** @enum {string} */
+                                    /**
+                                     * @description Specifies the API version to use. Please use `v2` for the latest version of the API.
+                                     * @enum {string}
+                                     */
                                     version?: "v1" | "v2";
                                     action?: string;
                                     source?: ("UI" | "API" | "AUTOMATION")[];
@@ -16474,7 +16505,10 @@ export interface paths {
          */
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    /** @description filter by integrations that has actions processing enabled */
+                    actionsProcessingEnabled?: boolean;
+                };
                 header?: never;
                 path?: never;
                 cookie?: never;
@@ -16679,6 +16713,11 @@ export interface paths {
                         spec?: {
                             [key: string]: unknown;
                         };
+                        /**
+                         * @description If `true`, This integration will be able to process actions runs
+                         * @default false
+                         */
+                        actionsProcessingEnabled?: boolean;
                         /** @description Various configuration options for the integration. */
                         config?: ({
                             /** @description If `true`, deleting an entity will also delete its dependent entities. */
@@ -17062,7 +17101,7 @@ export interface paths {
         };
         /**
          * Get all webhooks
-         * @description This route allows you to fetch all webhooks configured in your Port organization. You can also see them in the [data sources page](https://app.getport.io/settings/data-sources) of your Port account.<br/><br/>To learn more about webhooks, check out the [documentation](https://docs.port.io/build-your-software-catalog/custom-integration/webhook/).
+         * @description This route allows you to fetch all webhooks configured in your Port organization. You can also see them in the [data sources page](https://app.getport.io/settings/data-sources) of your Port account.<br/><br/>To learn more about webhooks, check out the [documentation](https://docs.port.io/build-your-software-catalog/custom-integration/webhook/).<br/><br/>:::warning Permission requirements<br/>To use this endpoint, you must have a `moderator` or `admin` role in your Port organization.<br/><br/>To learn more about the different roles and permissions, please refer to the [documentation](/sso-rbac/users-and-teams/manage-users-teams#roles--permissions).<br/><br/>If you already have an existing Port account, this requirement will be enforced starting **November 15th, 2025**.<br/>:::
          */
         get: {
             parameters: {
@@ -17230,7 +17269,7 @@ export interface paths {
         };
         /**
          * Get a webhook
-         * @description This route allows you to fetch a specific webhook in your Port organization. You can also see it in the [data sources page](https://app.getport.io/settings/data-sources) of your Port account.<br/><br/>To learn more about webhooks, check out the [documentation](https://docs.port.io/build-your-software-catalog/custom-integration/webhook/).
+         * @description This route allows you to fetch a specific webhook in your Port organization. You can also see it in the [data sources page](https://app.getport.io/settings/data-sources) of your Port account.<br/><br/>To learn more about webhooks, check out the [documentation](https://docs.port.io/build-your-software-catalog/custom-integration/webhook/).<br/><br/>:::warning Permission requirements<br/>To use this endpoint, you must have a `moderator` or `admin` role in your Port organization.<br/><br/>To learn more about the different roles and permissions, please refer to the [documentation](/sso-rbac/users-and-teams/manage-users-teams#roles--permissions).<br/><br/>If you already have an existing Port account, this requirement will be enforced starting **November 15th, 2025**.<br/>:::
          */
         get: {
             parameters: {
@@ -17590,7 +17629,7 @@ export interface paths {
         };
         /**
          * Get audit logs
-         * @description This route allows you to fetch audit logs from your Port account. Your audit logs can also be viewed via [Port's UI](https://app.getport.io/settings/AuditLog).<br/><br/>This route will perform a logical `AND` between all query parameters below, and return all logs that match the criteria.
+         * @description This route allows you to fetch audit logs from your Port account. Your audit logs can also be viewed via [Port's UI](https://app.getport.io/settings/AuditLog).<br/><br/>This route will perform a logical `AND` between all query parameters below, and return all logs that match the criteria.<br/><br/>:::warning Beta integration value<br/>The `integration` value in the `resources` parameter is **experimental**. Its behavior may change in future versions of the API.<br/>:::
          */
         get: {
             parameters: {
@@ -17611,8 +17650,8 @@ export interface paths {
                     origin?: string[];
                     /** @description Fetch all audit logs related to the specified integration. */
                     InstallationId?: string;
-                    /** @description Fetch all audit logs related to the specified resource type/s. */
-                    resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action");
+                    /** @description Fetch all audit logs related to the specified resource type/s.<br/>**Possible values**: [`blueprint`, `entity`, `run`, `webhook`, `scorecard`, `action`, `integration`] */
+                    resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration");
                     /** @description The fields you want to include in the response. If used, only the specified fields will be included in the response. */
                     includes?: ("action" | "context" | "diff" | "identifier" | "resourceType" | "status" | "trigger" | "additionalData" | "message")[];
                     /** @description The starting timestamp of the audit logs you want to fetch, in the ISO format `2022-04-23T18:25:43.511Z`. */
@@ -19409,6 +19448,8 @@ export interface paths {
                                 operator: "isEmpty" | "isNotEmpty";
                             })[];
                         };
+                        /** @description An object containing the additional properties of the scorecard, in `"key":"value"` pairs where the `key` is the property's identifier, and the `value` is its value. */
+                        properties?: Record<string, never>;
                         /** @description The [rules](https://docs.port.io/scorecards/concepts-and-structure/#rule-elements) that define the scorecard. */
                         rules: {
                             /** @description The identifier of the rule. */
@@ -19624,6 +19665,8 @@ export interface paths {
                                 operator: "isEmpty" | "isNotEmpty";
                             })[];
                         };
+                        /** @description An object containing the additional properties of the scorecard, in `"key":"value"` pairs where the `key` is the property's identifier, and the `value` is its value. */
+                        properties?: Record<string, never>;
                         /** @description The [rules](https://docs.port.io/scorecards/concepts-and-structure/#rule-elements) that define the scorecard. */
                         rules: {
                             /** @description The identifier of the rule. */
@@ -19901,6 +19944,8 @@ export interface paths {
                                 operator: "isEmpty" | "isNotEmpty";
                             })[];
                         };
+                        /** @description An object containing the additional properties of the scorecard, in `"key":"value"` pairs where the `key` is the property's identifier, and the `value` is its value. */
+                        properties?: Record<string, never>;
                         /** @description The [rules](https://docs.port.io/scorecards/concepts-and-structure/#rule-elements) that define the scorecard. */
                         rules: {
                             /** @description The identifier of the rule. */
@@ -21140,8 +21185,8 @@ export interface components {
                     origin?: string[];
                     /** @description Fetch all audit logs related to the specified integration. */
                     InstallationId?: string;
-                    /** @description Fetch all audit logs related to the specified resource type/s. */
-                    resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action");
+                    /** @description Fetch all audit logs related to the specified resource type/s.<br/>**Possible values**: [`blueprint`, `entity`, `run`, `webhook`, `scorecard`, `action`, `integration`] */
+                    resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration");
                     /** @description The fields you want to include in the response. If used, only the specified fields will be included in the response. */
                     includes?: ("action" | "context" | "diff" | "identifier" | "resourceType" | "status" | "trigger" | "additionalData" | "message")[];
                     /**
@@ -21271,7 +21316,10 @@ export interface components {
                     limit?: number;
                     /** @description The run id of your backend, for example the id that GitHub gives the workflow. This can be used to identify the action run instead of the `run_id`. */
                     external_run_id?: string;
-                    /** @enum {string} */
+                    /**
+                     * @description Specifies the API version to use. Please use `v2` for the latest version of the API.
+                     * @enum {string}
+                     */
                     version?: "v1" | "v2";
                     action?: string;
                     source?: ("UI" | "API" | "AUTOMATION")[];
@@ -21751,8 +21799,8 @@ export interface components {
                         origin?: string[];
                         /** @description Fetch all audit logs related to the specified integration. */
                         InstallationId?: string;
-                        /** @description Fetch all audit logs related to the specified resource type/s. */
-                        resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action");
+                        /** @description Fetch all audit logs related to the specified resource type/s.<br/>**Possible values**: [`blueprint`, `entity`, `run`, `webhook`, `scorecard`, `action`, `integration`] */
+                        resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration");
                         /** @description The fields you want to include in the response. If used, only the specified fields will be included in the response. */
                         includes?: ("action" | "context" | "diff" | "identifier" | "resourceType" | "status" | "trigger" | "additionalData" | "message")[];
                         /**
@@ -21882,7 +21930,10 @@ export interface components {
                         limit?: number;
                         /** @description The run id of your backend, for example the id that GitHub gives the workflow. This can be used to identify the action run instead of the `run_id`. */
                         external_run_id?: string;
-                        /** @enum {string} */
+                        /**
+                         * @description Specifies the API version to use. Please use `v2` for the latest version of the API.
+                         * @enum {string}
+                         */
                         version?: "v1" | "v2";
                         action?: string;
                         source?: ("UI" | "API" | "AUTOMATION")[];

@@ -81,7 +81,7 @@ export class EntityResource extends BaseResource {
     this.validateCreateInput(data);
     
     const response = await this.httpClient.post<ApiEntityResponse>(
-      `${this.basePath}/${data.blueprint}/entities`,
+      `${this.basePath}/${encodeURIComponent(data.blueprint)}/entities`,
       data,
       options
     );
@@ -108,10 +108,10 @@ export class EntityResource extends BaseResource {
 
     let path: string;
     if (blueprint) {
-      path = `${this.basePath}/${blueprint}/entities/${identifier}`;
+      path = `${this.basePath}/${encodeURIComponent(blueprint)}/entities/${encodeURIComponent(identifier)}`;
     } else {
       // Search across all blueprints
-      path = `/v1/entities/${identifier}`;
+      path = `/v1/entities/${encodeURIComponent(identifier)}`;
     }
 
     const response = await this.httpClient.get<ApiEntityResponse>(path, options);
@@ -151,9 +151,9 @@ export class EntityResource extends BaseResource {
 
     let path: string;
     if (blueprint) {
-      path = `${this.basePath}/${blueprint}/entities/${identifier}`;
+      path = `${this.basePath}/${encodeURIComponent(blueprint)}/entities/${encodeURIComponent(identifier)}`;
     } else {
-      path = `/v1/entities/${identifier}`;
+      path = `/v1/entities/${encodeURIComponent(identifier)}`;
     }
 
     const response = await this.httpClient.patch<ApiEntityResponse>(
@@ -183,9 +183,9 @@ export class EntityResource extends BaseResource {
 
     let path: string;
     if (blueprint) {
-      path = `${this.basePath}/${blueprint}/entities/${identifier}`;
+      path = `${this.basePath}/${encodeURIComponent(blueprint)}/entities/${encodeURIComponent(identifier)}`;
     } else {
-      path = `/v1/entities/${identifier}`;
+      path = `/v1/entities/${encodeURIComponent(identifier)}`;
     }
 
     await this.httpClient.delete(path, options);
@@ -214,7 +214,7 @@ export class EntityResource extends BaseResource {
     
     if (options?.blueprint) {
       path = this.buildUrl(
-        `${this.basePath}/${options.blueprint}/entities`,
+        `${this.basePath}/${encodeURIComponent(options.blueprint)}/entities`,
         {
           limit: options.limit,
           offset: options.offset,
@@ -369,9 +369,9 @@ export class EntityResource extends BaseResource {
 
     let path: string;
     if (blueprint) {
-      path = `${this.basePath}/${blueprint}/entities/${identifier}/relations/${relation}`;
+      path = `${this.basePath}/${encodeURIComponent(blueprint)}/entities/${encodeURIComponent(identifier)}/relations/${encodeURIComponent(relation)}`;
     } else {
-      path = `/v1/entities/${identifier}/relations/${relation}`;
+      path = `/v1/entities/${encodeURIComponent(identifier)}/relations/${encodeURIComponent(relation)}`;
     }
 
     const response = await this.httpClient.get<ApiEntitiesResponse>(path, options);

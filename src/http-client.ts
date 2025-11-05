@@ -29,6 +29,11 @@ export interface HttpClientConfig {
   retryDelay: number;
   proxy?: ProxyConfig;
   logger?: LoggerConfig;
+  /**
+   * Custom fetch implementation (for testability and flexibility)
+   * Defaults to global fetch
+   */
+  fetch?: typeof fetch;
 }
 
 /**
@@ -39,6 +44,10 @@ export interface RequestOptions {
   skipRetry?: boolean;
   headers?: Record<string, string>;
   signal?: AbortSignal;
+  /**
+   * Query parameters for GET/DELETE requests
+   */
+  query?: Record<string, string | number | boolean | undefined>;
 }
 
 /**
@@ -61,6 +70,7 @@ export class HttpClient {
   private readonly retryDelay: number;
   private readonly proxyAgent?: ProxyAgent;
   private readonly logger: Logger;
+  private readonly fetchImpl: typeof fetch;
   private accessToken?: string;
   private tokenExpiry?: Date;
   private refreshPromise?: Promise<string>;
@@ -71,6 +81,7 @@ export class HttpClient {
     this.timeout = config.timeout;
     this.maxRetries = config.maxRetries;
     this.retryDelay = config.retryDelay;
+    this.fetchImpl = config.fetch || fetch;
     
     // Initialize logger
     this.logger = createLogger(config.logger).child('HttpClient');
@@ -148,46 +159,82 @@ export class HttpClient {
 
     this.logger.debug('Refreshing access token');
 
-    const response = await fetch(`${this.baseUrl}/v1/auth/access_token`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        clientId: this.credentials.clientId,
-        clientSecret: this.credentials.clientSecret,
-      }),
-    });
+    // Add timeout to token refresh to avoid hanging indefinitely
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
-    if (!response.ok) {
-      const body = await this.parseErrorResponse(response);
-      this.logger.error('Token refresh failed', { status: response.status });
-      throw new PortAuthError(
-        body.message || 'Failed to authenticate',
-        body
-      );
+    try {
+      const response = await this.fetchImpl(`${this.baseUrl}/v1/auth/access_token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          clientId: this.credentials.clientId,
+          clientSecret: this.credentials.clientSecret,
+        }),
+        signal: controller.signal,
+        // @ts-expect-error - dispatcher is valid but not in types
+        dispatcher: this.proxyAgent,
+      });
+
+      if (!response.ok) {
+        const body = await this.parseErrorResponse(response);
+        this.logger.error('Token refresh failed', { status: response.status });
+        throw new PortAuthError(
+          body.message || 'Failed to authenticate',
+          body
+        );
+      }
+
+      const data = (await response.json()) as TokenResponse;
+      this.accessToken = data.accessToken;
+      
+      // Set expiry to 5 minutes before actual expiry for safety
+      const expiryMs = (data.expiresIn - 300) * 1000;
+      this.tokenExpiry = new Date(Date.now() + expiryMs);
+
+      this.logger.debug('Access token refreshed successfully', { 
+        expiresIn: data.expiresIn 
+      });
+
+      return this.accessToken;
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new PortTimeoutError(
+          `Token refresh timeout after ${this.timeout}ms`,
+          this.timeout
+        );
+      }
+      throw error;
+    } finally {
+      clearTimeout(timeoutId);
     }
-
-    const data = (await response.json()) as TokenResponse;
-    this.accessToken = data.accessToken;
-    
-    // Set expiry to 5 minutes before actual expiry for safety
-    const expiryMs = (data.expiresIn - 300) * 1000;
-    this.tokenExpiry = new Date(Date.now() + expiryMs);
-
-    this.logger.debug('Access token refreshed successfully', { 
-      expiresIn: data.expiresIn 
-    });
-
-    return this.accessToken;
   }
 
   /**
    * Parse error response from API
    */
-  private async parseErrorResponse(response: Response): Promise<any> {
+  private async parseErrorResponse(response: Response): Promise<{
+    message?: string;
+    statusCode?: number;
+    error?: string;
+    resource?: string;
+    identifier?: string;
+    errors?: unknown;
+    [key: string]: unknown;
+  }> {
     try {
-      return await response.json();
+      const json = await response.json() as Record<string, unknown>;
+      return json as {
+        message?: string;
+        statusCode?: number;
+        error?: string;
+        resource?: string;
+        identifier?: string;
+        errors?: unknown;
+        [key: string]: unknown;
+      };
     } catch {
       return {
         message: response.statusText || 'An error occurred',
@@ -202,11 +249,16 @@ export class HttpClient {
   private async handleError(response: Response, method: string, path: string): Promise<never> {
     const body = await this.parseErrorResponse(response);
     
+    // Propagate server-provided request ID from headers for debugging correlation
+    const serverRequestId = response.headers.get('X-Request-Id') || 
+                            response.headers.get('Request-Id') ||
+                            response.headers.get('X-Correlation-Id');
+    
     // Create request context for debugging
     const context = {
       method,
       url: path,
-      requestId: `${method}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      requestId: serverRequestId || `${method}-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
     };
 
     switch (response.status) {
@@ -264,13 +316,30 @@ export class HttpClient {
   }
 
   /**
-   * Should retry based on error
+   * Check if HTTP method is idempotent
    */
-  private shouldRetry(error: unknown, attempt: number): boolean {
+  private isIdempotentMethod(method: string): boolean {
+    // GET, HEAD, PUT, DELETE, OPTIONS, TRACE are idempotent
+    // POST, PATCH are not idempotent
+    return ['GET', 'HEAD', 'PUT', 'DELETE', 'OPTIONS', 'TRACE'].includes(method.toUpperCase());
+  }
+
+  /**
+   * Should retry based on error and method
+   */
+  private shouldRetry(error: unknown, attempt: number, method: string): boolean {
     if (attempt >= this.maxRetries) {
       return false;
     }
 
+    // Differentiate idempotent vs non-idempotent methods (avoid retrying POSTs by default)
+    // Only retry non-idempotent methods for network errors and timeouts
+    if (!this.isIdempotentMethod(method)) {
+      // For POST/PATCH, only retry on network errors or timeouts
+      return error instanceof PortNetworkError || error instanceof PortTimeoutError;
+    }
+
+    // For idempotent methods, retry on network/server errors
     // Retry network errors
     if (error instanceof PortNetworkError) {
       return true;
@@ -286,12 +355,17 @@ export class HttpClient {
       return true;
     }
 
+    // Retry timeout errors
+    if (error instanceof PortTimeoutError) {
+      return true;
+    }
+
     // Don't retry client errors (4xx)
     return false;
   }
 
   /**
-   * Calculate retry delay with exponential backoff
+   * Calculate retry delay with exponential backoff and jitter
    */
   private getRetryDelay(attempt: number, error: unknown): number {
     // If rate limit error with Retry-After header, use that
@@ -300,7 +374,12 @@ export class HttpClient {
     }
 
     // Exponential backoff: delay * 2^attempt
-    return this.retryDelay * Math.pow(2, attempt);
+    const baseDelay = this.retryDelay * Math.pow(2, attempt);
+    
+    // Add jitter to avoid thundering herd issues (random between 0 and 25% of delay)
+    const jitter = Math.random() * baseDelay * 0.25;
+    
+    return baseDelay + jitter;
   }
 
   /**
@@ -319,7 +398,19 @@ export class HttpClient {
     data?: unknown,
     options?: RequestOptions
   ): Promise<T> {
-    const url = `${this.baseUrl}${path}`;
+    // Use URL() for safer URL building instead of string concatenation
+    const urlObj = new URL(path, this.baseUrl);
+    
+    // Add query parameters if provided
+    if (options?.query) {
+      for (const [key, value] of Object.entries(options.query)) {
+        if (value !== undefined && value !== null) {
+          urlObj.searchParams.append(key, String(value));
+        }
+      }
+    }
+    
+    const url = urlObj.toString();
     const timeout = options?.timeout || this.timeout;
     const skipRetry = options?.skipRetry || false;
 
@@ -327,6 +418,7 @@ export class HttpClient {
     let lastError: unknown;
 
     while (attempt < this.maxRetries) {
+      let timeoutId: NodeJS.Timeout | undefined;
       try {
         // Get access token
         const token = await this.getAccessToken();
@@ -338,7 +430,7 @@ export class HttpClient {
 
         // Create abort controller for timeout
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), timeout);
+        timeoutId = setTimeout(() => controller.abort(), timeout);
 
         // If user provided a signal, abort our controller if it's aborted
         if (options?.signal) {
@@ -351,8 +443,8 @@ export class HttpClient {
           }
         }
 
-        // Make request
-        const response = await fetch(url, {
+        // Make request using injected fetch implementation
+        const response = await this.fetchImpl(url, {
           method,
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -365,7 +457,10 @@ export class HttpClient {
           dispatcher: this.proxyAgent,
         });
 
-        clearTimeout(timeoutId);
+        // Clear timeout in finally block to prevent timer leaks
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
 
         this.logger.debug(`Response ${method} ${path}`, { 
           status: response.status,
@@ -386,6 +481,11 @@ export class HttpClient {
       } catch (error) {
         lastError = error;
         
+        // Clear timeout in catch block as well
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
+        
         this.logger.warn(`Request failed: ${method} ${path}`, { 
           attempt: attempt + 1,
           error: error instanceof Error ? error.message : String(error) 
@@ -402,7 +502,7 @@ export class HttpClient {
           const context = {
             method,
             url: path,
-            requestId: `${method}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            requestId: `${method}-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
           };
           const timeoutError = new PortTimeoutError(
             `Request timeout after ${timeout}ms`,
@@ -417,7 +517,7 @@ export class HttpClient {
           const context = {
             method,
             url: path,
-            requestId: `${method}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            requestId: `${method}-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
           };
           lastError = new PortNetworkError(
             'Network error occurred',
@@ -427,7 +527,7 @@ export class HttpClient {
         }
 
         // Check if should retry
-        if (skipRetry || !this.shouldRetry(lastError, attempt)) {
+        if (skipRetry || !this.shouldRetry(lastError, attempt, method)) {
           this.logger.error(`Request failed permanently: ${method} ${path}`, { 
             attempt: attempt + 1,
             error: lastError instanceof Error ? lastError.message : String(lastError) 
@@ -444,6 +544,11 @@ export class HttpClient {
         await this.sleep(delay);
 
         attempt++;
+      } finally {
+        // Always clear timeout to prevent timer leaks
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
       }
     }
 

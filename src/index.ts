@@ -4,7 +4,9 @@
  * @packageDocumentation
  */
 
-export const VERSION = '0.1.0';
+// Derive VERSION from package.json at build time
+// This will be replaced by tsup's define plugin during build
+export const VERSION = process.env.PORT_SDK_VERSION || '0.1.0';
 
 // Main client
 export { PortClient } from './client';
