@@ -45,7 +45,8 @@ export class PortError extends Error {
     }
     
     Object.setPrototypeOf(this, PortError.prototype);
-    Object.freeze(this);
+    // Note: Don't freeze here - child classes need to set properties after super()
+    // Child classes will freeze themselves after setting all properties
   }
 
   /**
