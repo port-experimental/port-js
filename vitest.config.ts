@@ -33,6 +33,30 @@ export default defineConfig({
     
     // Reporter
     reporters: ['verbose'],
+    
+    // Coverage configuration
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html', 'lcov'],
+      reportsDirectory: './coverage',
+      exclude: [
+        'node_modules/',
+        'dist/',
+        'tests/',
+        '**/*.test.ts',
+        '**/*.config.ts',
+        'examples/',
+        'scripts/',
+        'docs/',
+        'coverage/',
+      ],
+      thresholds: {
+        statements: 68,
+        branches: 80,
+        functions: 70,
+        lines: 68,
+      },
+    },
   },
 });
 

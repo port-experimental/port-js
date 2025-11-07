@@ -120,22 +120,27 @@ jobs:
             const high = '${{ steps.audit.outputs.high }}';
             const moderate = '${{ steps.audit.outputs.moderate }}';
             
+            const typecheckSuccess = '${{ steps.typecheck.outputs.typecheck_success }}' === 'true';
+            const testSuccess = '${{ steps.test.outputs.test_success }}' === 'true';
+            const buildSuccess = '${{ steps.build.outputs.build_success }}' === 'true';
+            const coverage = '${{ steps.coverage.outputs.coverage }}';
+            
             const body = `## 🏥 SDK Health Check Alert
             
             The daily health check detected issues with the SDK.
             
             ### Status
             - Security Audit: ${critical === '0' && high === '0' ? '✅' : '⚠️'} (Critical: ${critical}, High: ${high}, Moderate: ${moderate})
-            - Type Check: ${{ steps.typecheck.outputs.typecheck_success == 'true' ? '✅' : '❌' }}
-            - Tests: ${{ steps.test.outputs.test_success == 'true' ? '✅' : '❌' }}
-            - Build: ${{ steps.build.outputs.build_success == 'true' ? '✅' : '❌' }}
-            - Coverage: ${{ steps.coverage.outputs.coverage }}%
+            - Type Check: ${typecheckSuccess ? '✅' : '❌'}
+            - Tests: ${testSuccess ? '✅' : '❌'}
+            - Build: ${buildSuccess ? '✅' : '❌'}
+            - Coverage: ${coverage}%
             
             ### Action Required
             ${critical !== '0' || high !== '0' ? '- 🔒 **URGENT:** Fix security vulnerabilities' : ''}
-            ${{ steps.typecheck.outputs.typecheck_success != 'true' ? '- Fix TypeScript errors' : '' }}
-            ${{ steps.test.outputs.test_success != 'true' ? '- Fix failing tests' : '' }}
-            ${{ steps.build.outputs.build_success != 'true' ? '- Fix build errors' : '' }}
+            ${!typecheckSuccess ? '- Fix TypeScript errors' : ''}
+            ${!testSuccess ? '- Fix failing tests' : ''}
+            ${!buildSuccess ? '- Fix build errors' : ''}
             
             ### Workflow Run
             ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
