@@ -9,6 +9,14 @@ export interface RequestContext {
   url?: string;
   method?: string;
   requestId?: string;
+  /**
+   * Optional request payload (sanitized for security)
+   */
+  requestPayload?: unknown;
+  /**
+   * Optional response payload (sanitized for security)
+   */
+  responsePayload?: unknown;
 }
 
 /**
@@ -24,12 +32,21 @@ export class PortError extends Error {
     public readonly code?: string,
     public readonly statusCode?: number,
     public readonly details?: unknown,
-    context?: RequestContext
+    context?: RequestContext,
+    options?: { cause?: unknown }
   ) {
-    super(message);
+    super(message, options);
     this.name = 'PortError';
     this.context = context;
+    
+    // Use Error.captureStackTrace for cleaner stack traces (Node.js)
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, this.constructor);
+    }
+    
     Object.setPrototypeOf(this, PortError.prototype);
+    // Note: Don't freeze here - child classes need to set properties after super()
+    // Child classes will freeze themselves after setting all properties
   }
 
   /**
@@ -49,10 +66,11 @@ export class PortError extends Error {
  * Authentication error (401)
  */
 export class PortAuthError extends PortError {
-  constructor(message: string, details?: unknown, context?: RequestContext) {
-    super(message, 'AUTH_ERROR', 401, details, context);
+  constructor(message: string, details?: unknown, context?: RequestContext, options?: { cause?: unknown }) {
+    super(message, 'AUTH_ERROR', 401, details, context, options);
     this.name = 'PortAuthError';
     Object.setPrototypeOf(this, PortAuthError.prototype);
+    Object.freeze(this);
   }
 }
 
@@ -69,6 +87,7 @@ export class PortForbiddenError extends PortError {
     super(message, 'FORBIDDEN', 403, details, context);
     this.name = 'PortForbiddenError';
     Object.setPrototypeOf(this, PortForbiddenError.prototype);
+    Object.freeze(this);
   }
 }
 
@@ -91,6 +110,7 @@ export class PortNotFoundError extends PortError {
     );
     this.name = 'PortNotFoundError';
     Object.setPrototypeOf(this, PortNotFoundError.prototype);
+    Object.freeze(this);
   }
 }
 
@@ -112,6 +132,7 @@ export class PortValidationError extends PortError {
     super(message, 'VALIDATION_ERROR', 422, validationErrors, context);
     this.name = 'PortValidationError';
     Object.setPrototypeOf(this, PortValidationError.prototype);
+    Object.freeze(this);
   }
 }
 
@@ -128,6 +149,7 @@ export class PortRateLimitError extends PortError {
     super(message, 'RATE_LIMIT', 429, details, context);
     this.name = 'PortRateLimitError';
     Object.setPrototypeOf(this, PortRateLimitError.prototype);
+    Object.freeze(this);
   }
 }
 
@@ -139,6 +161,7 @@ export class PortServerError extends PortError {
     super(message, 'SERVER_ERROR', statusCode, details, context);
     this.name = 'PortServerError';
     Object.setPrototypeOf(this, PortServerError.prototype);
+    Object.freeze(this);
   }
 }
 
@@ -147,9 +170,17 @@ export class PortServerError extends PortError {
  */
 export class PortNetworkError extends PortError {
   constructor(message: string, public readonly originalError?: Error, context?: RequestContext) {
-    super(message, 'NETWORK_ERROR', undefined, originalError, context);
+    super(
+      message,
+      'NETWORK_ERROR',
+      undefined,
+      originalError,
+      context,
+      originalError ? { cause: originalError } : undefined
+    );
     this.name = 'PortNetworkError';
     Object.setPrototypeOf(this, PortNetworkError.prototype);
+    Object.freeze(this);
   }
 }
 
@@ -161,6 +192,7 @@ export class PortTimeoutError extends PortError {
     super(message, 'TIMEOUT', 408, { timeout }, context);
     this.name = 'PortTimeoutError';
     Object.setPrototypeOf(this, PortTimeoutError.prototype);
+    Object.freeze(this);
   }
 }
 

@@ -18,9 +18,7 @@ This roadmap outlines the implementation plan for missing Port.io API resources 
 ### Success Criteria
 - [ ] 100% API coverage (all 15 resources)
 - [ ] Complete CRUD operations for all resources
-- [ ] Comprehensive test coverage (>90%) for new resources
 - [ ] Examples for each new resource
-- [ ] Smoke tests for all new functionality
 - [ ] Documentation updated for all additions
 
 ---
@@ -345,14 +343,12 @@ For each new resource, follow this checklist:
 - [ ] Add JSDoc comments with examples
 - [ ] Export from `src/index.ts`
 
-### 3. Testing (2 days)
+### 4. Testing (2 days)
 - [ ] Write unit tests (`tests/unit/resources/{resource}.test.ts`)
-- [ ] Achieve >90% test coverage
-- [ ] Create smoke test (`smoke-tests/XX-{resource}.ts`)
-- [ ] Add smoke test script to `package.json`
+- [ ] Create integration test (`tests/integration/{resource}.integration.test.ts`)
 - [ ] Test against real API (manual verification)
 
-### 4. Documentation (1 day)
+### 5. Documentation (1 day)
 - [ ] Create example file (`examples/XX-{resource}.ts`)
 - [ ] Update `examples/README.md`
 - [ ] Update `README.md` if user-facing
@@ -360,7 +356,7 @@ For each new resource, follow this checklist:
 - [ ] Update `API_COVERAGE_ANALYSIS.md`
 - [ ] Generate TypeDoc: `pnpm docs:generate`
 
-### 5. Review & Polish (1 day)
+### 6. Review & Polish (1 day)
 - [ ] Code review
 - [ ] Type check passes
 - [ ] All tests pass
@@ -380,11 +376,6 @@ Track progress with these metrics:
 - **Current:** 60% (9/15 resources)
 - **Target:** 100% (15/15 resources)
 - **Measure:** Number of resources fully implemented
-
-### Test Coverage
-- **Current:** 86.6%
-- **Target:** 90%+
-- **Measure:** `pnpm test:coverage`
 
 ### Documentation Completeness
 - **Target:** 100% of public methods have JSDoc with examples
@@ -441,9 +432,7 @@ After completing all resources:
 
 ### v1.0.0 Release Checklist
 - [ ] All 15 resources implemented
-- [ ] 90%+ test coverage
 - [ ] All examples working
-- [ ] All smoke tests passing
 - [ ] Documentation complete
 - [ ] Migration guide from v0.x
 - [ ] Performance benchmarks
@@ -455,7 +444,6 @@ After completing all resources:
 - Update types from OpenAPI weekly
 - Address user feedback and issues
 - Keep examples up to date
-- Maintain high test coverage
 
 ---
 

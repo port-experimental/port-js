@@ -326,7 +326,7 @@ it('debug test', async () => {
 ## Getting Help
 
 - Check Port.io documentation: https://docs.port.io
-- Review smoke tests for manual verification: `smoke-tests/`
+- Review examples for usage patterns: `examples/`
 - Run unit tests first to isolate SDK issues: `pnpm test`
 - Contact Port support for API-specific issues
 

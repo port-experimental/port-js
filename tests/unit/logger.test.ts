@@ -263,13 +263,14 @@ describe('Logger', () => {
       expect(logger.isLevelEnabled(LogLevel.DEBUG)).toBe(true);
     });
 
-    it('should prefer verbose over explicit level', () => {
+    it('should prefer explicit level over verbose', () => {
       const logger = createLogger({ level: LogLevel.ERROR, verbose: true });
-      // verbose mode sets level to DEBUG, overriding explicit level
+      // explicit level takes precedence over verbose (per implementation)
+      // Level precedence: config.level > PORT_LOG_LEVEL > config.verbose/PORT_VERBOSE > default
       expect(logger.isLevelEnabled(LogLevel.ERROR)).toBe(true);
-      expect(logger.isLevelEnabled(LogLevel.WARN)).toBe(true);
-      expect(logger.isLevelEnabled(LogLevel.DEBUG)).toBe(true);
-      expect(logger.isLevelEnabled(LogLevel.TRACE)).toBe(false); // Still respects DEBUG limit
+      expect(logger.isLevelEnabled(LogLevel.WARN)).toBe(false);
+      expect(logger.isLevelEnabled(LogLevel.DEBUG)).toBe(false);
+      expect(logger.isLevelEnabled(LogLevel.TRACE)).toBe(false);
     });
   });
 

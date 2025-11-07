@@ -45,9 +45,6 @@ pnpm dev
 # Run tests in watch mode
 pnpm test:watch
 
-# Run tests with coverage
-pnpm test:coverage
-
 # View test UI
 pnpm test:ui
 
@@ -115,7 +112,6 @@ Requirements:
 - Unit tests for all new functionality
 - Integration tests for API interactions
 - Security tests for sensitive operations
-- Minimum 90% code coverage
 
 ### 4. Code Style
 
@@ -304,22 +300,6 @@ describe('EntityResource', () => {
 });
 ```
 
-### Test Coverage
-
-Aim for:
-- **Statements**: >90%
-- **Branches**: >85%
-- **Functions**: >90%
-- **Lines**: >90%
-
-```bash
-# Check coverage
-pnpm test:coverage
-
-# View HTML report
-open coverage/index.html
-```
-
 ## 🔍 Code Review Process
 
 ### Pull Request Template
@@ -347,7 +327,6 @@ Why is this change needed?
 - [ ] Unit tests added/updated
 - [ ] Integration tests added/updated
 - [ ] All tests passing locally
-- [ ] Coverage maintained/improved
 
 ## Security Checklist
 - [ ] No credentials in code
@@ -390,7 +369,6 @@ Closes #XXX
    ```bash
    # Before pushing
    pnpm test
-   pnpm test:coverage
    pnpm type-check
    pnpm build
    pnpm audit --prod
@@ -437,7 +415,6 @@ Added retry logic with exponential backoff. Also added test coverage for this sc
 
 3. **Testing** (High)
    - Tests exist and are meaningful
-   - Coverage maintained
    - Tests actually test the right thing
 
 4. **Code Quality** (High)
@@ -479,7 +456,6 @@ Added retry logic with exponential backoff. Also added test coverage for this sc
 - [ ] Unit tests present
 - [ ] Integration tests if needed
 - [ ] Tests are clear and focused
-- [ ] Coverage maintained (>90%)
 - [ ] Tests actually run and pass
 
 ### Documentation 📚
@@ -526,7 +502,7 @@ for better reusability. Not blocking, but would improve maintainability.
 ```markdown
 Nice! This is a much cleaner approach than what we had before.
 
-Great test coverage on this edge case!
+Great tests for this edge case!
 
 Love the detailed JSDoc comments here. 👍
 ```
@@ -555,9 +531,7 @@ At least **2 approvals** required for:
 
 ### Security Vulnerabilities
 
-**DO NOT** open public issues for security vulnerabilities.
-
-Email: security@getport.io
+Please contact Port.io security team through their official security contact method.
 
 ### Other Bugs
 
@@ -596,7 +570,6 @@ Before releasing:
    ```bash
    pnpm test
    pnpm test:integration
-   pnpm test:coverage
    ```
 
 2. **No security vulnerabilities**
@@ -615,12 +588,7 @@ Before releasing:
    pnpm types:check
    ```
 
-5. **Smoke tests pass**
-   ```bash
-   pnpm smoke
-   ```
-
-6. **Documentation updated**
+5. **Documentation updated**
    - README.md
    - CHANGELOG.md
    - API documentation

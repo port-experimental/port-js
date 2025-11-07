@@ -486,10 +486,28 @@ describe('HttpClient', () => {
     });
 
     it('should throw PortAuthError on 401', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 401,
-        json: async () => ({ message: 'Unauthorized' }),
+      mockFetch.mockImplementation((url: string) => {
+        if (url.includes('/auth/access_token')) {
+          return Promise.resolve({
+            ok: true,
+            status: 200,
+            json: async () => ({
+              accessToken: 'test-token',
+              expiresIn: 3600,
+              tokenType: 'Bearer',
+            }),
+          } as Response);
+        }
+        // Return 401 for actual request
+        return Promise.resolve({
+          ok: false,
+          status: 401,
+          statusText: 'Unauthorized',
+          headers: {
+            get: () => null,
+          },
+          json: async () => ({ message: 'Unauthorized' }),
+        } as Response);
       });
 
       const client = new HttpClient(config);
@@ -498,10 +516,32 @@ describe('HttpClient', () => {
     });
 
     it('should throw PortNotFoundError on 404', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 404,
-        json: async () => ({ message: 'Not found' }),
+      mockFetch.mockImplementation((url: string) => {
+        if (url.includes('/auth/access_token')) {
+          return Promise.resolve({
+            ok: true,
+            status: 200,
+            json: async () => ({
+              accessToken: 'test-token',
+              expiresIn: 3600,
+              tokenType: 'Bearer',
+            }),
+          } as Response);
+        }
+        // Return 404 for actual request
+        return Promise.resolve({
+          ok: false,
+          status: 404,
+          statusText: 'Not Found',
+          headers: {
+            get: () => null,
+          },
+          json: async () => ({ 
+            message: 'Not found',
+            resource: 'Entity',
+            identifier: '999',
+          }),
+        } as Response);
       });
 
       const client = new HttpClient(config);
@@ -510,13 +550,31 @@ describe('HttpClient', () => {
     });
 
     it('should throw PortValidationError on 422', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 422,
-        json: async () => ({
-          message: 'Validation failed',
-          errors: [{ field: 'name', message: 'Required' }],
-        }),
+      mockFetch.mockImplementation((url: string) => {
+        if (url.includes('/auth/access_token')) {
+          return Promise.resolve({
+            ok: true,
+            status: 200,
+            json: async () => ({
+              accessToken: 'test-token',
+              expiresIn: 3600,
+              tokenType: 'Bearer',
+            }),
+          } as Response);
+        }
+        // Return 422 for actual request
+        return Promise.resolve({
+          ok: false,
+          status: 422,
+          statusText: 'Unprocessable Entity',
+          headers: {
+            get: () => null,
+          },
+          json: async () => ({
+            message: 'Validation failed',
+            errors: [{ field: 'name', message: 'Required' }],
+          }),
+        } as Response);
       });
 
       const client = new HttpClient(config);
@@ -690,9 +748,14 @@ describe('HttpClient', () => {
         }),
       });
       
+      // Mock 400 Bad Request response (should not retry)
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 400,
+        statusText: 'Bad Request',
+        headers: {
+          get: () => null,
+        },
         json: async () => ({ message: 'Bad request' }),
       });
 
@@ -759,21 +822,33 @@ describe('HttpClient', () => {
         }),
       });
       
-      // Mock a slow response that triggers abort
-      mockFetch.mockImplementationOnce(
-        () =>
-          new Promise((_, reject) => {
-            setTimeout(() => {
+      // Mock a slow response that waits for abort signal
+      mockFetch.mockImplementationOnce((url: string, options?: RequestInit) => {
+        return new Promise((_, reject) => {
+          if (options?.signal) {
+            // If already aborted, reject immediately
+            if (options.signal.aborted) {
               const error = new Error('The operation was aborted');
               error.name = 'AbortError';
               reject(error);
-            }, 50);
-          })
-      );
+              return;
+            }
+            // Wait for abort signal
+            options.signal.addEventListener('abort', () => {
+              const error = new Error('The operation was aborted');
+              error.name = 'AbortError';
+              reject(error);
+            }, { once: true });
+          } else {
+            // Fallback - should not happen in tests
+            setTimeout(() => reject(new Error('No signal')), 200);
+          }
+        });
+      });
 
       const client = new HttpClient({ ...config, timeout: 100 });
       
-      await expect(client.get('/test')).rejects.toThrow(PortTimeoutError);
+      await expect(client.get('/test', { skipRetry: true })).rejects.toThrow(PortTimeoutError);
     }, 10000);
 
     it('should respect custom timeout option', async () => {
@@ -788,21 +863,33 @@ describe('HttpClient', () => {
         }),
       });
       
-      // Mock a slow response that triggers abort
-      mockFetch.mockImplementationOnce(
-        () =>
-          new Promise((_, reject) => {
-            setTimeout(() => {
+      // Mock a slow response that waits for abort signal
+      mockFetch.mockImplementationOnce((url: string, options?: RequestInit) => {
+        return new Promise((_, reject) => {
+          if (options?.signal) {
+            // If already aborted, reject immediately
+            if (options.signal.aborted) {
               const error = new Error('The operation was aborted');
               error.name = 'AbortError';
               reject(error);
-            }, 25);
-          })
-      );
+              return;
+            }
+            // Wait for abort signal
+            options.signal.addEventListener('abort', () => {
+              const error = new Error('The operation was aborted');
+              error.name = 'AbortError';
+              reject(error);
+            }, { once: true });
+          } else {
+            // Fallback - should not happen in tests
+            setTimeout(() => reject(new Error('No signal')), 200);
+          }
+        });
+      });
 
       const client = new HttpClient(config);
       
-      await expect(client.get('/test', { timeout: 50 })).rejects.toThrow(
+      await expect(client.get('/test', { timeout: 50, skipRetry: true })).rejects.toThrow(
         PortTimeoutError
       );
     }, 10000);

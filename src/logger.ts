@@ -56,6 +56,7 @@ export interface LoggerConfig {
 
   /**
    * Enable verbose logging (sets level to DEBUG)
+   * @deprecated Use `level: LogLevel.DEBUG` instead. This is kept for backward compatibility.
    * @default false
    */
   verbose?: boolean;
@@ -73,6 +74,12 @@ export interface LoggerConfig {
   timestamp?: boolean;
 
   /**
+   * Enable structured JSON output mode for log aggregation systems
+   * @default false
+   */
+  json?: boolean;
+
+  /**
    * Custom log output function (for testing or custom handlers)
    */
   outputFn?: (level: LogLevel, message: string, meta?: Record<string, unknown>) => void;
@@ -82,15 +89,20 @@ export interface LoggerConfig {
    * @default true in development, false in production
    */
   enabled?: boolean;
+
+  /**
+   * Configurable list of sensitive keys to redact (in addition to default list)
+   */
+  sensitiveKeys?: string[];
 }
 
 /**
- * Sensitive keys to redact from logs
+ * Default sensitive keys to redact from logs
  * 
  * SECURITY: These keys are considered sensitive and will be replaced with [REDACTED]
  * when logging. This prevents credential leakage in logs.
  */
-const SENSITIVE_KEYS = [
+const DEFAULT_SENSITIVE_KEYS = [
   'password',
   'secret',
   'token',
@@ -115,15 +127,15 @@ const SENSITIVE_KEYS = [
 /**
  * Check if a key is sensitive
  */
-function isSensitiveKey(key: string): boolean {
+function isSensitiveKey(key: string, sensitiveKeys: readonly string[]): boolean {
   const lowerKey = key.toLowerCase();
-  return SENSITIVE_KEYS.some(sensitive => lowerKey.includes(sensitive));
+  return sensitiveKeys.some(sensitive => lowerKey.includes(sensitive));
 }
 
 /**
  * Sanitize an object by redacting sensitive values
  */
-function sanitizeObject(obj: unknown): unknown {
+function sanitizeObject(obj: unknown, sensitiveKeys: readonly string[]): unknown {
   if (obj === null || obj === undefined) {
     return obj;
   }
@@ -133,15 +145,15 @@ function sanitizeObject(obj: unknown): unknown {
   }
 
   if (Array.isArray(obj)) {
-    return obj.map(item => sanitizeObject(item));
+    return obj.map(item => sanitizeObject(item, sensitiveKeys));
   }
 
   const sanitized: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(obj)) {
-    if (isSensitiveKey(key)) {
+    if (isSensitiveKey(key, sensitiveKeys)) {
       sanitized[key] = '[REDACTED]';
     } else if (typeof value === 'object' && value !== null) {
-      sanitized[key] = sanitizeObject(value);
+      sanitized[key] = sanitizeObject(value, sensitiveKeys);
     } else {
       sanitized[key] = value;
     }
@@ -245,21 +257,25 @@ export class Logger {
   private level: LogLevel;
   private colors: boolean;
   private timestamp: boolean;
+  private json: boolean;
   private outputFn: (level: LogLevel, message: string, meta?: Record<string, unknown>) => void;
   private enabled: boolean;
+  private sensitiveKeys: readonly string[];
 
   constructor(config: LoggerConfig = {}) {
-    // Parse log level from config or environment
+    // Unify log level mechanism - use PORT_LOG_LEVEL only (deprecate PORT_VERBOSE)
     const envLevel = parseLogLevel(process.env.PORT_LOG_LEVEL);
+    // Backward compatibility: PORT_VERBOSE still works but is deprecated
     const envVerbose = process.env.PORT_VERBOSE === 'true' || process.env.PORT_VERBOSE === '1';
     
-    // Determine log level
-    if (config.verbose || envVerbose) {
-      this.level = LogLevel.DEBUG;
-    } else if (config.level !== undefined) {
+    // Determine log level - unified precedence: config.level > PORT_LOG_LEVEL > config.verbose/PORT_VERBOSE > default
+    if (config.level !== undefined) {
       this.level = config.level;
     } else if (envLevel !== undefined) {
       this.level = envLevel;
+    } else if (config.verbose || envVerbose) {
+      // Deprecated: verbose mode
+      this.level = LogLevel.DEBUG;
     } else {
       // Default to WARN
       this.level = LogLevel.WARN;
@@ -275,24 +291,67 @@ export class Logger {
       ? config.timestamp 
       : true;
 
+    // Configure JSON output mode
+    this.json = config.json ?? false;
+
+    // Build sensitive keys list (default + custom)
+    this.sensitiveKeys = config.sensitiveKeys 
+      ? [...DEFAULT_SENSITIVE_KEYS, ...config.sensitiveKeys]
+      : DEFAULT_SENSITIVE_KEYS;
+
     // Configure output function
-    this.outputFn = config.outputFn || ((level, message, meta) => {
-      const output = meta 
-        ? `${message} ${JSON.stringify(sanitizeObject(meta))}`
-        : message;
-      
-      if (level <= LogLevel.WARN) {
-        console.error(output);
-      } else {
-        console.log(output);
-      }
-    });
+    if (config.outputFn) {
+      this.outputFn = config.outputFn;
+    } else if (this.json) {
+      // Structured JSON output for log aggregation
+      this.outputFn = (level, message, meta) => {
+        const sanitizedMeta = meta ? sanitizeObject(meta, this.sensitiveKeys) : {};
+        const logEntry: Record<string, unknown> = {
+          timestamp: new Date().toISOString(),
+          level: LogLevelNames[level],
+          message,
+        };
+        
+        // Spread sanitized metadata only if it's an object
+        if (typeof sanitizedMeta === 'object' && sanitizedMeta !== null && !Array.isArray(sanitizedMeta)) {
+          Object.assign(logEntry, sanitizedMeta);
+        }
+        
+        const output = JSON.stringify(logEntry);
+        if (level <= LogLevel.WARN) {
+          console.error(output);
+        } else {
+          console.log(output);
+        }
+      };
+    } else {
+      // Default text output
+      this.outputFn = (level, message, meta) => {
+        const formatted = formatMessage(level, message, this.colors, this.timestamp);
+        const output = meta 
+          ? `${formatted} ${JSON.stringify(sanitizeObject(meta, this.sensitiveKeys))}`
+          : formatted;
+        
+        if (level <= LogLevel.WARN) {
+          console.error(output);
+        } else {
+          console.log(output);
+        }
+      };
+    }
 
     // Enable/disable logging
     const nodeEnv = process.env.NODE_ENV;
     this.enabled = config.enabled !== undefined
       ? config.enabled
       : nodeEnv !== 'production';
+  }
+
+  /**
+   * Set log level at runtime
+   */
+  setLevel(level: LogLevel): void {
+    this.level = level;
   }
 
   /**
@@ -345,8 +404,7 @@ export class Logger {
       return;
     }
 
-    const formattedMessage = formatMessage(level, message, this.colors, this.timestamp);
-    this.outputFn(level, formattedMessage, meta);
+    this.outputFn(level, message, meta);
   }
 
   /**
