@@ -201,10 +201,18 @@ export interface paths {
                                                 maxHops?: number;
                                             })[];
                                             fromBlueprint?: string;
-                                        };
+                                        } | (string | {
+                                            property: string;
+                                            /** @enum {string} */
+                                            context: "user" | "userTeams";
+                                        });
                                         /** @enum {string} */
                                         operator: "matchAny";
-                                        value: string | string[];
+                                        value: string[] | (string | {
+                                            property: string;
+                                            /** @enum {string} */
+                                            context: "user" | "userTeams";
+                                        });
                                     } | components["schemas"]["def-1"])[];
                                 };
                             };
@@ -612,6 +620,8 @@ export interface paths {
                     exclude?: string[];
                     attach_title_to_relation?: boolean;
                     attach_identifier_to_title_mirror_properties?: boolean;
+                    /** @description When enabled allows some of the blueprint searches to fail without failing the full request. */
+                    allow_partial_results?: boolean;
                 };
                 header?: never;
                 path: {
@@ -1025,6 +1035,8 @@ export interface paths {
                     exclude?: string[];
                     attach_title_to_relation?: boolean;
                     attach_identifier_to_title_mirror_properties?: boolean;
+                    /** @description When enabled allows some of the blueprint searches to fail without failing the full request. */
+                    allow_partial_results?: boolean;
                 };
                 header?: never;
                 path: {
@@ -1776,6 +1788,8 @@ export interface paths {
                     exclude?: string[];
                     attach_title_to_relation?: boolean;
                     attach_identifier_to_title_mirror_properties?: boolean;
+                    /** @description When enabled allows some of the blueprint searches to fail without failing the full request. */
+                    allow_partial_results?: boolean;
                 };
                 header?: never;
                 path?: never;
@@ -1871,10 +1885,18 @@ export interface paths {
                                     maxHops?: number;
                                 })[];
                                 fromBlueprint?: string;
-                            };
+                            } | (string | {
+                                property: string;
+                                /** @enum {string} */
+                                context: "user" | "userTeams";
+                            });
                             /** @enum {string} */
                             operator: "matchAny";
-                            value: string | string[];
+                            value: string[] | (string | {
+                                property: string;
+                                /** @enum {string} */
+                                context: "user" | "userTeams";
+                            });
                         } | components["schemas"]["def-1"])[];
                     };
                 };
@@ -6589,10 +6611,18 @@ export interface paths {
                                             maxHops?: number;
                                         })[];
                                         fromBlueprint?: string;
-                                    };
+                                    } | (string | {
+                                        property: string;
+                                        /** @enum {string} */
+                                        context: "user" | "userTeams";
+                                    });
                                     /** @enum {string} */
                                     operator: "matchAny";
-                                    value: string | string[];
+                                    value: string[] | (string | {
+                                        property: string;
+                                        /** @enum {string} */
+                                        context: "user" | "userTeams";
+                                    });
                                 } | components["schemas"]["def-1"])[];
                                 /** @enum {string} */
                                 combinator: "and" | "or";
@@ -6973,6 +7003,8 @@ export interface paths {
                         });
                         /** @description Only relevant for **automations**. If `false`, the automation will be inactive (will not be triggered). */
                         publish?: boolean;
+                        /** @description Whether members can view the runs of this action. */
+                        allowAnyoneToViewRuns?: boolean;
                     };
                 };
             };
@@ -7436,10 +7468,18 @@ export interface paths {
                                             maxHops?: number;
                                         })[];
                                         fromBlueprint?: string;
-                                    };
+                                    } | (string | {
+                                        property: string;
+                                        /** @enum {string} */
+                                        context: "user" | "userTeams";
+                                    });
                                     /** @enum {string} */
                                     operator: "matchAny";
-                                    value: string | string[];
+                                    value: string[] | (string | {
+                                        property: string;
+                                        /** @enum {string} */
+                                        context: "user" | "userTeams";
+                                    });
                                 } | components["schemas"]["def-1"])[];
                                 /** @enum {string} */
                                 combinator: "and" | "or";
@@ -7820,6 +7860,8 @@ export interface paths {
                         });
                         /** @description Only relevant for **automations**. If `false`, the automation will be inactive (will not be triggered). */
                         publish?: boolean;
+                        /** @description Whether members can view the runs of this action. */
+                        allowAnyoneToViewRuns?: boolean;
                     };
                 };
             };
@@ -9077,6 +9119,8 @@ export interface paths {
                     user_id?: string;
                     /** @description The maximum number of action runs to fetch. */
                     limit?: number;
+                    /** @description The fields to exclude from the response */
+                    exclude?: string[];
                     /** @description The run id of your backend, for example the id that GitHub gives the workflow. This can be used to identify the action run instead of the `run_id`. */
                     external_run_id?: string;
                     /** @description Specifies the API version to use. Please use `v2` for the latest version of the API. */
@@ -9765,6 +9809,8 @@ export interface paths {
                                 identifier?: string;
                                 /** @description Fetch all audit logs related to the specified entity. */
                                 entity?: string;
+                                /** @description Include deleted entities when searching for audit logs. This requires the `entity`, `blueprint`, `status`, `from`and `to` parameters. And the diff between `from` & `to` is limited to 1 day. */
+                                include_deleted_entities?: boolean;
                                 /** @description Fetch all audit logs related to the specified blueprint. */
                                 blueprint?: string;
                                 /** @description Fetch all audit logs related to the specified action run. */
@@ -9906,6 +9952,8 @@ export interface paths {
                                 user_id?: string;
                                 /** @description The maximum number of action runs to fetch. */
                                 limit?: number;
+                                /** @description The fields to exclude from the response */
+                                exclude?: string[];
                                 /** @description The run id of your backend, for example the id that GitHub gives the workflow. This can be used to identify the action run instead of the `run_id`. */
                                 external_run_id?: string;
                                 /**
@@ -9966,6 +10014,21 @@ export interface paths {
                             title?: string;
                             dataset: components["schemas"]["def-1"];
                             hiddenBlueprints?: string[];
+                        } | {
+                            id?: string;
+                            updatedAt?: string;
+                            updatedBy?: string;
+                            createdAt?: string;
+                            createdBy?: string;
+                            icon?: string;
+                            /** @enum {unknown} */
+                            type: "bar-chart";
+                            title?: string;
+                            blueprint?: string;
+                            property: string;
+                            description?: string;
+                            dataset: components["schemas"]["def-1"];
+                            emptyStateText?: string;
                         } | {
                             id?: string;
                             updatedAt?: string;
@@ -10089,7 +10152,11 @@ export interface paths {
                                 /** @enum {string} */
                                 color?: "blue" | "turquoise" | "orange" | "purple" | "pink" | "yellow" | "green" | "red" | "gold" | "silver" | "paleBlue" | "darkGray" | "lightGray" | "bronze" | "lime" | "olive" | "brown";
                             }[];
-                        } & (unknown & unknown & unknown & unknown & unknown & unknown & unknown)) | ({
+                            /** @enum {string} */
+                            displayFormatting?: "none" | "round" | "custom";
+                            /** @enum {string} */
+                            decimalPlaces?: ".0" | ".00" | ".000" | ".0000" | ".00000";
+                        } & (unknown & unknown & unknown & unknown & unknown & unknown & unknown & unknown)) | ({
                             id?: string;
                             updatedAt?: string;
                             updatedBy?: string;
@@ -10104,7 +10171,7 @@ export interface paths {
                             url: string;
                             /** @enum {string} */
                             urlType: "public" | "protected";
-                        } & unknown) | {
+                        } & unknown) | ({
                             id?: string;
                             updatedAt?: string;
                             updatedBy?: string;
@@ -10114,8 +10181,17 @@ export interface paths {
                             type: "markdown";
                             title: string;
                             icon?: string;
-                            markdown?: string;
                         } | {
+                            /** @enum {string} */
+                            source?: "custom";
+                            markdown: string;
+                        } | {
+                            /** @enum {string} */
+                            source: "property";
+                            blueprintIdentifier: string;
+                            propertyIdentifier: string;
+                            entityIdentifier: string;
+                        }) | {
                             id?: string;
                             updatedAt?: string;
                             updatedBy?: string;
@@ -10376,6 +10452,8 @@ export interface paths {
                                         identifier?: string;
                                         /** @description Fetch all audit logs related to the specified entity. */
                                         entity?: string;
+                                        /** @description Include deleted entities when searching for audit logs. This requires the `entity`, `blueprint`, `status`, `from`and `to` parameters. And the diff between `from` & `to` is limited to 1 day. */
+                                        include_deleted_entities?: boolean;
                                         /** @description Fetch all audit logs related to the specified blueprint. */
                                         blueprint?: string;
                                         /** @description Fetch all audit logs related to the specified action run. */
@@ -10517,6 +10595,8 @@ export interface paths {
                                         user_id?: string;
                                         /** @description The maximum number of action runs to fetch. */
                                         limit?: number;
+                                        /** @description The fields to exclude from the response */
+                                        exclude?: string[];
                                         /** @description The run id of your backend, for example the id that GitHub gives the workflow. This can be used to identify the action run instead of the `run_id`. */
                                         external_run_id?: string;
                                         /**
@@ -10577,6 +10657,21 @@ export interface paths {
                                     title?: string;
                                     dataset: components["schemas"]["def-1"];
                                     hiddenBlueprints?: string[];
+                                } | {
+                                    id?: string;
+                                    updatedAt?: string;
+                                    updatedBy?: string;
+                                    createdAt?: string;
+                                    createdBy?: string;
+                                    icon?: string;
+                                    /** @enum {unknown} */
+                                    type: "bar-chart";
+                                    title?: string;
+                                    blueprint?: string;
+                                    property: string;
+                                    description?: string;
+                                    dataset: components["schemas"]["def-1"];
+                                    emptyStateText?: string;
                                 } | {
                                     id?: string;
                                     updatedAt?: string;
@@ -10700,7 +10795,11 @@ export interface paths {
                                         /** @enum {string} */
                                         color?: "blue" | "turquoise" | "orange" | "purple" | "pink" | "yellow" | "green" | "red" | "gold" | "silver" | "paleBlue" | "darkGray" | "lightGray" | "bronze" | "lime" | "olive" | "brown";
                                     }[];
-                                } & (unknown & unknown & unknown & unknown & unknown & unknown & unknown)) | ({
+                                    /** @enum {string} */
+                                    displayFormatting?: "none" | "round" | "custom";
+                                    /** @enum {string} */
+                                    decimalPlaces?: ".0" | ".00" | ".000" | ".0000" | ".00000";
+                                } & (unknown & unknown & unknown & unknown & unknown & unknown & unknown & unknown)) | ({
                                     id?: string;
                                     updatedAt?: string;
                                     updatedBy?: string;
@@ -10715,7 +10814,7 @@ export interface paths {
                                     url: string;
                                     /** @enum {string} */
                                     urlType: "public" | "protected";
-                                } & unknown) | {
+                                } & unknown) | ({
                                     id?: string;
                                     updatedAt?: string;
                                     updatedBy?: string;
@@ -10725,8 +10824,17 @@ export interface paths {
                                     type: "markdown";
                                     title: string;
                                     icon?: string;
-                                    markdown?: string;
                                 } | {
+                                    /** @enum {string} */
+                                    source?: "custom";
+                                    markdown: string;
+                                } | {
+                                    /** @enum {string} */
+                                    source: "property";
+                                    blueprintIdentifier: string;
+                                    propertyIdentifier: string;
+                                    entityIdentifier: string;
+                                }) | {
                                     id?: string;
                                     updatedAt?: string;
                                     updatedBy?: string;
@@ -10988,6 +11096,8 @@ export interface paths {
                                     identifier?: string;
                                     /** @description Fetch all audit logs related to the specified entity. */
                                     entity?: string;
+                                    /** @description Include deleted entities when searching for audit logs. This requires the `entity`, `blueprint`, `status`, `from`and `to` parameters. And the diff between `from` & `to` is limited to 1 day. */
+                                    include_deleted_entities?: boolean;
                                     /** @description Fetch all audit logs related to the specified blueprint. */
                                     blueprint?: string;
                                     /** @description Fetch all audit logs related to the specified action run. */
@@ -11129,6 +11239,8 @@ export interface paths {
                                     user_id?: string;
                                     /** @description The maximum number of action runs to fetch. */
                                     limit?: number;
+                                    /** @description The fields to exclude from the response */
+                                    exclude?: string[];
                                     /** @description The run id of your backend, for example the id that GitHub gives the workflow. This can be used to identify the action run instead of the `run_id`. */
                                     external_run_id?: string;
                                     /**
@@ -11189,6 +11301,21 @@ export interface paths {
                                 title?: string;
                                 dataset: components["schemas"]["def-1"];
                                 hiddenBlueprints?: string[];
+                            } | {
+                                id?: string;
+                                updatedAt?: string;
+                                updatedBy?: string;
+                                createdAt?: string;
+                                createdBy?: string;
+                                icon?: string;
+                                /** @enum {unknown} */
+                                type: "bar-chart";
+                                title?: string;
+                                blueprint?: string;
+                                property: string;
+                                description?: string;
+                                dataset: components["schemas"]["def-1"];
+                                emptyStateText?: string;
                             } | {
                                 id?: string;
                                 updatedAt?: string;
@@ -11312,7 +11439,11 @@ export interface paths {
                                     /** @enum {string} */
                                     color?: "blue" | "turquoise" | "orange" | "purple" | "pink" | "yellow" | "green" | "red" | "gold" | "silver" | "paleBlue" | "darkGray" | "lightGray" | "bronze" | "lime" | "olive" | "brown";
                                 }[];
-                            } & (unknown & unknown & unknown & unknown & unknown & unknown & unknown)) | ({
+                                /** @enum {string} */
+                                displayFormatting?: "none" | "round" | "custom";
+                                /** @enum {string} */
+                                decimalPlaces?: ".0" | ".00" | ".000" | ".0000" | ".00000";
+                            } & (unknown & unknown & unknown & unknown & unknown & unknown & unknown & unknown)) | ({
                                 id?: string;
                                 updatedAt?: string;
                                 updatedBy?: string;
@@ -11327,7 +11458,7 @@ export interface paths {
                                 url: string;
                                 /** @enum {string} */
                                 urlType: "public" | "protected";
-                            } & unknown) | {
+                            } & unknown) | ({
                                 id?: string;
                                 updatedAt?: string;
                                 updatedBy?: string;
@@ -11337,8 +11468,17 @@ export interface paths {
                                 type: "markdown";
                                 title: string;
                                 icon?: string;
-                                markdown?: string;
                             } | {
+                                /** @enum {string} */
+                                source?: "custom";
+                                markdown: string;
+                            } | {
+                                /** @enum {string} */
+                                source: "property";
+                                blueprintIdentifier: string;
+                                propertyIdentifier: string;
+                                entityIdentifier: string;
+                            }) | {
                                 id?: string;
                                 updatedAt?: string;
                                 updatedBy?: string;
@@ -11491,10 +11631,18 @@ export interface paths {
                                             maxHops?: number;
                                         })[];
                                         fromBlueprint?: string;
-                                    };
+                                    } | (string | {
+                                        property: string;
+                                        /** @enum {string} */
+                                        context: "user" | "userTeams";
+                                    });
                                     /** @enum {string} */
                                     operator: "matchAny";
-                                    value: string | string[];
+                                    value: string[] | (string | {
+                                        property: string;
+                                        /** @enum {string} */
+                                        context: "user" | "userTeams";
+                                    });
                                 } | components["schemas"]["def-1"])[];
                             };
                             identifier: string;
@@ -11951,6 +12099,8 @@ export interface paths {
                                 identifier?: string;
                                 /** @description Fetch all audit logs related to the specified entity. */
                                 entity?: string;
+                                /** @description Include deleted entities when searching for audit logs. This requires the `entity`, `blueprint`, `status`, `from`and `to` parameters. And the diff between `from` & `to` is limited to 1 day. */
+                                include_deleted_entities?: boolean;
                                 /** @description Fetch all audit logs related to the specified blueprint. */
                                 blueprint?: string;
                                 /** @description Fetch all audit logs related to the specified action run. */
@@ -12092,6 +12242,8 @@ export interface paths {
                                 user_id?: string;
                                 /** @description The maximum number of action runs to fetch. */
                                 limit?: number;
+                                /** @description The fields to exclude from the response */
+                                exclude?: string[];
                                 /** @description The run id of your backend, for example the id that GitHub gives the workflow. This can be used to identify the action run instead of the `run_id`. */
                                 external_run_id?: string;
                                 /**
@@ -12152,6 +12304,21 @@ export interface paths {
                             title?: string;
                             dataset: components["schemas"]["def-1"];
                             hiddenBlueprints?: string[];
+                        } | {
+                            id?: string;
+                            updatedAt?: string;
+                            updatedBy?: string;
+                            createdAt?: string;
+                            createdBy?: string;
+                            icon?: string;
+                            /** @enum {unknown} */
+                            type: "bar-chart";
+                            title?: string;
+                            blueprint?: string;
+                            property: string;
+                            description?: string;
+                            dataset: components["schemas"]["def-1"];
+                            emptyStateText?: string;
                         } | {
                             id?: string;
                             updatedAt?: string;
@@ -12275,7 +12442,11 @@ export interface paths {
                                 /** @enum {string} */
                                 color?: "blue" | "turquoise" | "orange" | "purple" | "pink" | "yellow" | "green" | "red" | "gold" | "silver" | "paleBlue" | "darkGray" | "lightGray" | "bronze" | "lime" | "olive" | "brown";
                             }[];
-                        } & (unknown & unknown & unknown & unknown & unknown & unknown & unknown)) | ({
+                            /** @enum {string} */
+                            displayFormatting?: "none" | "round" | "custom";
+                            /** @enum {string} */
+                            decimalPlaces?: ".0" | ".00" | ".000" | ".0000" | ".00000";
+                        } & (unknown & unknown & unknown & unknown & unknown & unknown & unknown & unknown)) | ({
                             id?: string;
                             updatedAt?: string;
                             updatedBy?: string;
@@ -12290,7 +12461,7 @@ export interface paths {
                             url: string;
                             /** @enum {string} */
                             urlType: "public" | "protected";
-                        } & unknown) | {
+                        } & unknown) | ({
                             id?: string;
                             updatedAt?: string;
                             updatedBy?: string;
@@ -12300,8 +12471,17 @@ export interface paths {
                             type: "markdown";
                             title: string;
                             icon?: string;
-                            markdown?: string;
                         } | {
+                            /** @enum {string} */
+                            source?: "custom";
+                            markdown: string;
+                        } | {
+                            /** @enum {string} */
+                            source: "property";
+                            blueprintIdentifier: string;
+                            propertyIdentifier: string;
+                            entityIdentifier: string;
+                        }) | {
                             id?: string;
                             updatedAt?: string;
                             updatedBy?: string;
@@ -12562,6 +12742,8 @@ export interface paths {
                                         identifier?: string;
                                         /** @description Fetch all audit logs related to the specified entity. */
                                         entity?: string;
+                                        /** @description Include deleted entities when searching for audit logs. This requires the `entity`, `blueprint`, `status`, `from`and `to` parameters. And the diff between `from` & `to` is limited to 1 day. */
+                                        include_deleted_entities?: boolean;
                                         /** @description Fetch all audit logs related to the specified blueprint. */
                                         blueprint?: string;
                                         /** @description Fetch all audit logs related to the specified action run. */
@@ -12703,6 +12885,8 @@ export interface paths {
                                         user_id?: string;
                                         /** @description The maximum number of action runs to fetch. */
                                         limit?: number;
+                                        /** @description The fields to exclude from the response */
+                                        exclude?: string[];
                                         /** @description The run id of your backend, for example the id that GitHub gives the workflow. This can be used to identify the action run instead of the `run_id`. */
                                         external_run_id?: string;
                                         /**
@@ -12763,6 +12947,21 @@ export interface paths {
                                     title?: string;
                                     dataset: components["schemas"]["def-1"];
                                     hiddenBlueprints?: string[];
+                                } | {
+                                    id?: string;
+                                    updatedAt?: string;
+                                    updatedBy?: string;
+                                    createdAt?: string;
+                                    createdBy?: string;
+                                    icon?: string;
+                                    /** @enum {unknown} */
+                                    type: "bar-chart";
+                                    title?: string;
+                                    blueprint?: string;
+                                    property: string;
+                                    description?: string;
+                                    dataset: components["schemas"]["def-1"];
+                                    emptyStateText?: string;
                                 } | {
                                     id?: string;
                                     updatedAt?: string;
@@ -12886,7 +13085,11 @@ export interface paths {
                                         /** @enum {string} */
                                         color?: "blue" | "turquoise" | "orange" | "purple" | "pink" | "yellow" | "green" | "red" | "gold" | "silver" | "paleBlue" | "darkGray" | "lightGray" | "bronze" | "lime" | "olive" | "brown";
                                     }[];
-                                } & (unknown & unknown & unknown & unknown & unknown & unknown & unknown)) | ({
+                                    /** @enum {string} */
+                                    displayFormatting?: "none" | "round" | "custom";
+                                    /** @enum {string} */
+                                    decimalPlaces?: ".0" | ".00" | ".000" | ".0000" | ".00000";
+                                } & (unknown & unknown & unknown & unknown & unknown & unknown & unknown & unknown)) | ({
                                     id?: string;
                                     updatedAt?: string;
                                     updatedBy?: string;
@@ -12901,7 +13104,7 @@ export interface paths {
                                     url: string;
                                     /** @enum {string} */
                                     urlType: "public" | "protected";
-                                } & unknown) | {
+                                } & unknown) | ({
                                     id?: string;
                                     updatedAt?: string;
                                     updatedBy?: string;
@@ -12911,8 +13114,17 @@ export interface paths {
                                     type: "markdown";
                                     title: string;
                                     icon?: string;
-                                    markdown?: string;
                                 } | {
+                                    /** @enum {string} */
+                                    source?: "custom";
+                                    markdown: string;
+                                } | {
+                                    /** @enum {string} */
+                                    source: "property";
+                                    blueprintIdentifier: string;
+                                    propertyIdentifier: string;
+                                    entityIdentifier: string;
+                                }) | {
                                     id?: string;
                                     updatedAt?: string;
                                     updatedBy?: string;
@@ -13174,6 +13386,8 @@ export interface paths {
                                     identifier?: string;
                                     /** @description Fetch all audit logs related to the specified entity. */
                                     entity?: string;
+                                    /** @description Include deleted entities when searching for audit logs. This requires the `entity`, `blueprint`, `status`, `from`and `to` parameters. And the diff between `from` & `to` is limited to 1 day. */
+                                    include_deleted_entities?: boolean;
                                     /** @description Fetch all audit logs related to the specified blueprint. */
                                     blueprint?: string;
                                     /** @description Fetch all audit logs related to the specified action run. */
@@ -13315,6 +13529,8 @@ export interface paths {
                                     user_id?: string;
                                     /** @description The maximum number of action runs to fetch. */
                                     limit?: number;
+                                    /** @description The fields to exclude from the response */
+                                    exclude?: string[];
                                     /** @description The run id of your backend, for example the id that GitHub gives the workflow. This can be used to identify the action run instead of the `run_id`. */
                                     external_run_id?: string;
                                     /**
@@ -13375,6 +13591,21 @@ export interface paths {
                                 title?: string;
                                 dataset: components["schemas"]["def-1"];
                                 hiddenBlueprints?: string[];
+                            } | {
+                                id?: string;
+                                updatedAt?: string;
+                                updatedBy?: string;
+                                createdAt?: string;
+                                createdBy?: string;
+                                icon?: string;
+                                /** @enum {unknown} */
+                                type: "bar-chart";
+                                title?: string;
+                                blueprint?: string;
+                                property: string;
+                                description?: string;
+                                dataset: components["schemas"]["def-1"];
+                                emptyStateText?: string;
                             } | {
                                 id?: string;
                                 updatedAt?: string;
@@ -13498,7 +13729,11 @@ export interface paths {
                                     /** @enum {string} */
                                     color?: "blue" | "turquoise" | "orange" | "purple" | "pink" | "yellow" | "green" | "red" | "gold" | "silver" | "paleBlue" | "darkGray" | "lightGray" | "bronze" | "lime" | "olive" | "brown";
                                 }[];
-                            } & (unknown & unknown & unknown & unknown & unknown & unknown & unknown)) | ({
+                                /** @enum {string} */
+                                displayFormatting?: "none" | "round" | "custom";
+                                /** @enum {string} */
+                                decimalPlaces?: ".0" | ".00" | ".000" | ".0000" | ".00000";
+                            } & (unknown & unknown & unknown & unknown & unknown & unknown & unknown & unknown)) | ({
                                 id?: string;
                                 updatedAt?: string;
                                 updatedBy?: string;
@@ -13513,7 +13748,7 @@ export interface paths {
                                 url: string;
                                 /** @enum {string} */
                                 urlType: "public" | "protected";
-                            } & unknown) | {
+                            } & unknown) | ({
                                 id?: string;
                                 updatedAt?: string;
                                 updatedBy?: string;
@@ -13523,8 +13758,17 @@ export interface paths {
                                 type: "markdown";
                                 title: string;
                                 icon?: string;
-                                markdown?: string;
                             } | {
+                                /** @enum {string} */
+                                source?: "custom";
+                                markdown: string;
+                            } | {
+                                /** @enum {string} */
+                                source: "property";
+                                blueprintIdentifier: string;
+                                propertyIdentifier: string;
+                                entityIdentifier: string;
+                            }) | {
                                 id?: string;
                                 updatedAt?: string;
                                 updatedBy?: string;
@@ -13672,10 +13916,18 @@ export interface paths {
                                             maxHops?: number;
                                         })[];
                                         fromBlueprint?: string;
-                                    };
+                                    } | (string | {
+                                        property: string;
+                                        /** @enum {string} */
+                                        context: "user" | "userTeams";
+                                    });
                                     /** @enum {string} */
                                     operator: "matchAny";
-                                    value: string | string[];
+                                    value: string[] | (string | {
+                                        property: string;
+                                        /** @enum {string} */
+                                        context: "user" | "userTeams";
+                                    });
                                 } | components["schemas"]["def-1"])[];
                             };
                             identifier: string;
@@ -13988,6 +14240,8 @@ export interface paths {
                                 identifier?: string;
                                 /** @description Fetch all audit logs related to the specified entity. */
                                 entity?: string;
+                                /** @description Include deleted entities when searching for audit logs. This requires the `entity`, `blueprint`, `status`, `from`and `to` parameters. And the diff between `from` & `to` is limited to 1 day. */
+                                include_deleted_entities?: boolean;
                                 /** @description Fetch all audit logs related to the specified blueprint. */
                                 blueprint?: string;
                                 /** @description Fetch all audit logs related to the specified action run. */
@@ -14129,6 +14383,8 @@ export interface paths {
                                 user_id?: string;
                                 /** @description The maximum number of action runs to fetch. */
                                 limit?: number;
+                                /** @description The fields to exclude from the response */
+                                exclude?: string[];
                                 /** @description The run id of your backend, for example the id that GitHub gives the workflow. This can be used to identify the action run instead of the `run_id`. */
                                 external_run_id?: string;
                                 /**
@@ -14189,6 +14445,21 @@ export interface paths {
                             title?: string;
                             dataset: components["schemas"]["def-1"];
                             hiddenBlueprints?: string[];
+                        } | {
+                            id?: string;
+                            updatedAt?: string;
+                            updatedBy?: string;
+                            createdAt?: string;
+                            createdBy?: string;
+                            icon?: string;
+                            /** @enum {unknown} */
+                            type: "bar-chart";
+                            title?: string;
+                            blueprint?: string;
+                            property: string;
+                            description?: string;
+                            dataset: components["schemas"]["def-1"];
+                            emptyStateText?: string;
                         } | {
                             id?: string;
                             updatedAt?: string;
@@ -14312,7 +14583,11 @@ export interface paths {
                                 /** @enum {string} */
                                 color?: "blue" | "turquoise" | "orange" | "purple" | "pink" | "yellow" | "green" | "red" | "gold" | "silver" | "paleBlue" | "darkGray" | "lightGray" | "bronze" | "lime" | "olive" | "brown";
                             }[];
-                        } & (unknown & unknown & unknown & unknown & unknown & unknown & unknown)) | ({
+                            /** @enum {string} */
+                            displayFormatting?: "none" | "round" | "custom";
+                            /** @enum {string} */
+                            decimalPlaces?: ".0" | ".00" | ".000" | ".0000" | ".00000";
+                        } & (unknown & unknown & unknown & unknown & unknown & unknown & unknown & unknown)) | ({
                             id?: string;
                             updatedAt?: string;
                             updatedBy?: string;
@@ -14327,7 +14602,7 @@ export interface paths {
                             url: string;
                             /** @enum {string} */
                             urlType: "public" | "protected";
-                        } & unknown) | {
+                        } & unknown) | ({
                             id?: string;
                             updatedAt?: string;
                             updatedBy?: string;
@@ -14337,8 +14612,17 @@ export interface paths {
                             type: "markdown";
                             title: string;
                             icon?: string;
-                            markdown?: string;
                         } | {
+                            /** @enum {string} */
+                            source?: "custom";
+                            markdown: string;
+                        } | {
+                            /** @enum {string} */
+                            source: "property";
+                            blueprintIdentifier: string;
+                            propertyIdentifier: string;
+                            entityIdentifier: string;
+                        }) | {
                             id?: string;
                             updatedAt?: string;
                             updatedBy?: string;
@@ -14599,6 +14883,8 @@ export interface paths {
                                         identifier?: string;
                                         /** @description Fetch all audit logs related to the specified entity. */
                                         entity?: string;
+                                        /** @description Include deleted entities when searching for audit logs. This requires the `entity`, `blueprint`, `status`, `from`and `to` parameters. And the diff between `from` & `to` is limited to 1 day. */
+                                        include_deleted_entities?: boolean;
                                         /** @description Fetch all audit logs related to the specified blueprint. */
                                         blueprint?: string;
                                         /** @description Fetch all audit logs related to the specified action run. */
@@ -14740,6 +15026,8 @@ export interface paths {
                                         user_id?: string;
                                         /** @description The maximum number of action runs to fetch. */
                                         limit?: number;
+                                        /** @description The fields to exclude from the response */
+                                        exclude?: string[];
                                         /** @description The run id of your backend, for example the id that GitHub gives the workflow. This can be used to identify the action run instead of the `run_id`. */
                                         external_run_id?: string;
                                         /**
@@ -14800,6 +15088,21 @@ export interface paths {
                                     title?: string;
                                     dataset: components["schemas"]["def-1"];
                                     hiddenBlueprints?: string[];
+                                } | {
+                                    id?: string;
+                                    updatedAt?: string;
+                                    updatedBy?: string;
+                                    createdAt?: string;
+                                    createdBy?: string;
+                                    icon?: string;
+                                    /** @enum {unknown} */
+                                    type: "bar-chart";
+                                    title?: string;
+                                    blueprint?: string;
+                                    property: string;
+                                    description?: string;
+                                    dataset: components["schemas"]["def-1"];
+                                    emptyStateText?: string;
                                 } | {
                                     id?: string;
                                     updatedAt?: string;
@@ -14923,7 +15226,11 @@ export interface paths {
                                         /** @enum {string} */
                                         color?: "blue" | "turquoise" | "orange" | "purple" | "pink" | "yellow" | "green" | "red" | "gold" | "silver" | "paleBlue" | "darkGray" | "lightGray" | "bronze" | "lime" | "olive" | "brown";
                                     }[];
-                                } & (unknown & unknown & unknown & unknown & unknown & unknown & unknown)) | ({
+                                    /** @enum {string} */
+                                    displayFormatting?: "none" | "round" | "custom";
+                                    /** @enum {string} */
+                                    decimalPlaces?: ".0" | ".00" | ".000" | ".0000" | ".00000";
+                                } & (unknown & unknown & unknown & unknown & unknown & unknown & unknown & unknown)) | ({
                                     id?: string;
                                     updatedAt?: string;
                                     updatedBy?: string;
@@ -14938,7 +15245,7 @@ export interface paths {
                                     url: string;
                                     /** @enum {string} */
                                     urlType: "public" | "protected";
-                                } & unknown) | {
+                                } & unknown) | ({
                                     id?: string;
                                     updatedAt?: string;
                                     updatedBy?: string;
@@ -14948,8 +15255,17 @@ export interface paths {
                                     type: "markdown";
                                     title: string;
                                     icon?: string;
-                                    markdown?: string;
                                 } | {
+                                    /** @enum {string} */
+                                    source?: "custom";
+                                    markdown: string;
+                                } | {
+                                    /** @enum {string} */
+                                    source: "property";
+                                    blueprintIdentifier: string;
+                                    propertyIdentifier: string;
+                                    entityIdentifier: string;
+                                }) | {
                                     id?: string;
                                     updatedAt?: string;
                                     updatedBy?: string;
@@ -15211,6 +15527,8 @@ export interface paths {
                                     identifier?: string;
                                     /** @description Fetch all audit logs related to the specified entity. */
                                     entity?: string;
+                                    /** @description Include deleted entities when searching for audit logs. This requires the `entity`, `blueprint`, `status`, `from`and `to` parameters. And the diff between `from` & `to` is limited to 1 day. */
+                                    include_deleted_entities?: boolean;
                                     /** @description Fetch all audit logs related to the specified blueprint. */
                                     blueprint?: string;
                                     /** @description Fetch all audit logs related to the specified action run. */
@@ -15352,6 +15670,8 @@ export interface paths {
                                     user_id?: string;
                                     /** @description The maximum number of action runs to fetch. */
                                     limit?: number;
+                                    /** @description The fields to exclude from the response */
+                                    exclude?: string[];
                                     /** @description The run id of your backend, for example the id that GitHub gives the workflow. This can be used to identify the action run instead of the `run_id`. */
                                     external_run_id?: string;
                                     /**
@@ -15412,6 +15732,21 @@ export interface paths {
                                 title?: string;
                                 dataset: components["schemas"]["def-1"];
                                 hiddenBlueprints?: string[];
+                            } | {
+                                id?: string;
+                                updatedAt?: string;
+                                updatedBy?: string;
+                                createdAt?: string;
+                                createdBy?: string;
+                                icon?: string;
+                                /** @enum {unknown} */
+                                type: "bar-chart";
+                                title?: string;
+                                blueprint?: string;
+                                property: string;
+                                description?: string;
+                                dataset: components["schemas"]["def-1"];
+                                emptyStateText?: string;
                             } | {
                                 id?: string;
                                 updatedAt?: string;
@@ -15535,7 +15870,11 @@ export interface paths {
                                     /** @enum {string} */
                                     color?: "blue" | "turquoise" | "orange" | "purple" | "pink" | "yellow" | "green" | "red" | "gold" | "silver" | "paleBlue" | "darkGray" | "lightGray" | "bronze" | "lime" | "olive" | "brown";
                                 }[];
-                            } & (unknown & unknown & unknown & unknown & unknown & unknown & unknown)) | ({
+                                /** @enum {string} */
+                                displayFormatting?: "none" | "round" | "custom";
+                                /** @enum {string} */
+                                decimalPlaces?: ".0" | ".00" | ".000" | ".0000" | ".00000";
+                            } & (unknown & unknown & unknown & unknown & unknown & unknown & unknown & unknown)) | ({
                                 id?: string;
                                 updatedAt?: string;
                                 updatedBy?: string;
@@ -15550,7 +15889,7 @@ export interface paths {
                                 url: string;
                                 /** @enum {string} */
                                 urlType: "public" | "protected";
-                            } & unknown) | {
+                            } & unknown) | ({
                                 id?: string;
                                 updatedAt?: string;
                                 updatedBy?: string;
@@ -15560,8 +15899,17 @@ export interface paths {
                                 type: "markdown";
                                 title: string;
                                 icon?: string;
-                                markdown?: string;
                             } | {
+                                /** @enum {string} */
+                                source?: "custom";
+                                markdown: string;
+                            } | {
+                                /** @enum {string} */
+                                source: "property";
+                                blueprintIdentifier: string;
+                                propertyIdentifier: string;
+                                entityIdentifier: string;
+                            }) | {
                                 id?: string;
                                 updatedAt?: string;
                                 updatedBy?: string;
@@ -16050,7 +16398,17 @@ export interface paths {
                              * @description Permission level for Port support users accessing this organization
                              * @enum {string}
                              */
-                            supportUserPermission?: "OPT_OUT" | "READ_ONLY" | "FULL_PERMISSIONS";
+                            supportUserPermission?: "OPT_OUT" | "OPT_IN";
+                            /**
+                             * @description Time-to-live for Port support user access
+                             * @enum {string}
+                             */
+                            supportUserTTL?: "ONE_DAY" | "ONE_WEEK" | "ONE_MONTH" | "FOREVER";
+                            /**
+                             * Format: date-time
+                             * @description Expiration date for Port support user access
+                             */
+                            supportUserExpiresAt?: string;
                         };
                         isOnboarded?: boolean;
                         toolSelectionProvisioning?: {
@@ -16148,8 +16506,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get all organization secrets
-         * @description This route allows you to retrieve all of the secrets in your organization.<br/><br/>To learn more about secrets management in Port, check out the [documentation](https://docs.port.io/sso-rbac/port-secrets).
+         * Get all organization secrets' metadata
+         * @description This route allows you to retrieve metadata about all secrets in your organization. Note that this endpoint returns only the metadata of the secrets, not the secrets content itself.<br/><br/>To learn more about secrets management in Port, check out the [documentation](https://docs.port.io/sso-rbac/port-secrets).
          */
         get: {
             parameters: {
@@ -16287,18 +16645,40 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get an organization secret
-         * @description This route allows you to retrieve a specific secret in your organization.<br/><br/>To learn more about secrets management in Port, check out the [documentation](https://docs.port.io/sso-rbac/port-secrets).
+         * Get an organization secret's metadata
+         * @description This route allows you to retrieve metadata about a specific secret in your organization. Note that this endpoint returns only the metadata of the secret, not the secret content itself.<br/><br/>To learn more about secrets management in Port, check out the [documentation](https://docs.port.io/sso-rbac/port-secrets).
          */
         get: {
             parameters: {
                 query?: never;
                 header?: never;
-                path?: never;
+                path: {
+                    /** @description The name of the secret you want to operate on. */
+                    secret_name: string;
+                };
                 cookie?: never;
             };
             requestBody?: never;
             responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            ok: boolean;
+                            secret: {
+                                secretName?: string;
+                                description?: string;
+                                /** Format: date-time */
+                                createdAt?: string;
+                                /** Format: date-time */
+                                updatedAt?: string;
+                            };
+                        };
+                    };
+                };
                 /** @description Default Response */
                 401: {
                     headers: {
@@ -17629,7 +18009,7 @@ export interface paths {
         };
         /**
          * Get audit logs
-         * @description This route allows you to fetch audit logs from your Port account. Your audit logs can also be viewed via [Port's UI](https://app.getport.io/settings/AuditLog).<br/><br/>This route will perform a logical `AND` between all query parameters below, and return all logs that match the criteria.<br/><br/>:::warning Beta integration value<br/>The `integration` value in the `resources` parameter is **experimental**. Its behavior may change in future versions of the API.<br/>:::
+         * @description This route allows you to fetch audit logs from your Port account. Your audit logs can also be viewed via [Port's UI](https://app.getport.io/settings/AuditLog).<br/><br/>This route will perform a logical `AND` between all query parameters below, and return all logs that match the criteria.<br/><br/>:::warning Beta integration value<br/>The `integration` value in the `resources` parameter is **experimental**. Its behavior may change in future versions of the API.<br/>:::<br/><br/>**Note:** Non-admin users have limited access to the audit logs API. They may:<br/>- Pass an `identifier` to access a specific audit log.<br/>- Pass an `entity` to retrieve audit logs of entities they have access to.<br/>Non-admin users **cannot** view audit logs of deleted entities.
          */
         get: {
             parameters: {
@@ -17638,6 +18018,8 @@ export interface paths {
                     identifier?: string;
                     /** @description Fetch all audit logs related to the specified entity. */
                     entity?: string;
+                    /** @description Include deleted entities when searching for audit logs. This requires the `entity`, `blueprint`, `status`, `from`and `to` parameters. And the diff between `from` & `to` is limited to 1 day. */
+                    include_deleted_entities?: boolean;
                     /** @description Fetch all audit logs related to the specified blueprint. */
                     blueprint?: string;
                     /** @description Fetch all audit logs related to the specified action run. */
@@ -18322,7 +18704,7 @@ export interface paths {
             parameters: {
                 query?: {
                     /** @description The fields you want to fetch for each user. If used, only the specified fields will be included in the response. */
-                    fields?: ("id" | "email" | "firstName" | "lastName" | "picture" | "status" | "type" | "providers" | "createdAt" | "updatedAt" | "teams.name" | "teams.provider" | "teams.createdAt" | "teams.updatedAt" | "roles.name" | "roles.description" | "roles.isAdmin" | "roles.protected" | "roles.createdAt" | "roles.updatedAt" | "orgMembers.orgId" | "orgMembers.status" | "orgMembers.lastLoginAt")[];
+                    fields?: ("id" | "email" | "firstName" | "isInvisible" | "lastName" | "picture" | "status" | "supportLevel" | "type" | "providers" | "createdAt" | "updatedAt" | "teams.name" | "teams.provider" | "teams.createdAt" | "teams.updatedAt" | "roles.name" | "roles.description" | "roles.isAdmin" | "roles.protected" | "roles.createdAt" | "roles.updatedAt" | "orgMembers.orgId" | "orgMembers.status" | "orgMembers.lastLoginAt")[];
                 };
                 header?: never;
                 path?: never;
@@ -20851,10 +21233,18 @@ export interface components {
                         maxHops?: number;
                     })[];
                     fromBlueprint?: string;
-                };
+                } | (string | {
+                    property: string;
+                    /** @enum {string} */
+                    context: "user" | "userTeams";
+                });
                 /** @enum {string} */
                 operator: "matchAny";
-                value: string | string[];
+                value: string[] | (string | {
+                    property: string;
+                    /** @enum {string} */
+                    context: "user" | "userTeams";
+                });
             } | components["schemas"]["def-1"])[];
         };
         /** /schemas/entitiesQueryWithJqQuery */
@@ -20946,10 +21336,18 @@ export interface components {
                         maxHops?: number;
                     })[];
                     fromBlueprint?: string;
-                };
+                } | (string | {
+                    property: string;
+                    /** @enum {string} */
+                    context: "user" | "userTeams";
+                });
                 /** @enum {string} */
                 operator: "matchAny";
-                value: string | string[];
+                value: string[] | (string | {
+                    property: string;
+                    /** @enum {string} */
+                    context: "user" | "userTeams";
+                });
             } | components["schemas"]["def-2"])[];
         };
         /** /schemas/dashboardWidget */
@@ -21173,6 +21571,8 @@ export interface components {
                     identifier?: string;
                     /** @description Fetch all audit logs related to the specified entity. */
                     entity?: string;
+                    /** @description Include deleted entities when searching for audit logs. This requires the `entity`, `blueprint`, `status`, `from`and `to` parameters. And the diff between `from` & `to` is limited to 1 day. */
+                    include_deleted_entities?: boolean;
                     /** @description Fetch all audit logs related to the specified blueprint. */
                     blueprint?: string;
                     /** @description Fetch all audit logs related to the specified action run. */
@@ -21314,6 +21714,8 @@ export interface components {
                     user_id?: string;
                     /** @description The maximum number of action runs to fetch. */
                     limit?: number;
+                    /** @description The fields to exclude from the response */
+                    exclude?: string[];
                     /** @description The run id of your backend, for example the id that GitHub gives the workflow. This can be used to identify the action run instead of the `run_id`. */
                     external_run_id?: string;
                     /**
@@ -21374,6 +21776,21 @@ export interface components {
                 title?: string;
                 dataset: components["schemas"]["def-1"];
                 hiddenBlueprints?: string[];
+            } | {
+                id?: string;
+                updatedAt?: string;
+                updatedBy?: string;
+                createdAt?: string;
+                createdBy?: string;
+                icon?: string;
+                /** @enum {unknown} */
+                type: "bar-chart";
+                title?: string;
+                blueprint?: string;
+                property: string;
+                description?: string;
+                dataset: components["schemas"]["def-1"];
+                emptyStateText?: string;
             } | {
                 id?: string;
                 updatedAt?: string;
@@ -21497,7 +21914,11 @@ export interface components {
                     /** @enum {string} */
                     color?: "blue" | "turquoise" | "orange" | "purple" | "pink" | "yellow" | "green" | "red" | "gold" | "silver" | "paleBlue" | "darkGray" | "lightGray" | "bronze" | "lime" | "olive" | "brown";
                 }[];
-            } & (unknown & unknown & unknown & unknown & unknown & unknown & unknown)) | ({
+                /** @enum {string} */
+                displayFormatting?: "none" | "round" | "custom";
+                /** @enum {string} */
+                decimalPlaces?: ".0" | ".00" | ".000" | ".0000" | ".00000";
+            } & (unknown & unknown & unknown & unknown & unknown & unknown & unknown & unknown)) | ({
                 id?: string;
                 updatedAt?: string;
                 updatedBy?: string;
@@ -21512,7 +21933,7 @@ export interface components {
                 url: string;
                 /** @enum {string} */
                 urlType: "public" | "protected";
-            } & unknown) | {
+            } & unknown) | ({
                 id?: string;
                 updatedAt?: string;
                 updatedBy?: string;
@@ -21522,8 +21943,17 @@ export interface components {
                 type: "markdown";
                 title: string;
                 icon?: string;
-                markdown?: string;
             } | {
+                /** @enum {string} */
+                source?: "custom";
+                markdown: string;
+            } | {
+                /** @enum {string} */
+                source: "property";
+                blueprintIdentifier: string;
+                propertyIdentifier: string;
+                entityIdentifier: string;
+            }) | {
                 id?: string;
                 updatedAt?: string;
                 updatedBy?: string;
@@ -21787,6 +22217,8 @@ export interface components {
                         identifier?: string;
                         /** @description Fetch all audit logs related to the specified entity. */
                         entity?: string;
+                        /** @description Include deleted entities when searching for audit logs. This requires the `entity`, `blueprint`, `status`, `from`and `to` parameters. And the diff between `from` & `to` is limited to 1 day. */
+                        include_deleted_entities?: boolean;
                         /** @description Fetch all audit logs related to the specified blueprint. */
                         blueprint?: string;
                         /** @description Fetch all audit logs related to the specified action run. */
@@ -21928,6 +22360,8 @@ export interface components {
                         user_id?: string;
                         /** @description The maximum number of action runs to fetch. */
                         limit?: number;
+                        /** @description The fields to exclude from the response */
+                        exclude?: string[];
                         /** @description The run id of your backend, for example the id that GitHub gives the workflow. This can be used to identify the action run instead of the `run_id`. */
                         external_run_id?: string;
                         /**
@@ -21988,6 +22422,21 @@ export interface components {
                     title?: string;
                     dataset: components["schemas"]["def-1"];
                     hiddenBlueprints?: string[];
+                } | {
+                    id?: string;
+                    updatedAt?: string;
+                    updatedBy?: string;
+                    createdAt?: string;
+                    createdBy?: string;
+                    icon?: string;
+                    /** @enum {unknown} */
+                    type: "bar-chart";
+                    title?: string;
+                    blueprint?: string;
+                    property: string;
+                    description?: string;
+                    dataset: components["schemas"]["def-1"];
+                    emptyStateText?: string;
                 } | {
                     id?: string;
                     updatedAt?: string;
@@ -22111,7 +22560,11 @@ export interface components {
                         /** @enum {string} */
                         color?: "blue" | "turquoise" | "orange" | "purple" | "pink" | "yellow" | "green" | "red" | "gold" | "silver" | "paleBlue" | "darkGray" | "lightGray" | "bronze" | "lime" | "olive" | "brown";
                     }[];
-                } & (unknown & unknown & unknown & unknown & unknown & unknown & unknown)) | ({
+                    /** @enum {string} */
+                    displayFormatting?: "none" | "round" | "custom";
+                    /** @enum {string} */
+                    decimalPlaces?: ".0" | ".00" | ".000" | ".0000" | ".00000";
+                } & (unknown & unknown & unknown & unknown & unknown & unknown & unknown & unknown)) | ({
                     id?: string;
                     updatedAt?: string;
                     updatedBy?: string;
@@ -22126,7 +22579,7 @@ export interface components {
                     url: string;
                     /** @enum {string} */
                     urlType: "public" | "protected";
-                } & unknown) | {
+                } & unknown) | ({
                     id?: string;
                     updatedAt?: string;
                     updatedBy?: string;
@@ -22136,8 +22589,17 @@ export interface components {
                     type: "markdown";
                     title: string;
                     icon?: string;
-                    markdown?: string;
                 } | {
+                    /** @enum {string} */
+                    source?: "custom";
+                    markdown: string;
+                } | {
+                    /** @enum {string} */
+                    source: "property";
+                    blueprintIdentifier: string;
+                    propertyIdentifier: string;
+                    entityIdentifier: string;
+                }) | {
                     id?: string;
                     updatedAt?: string;
                     updatedBy?: string;
@@ -22334,10 +22796,18 @@ export interface components {
                         maxHops?: number;
                     })[];
                     fromBlueprint?: string;
-                };
+                } | (string | {
+                    property: string;
+                    /** @enum {string} */
+                    context: "user" | "userTeams";
+                });
                 /** @enum {string} */
                 operator: "matchAny";
-                value: string | string[];
+                value: string[] | (string | {
+                    property: string;
+                    /** @enum {string} */
+                    context: "user" | "userTeams";
+                });
             } | components["schemas"]["def-7"])[];
         };
     };
