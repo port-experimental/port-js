@@ -140,30 +140,56 @@ jobs:
           # Check if version is already set (to avoid unnecessary update)
           CURRENT_VERSION=$(node -p "require('./package.json').version")
           if [ "$CURRENT_VERSION" = "$VERSION" ]; then
-            echo "✅ Version already set to $VERSION, skipping update"
+            echo "[OK] Version already set to $VERSION, skipping update"
           else
             # Update version using npm version command
             npm version "$VERSION" --no-git-tag-version || {
-              echo "❌ Failed to update version with npm version command"
+              echo "[ERROR] Failed to update version with npm version command"
               echo "Attempting manual update..."
               
               # Fallback: manually update package.json
-              node -e "
+              # SECURITY: Pass version via environment variable to prevent code injection
+              # Environment variables are safely handled by the shell and Node.js
+              VERSION_TO_SET="$VERSION" node -e "
                 const fs = require('fs');
                 const pkg = require('./package.json');
-                pkg.version = '$VERSION';
+                // Get version from environment variable (safely escaped by shell)
+                const version = process.env.VERSION_TO_SET;
+                if (!version || typeof version !== 'string') {
+                  console.error('[ERROR] Invalid version from environment');
+                  process.exit(1);
+                }
+                // Validate version format (semver) to prevent injection
+                if (!/^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?$/.test(version)) {
+                  console.error('[ERROR] Invalid version format:', version);
+                  process.exit(1);
+                }
+                // Set version (already validated and from environment, so safe)
+                pkg.version = version;
                 fs.writeFileSync('./package.json', JSON.stringify(pkg, null, 2) + '\n');
               "
             }
             
             # Verify version was updated
+            # SECURITY: Use environment variable to safely pass version for comparison
             PACKAGE_VERSION=$(node -p "require('./package.json').version")
-            if [ "$PACKAGE_VERSION" != "$VERSION" ]; then
-              echo "❌ Version mismatch: expected $VERSION, got $PACKAGE_VERSION"
+            VERSION_TO_VERIFY="$VERSION" node -e "
+              const pkg = require('./package.json');
+              const expected = process.env.VERSION_TO_VERIFY;
+              if (!expected || typeof expected !== 'string') {
+                console.error('[ERROR] Invalid version from environment');
+                process.exit(1);
+              }
+              if (pkg.version !== expected) {
+                console.error('[ERROR] Version mismatch: expected', JSON.stringify(expected), 'got', JSON.stringify(pkg.version));
+                process.exit(1);
+              }
+            " || {
+              echo "[ERROR] Version mismatch: expected $VERSION, got $PACKAGE_VERSION"
               exit 1
-            fi
+            }
             
-            echo "✅ package.json version updated to: $PACKAGE_VERSION"
+            echo "[OK] package.json version updated to: $PACKAGE_VERSION"
           fi
       
       - name: Security audit
@@ -382,11 +408,23 @@ jobs:
           startsWith(github.ref, 'refs/tags/v') &&
           github.event.inputs.dry_run != 'true'
         uses: actions/github-script@v7
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          TAG: ${{ github.ref_name }}
+          NPM_TAG: ${{ steps.npm-tag.outputs.tag }}
         with:
           script: |
             const fs = require('fs');
-            const version = '${{ steps.version.outputs.version }}';
-            const tag = '${{ github.ref_name }}';
+            // SECURITY: Get version from environment variable to prevent code injection
+            const version = process.env.VERSION || '';
+            const tag = process.env.TAG || '';
+            const npmTag = process.env.NPM_TAG || 'latest';
+            
+            // Validate version format
+            if (!version || !/^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?$/.test(version)) {
+              console.error('[ERROR] Invalid version format:', version);
+              process.exit(1);
+            }
             
             // Read changelog
             let changelog = 'Release v' + version;
@@ -402,12 +440,12 @@ jobs:
               repo: context.repo.repo,
               tag_name: tag,
               name: `v${version}`,
-              body: `## Changes\n\n${changelog}\n\n## Installation\n\n\`\`\`bash\nnpm install @port-experimental/port-sdk@${version}\n\`\`\`\n\n## Links\n\n- 📦 [npm Package](https://www.npmjs.com/package/@port-experimental/port-sdk/v/${version})\n- 📚 [Documentation](https://github.com/${context.repo.owner}/${context.repo.repo}#readme)\n- 📋 [Changelog](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/CHANGELOG.md)`,
+              body: `## Changes\n\n${changelog}\n\n## Installation\n\n\`\`\`bash\nnpm install @port-experimental/port-sdk@${version}\n\`\`\`\n\n## Links\n\n- [npm Package](https://www.npmjs.com/package/@port-experimental/port-sdk/v/${version})\n- [Documentation](https://github.com/${context.repo.owner}/${context.repo.repo}#readme)\n- [Changelog](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/CHANGELOG.md)`,
               draft: false,
-              prerelease: '${{ steps.npm-tag.outputs.tag }}' !== 'latest'
+              prerelease: npmTag !== 'latest'
             });
             
-            console.log('✅ GitHub release created');
+            console.log('[OK] GitHub release created');
       
       - name: Update package.json to next dev version
         if: |
@@ -458,19 +496,32 @@ jobs:
         if: failure() && github.event.inputs.dry_run != 'true'
         uses: actions/github-script@v7
         continue-on-error: true
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          NPM_TAG: ${{ steps.npm-tag.outputs.tag }}
+          WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          EVENT_NAME: ${{ github.event_name }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             try {
-              const version = '${{ steps.version.outputs.version }}' || 'unknown';
-              const tag = '${{ steps.npm-tag.outputs.tag }}' || 'latest';
-              const workflowUrl = `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
+              // SECURITY: Get values from environment variables to prevent code injection
+              const version = process.env.VERSION || 'unknown';
+              const tag = process.env.NPM_TAG || 'latest';
+              const workflowUrl = process.env.WORKFLOW_URL || '';
+              const eventName = process.env.EVENT_NAME || 'unknown';
+              
+              // Validate version format if not 'unknown'
+              if (version !== 'unknown' && !/^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?$/.test(version)) {
+                console.error('[ERROR] Invalid version format:', version);
+                // Continue anyway with 'unknown' version
+              }
               
               await github.rest.issues.create({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                title: `❌ npm Publish Failed for v${version}`,
-                body: `## 🚨 Publish Failure Alert
+                title: `[ERROR] npm Publish Failed for v${version}`,
+                body: `## Publish Failure Alert
                 
                 The automated npm publish workflow failed.
                 
@@ -478,7 +529,7 @@ jobs:
                 - **Version:** ${version}
                 - **Tag:** ${tag}
                 - **Workflow Run:** ${workflowUrl}
-                - **Triggered By:** ${{ github.event_name }}
+                - **Triggered By:** ${eventName}
                 
                 ### Possible Causes
                 - npm authentication failed (check NPM_TOKEN secret)
@@ -510,9 +561,9 @@ jobs:
                 labels: ['bug', 'publish-failure', 'urgent']
               });
               
-              console.log('✅ Issue created successfully');
+              console.log('[OK] Issue created successfully');
             } catch (error) {
-              console.error('❌ Failed to create issue:', error.message);
+              console.error('[ERROR] Failed to create issue:', error.message);
               console.log('This is a non-critical failure - workflow will continue');
               // Don't throw - this is a notification step, not critical
             }

@@ -54,9 +54,9 @@ gh run watch
 
 ## Notifications
 
-- ✅ Automated PRs created for successful API syncs
-- ⚠️ Issues created for failures or breaking changes
-- 📧 Email notifications for workflow failures
+- [OK] Automated PRs created for successful API syncs
+- [WARNING] Issues created for failures or breaking changes
+- Email notifications for workflow failures
 
 ## Maintenance
 

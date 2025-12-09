@@ -1,19 +1,17 @@
 # Port SDK - API Implementation Roadmap
 
-**Created:** October 5, 2025  
-**Status:** Planning Phase  
+**Created:** October 5, 2025 
+**Status:** Planning Phase 
 **Target Completion:** Q1 2026
 
----
-
-## Executive Summary
+--- ## Executive Summary
 
 This roadmap outlines the implementation plan for missing Port.io API resources and operations in the TypeScript SDK. Currently, the SDK has **60% API coverage** (9/15 resources). This plan will bring us to **100% coverage** with all 15 resources fully implemented.
 
 ### Current State
-- ✅ **Implemented:** 9 core resources (Actions, Action Runs, Audit Logs, Blueprints, Entities, Scorecards, Teams, Users, Webhooks)
-- ❌ **Missing:** 6 resources (Apps, Integrations, Migrations, Organization, Pages, Authentication)
-- ⚠️ **Partial:** Several missing operations in implemented resources
+- [OK] **Implemented:** 9 core resources (Actions, Action Runs, Audit Logs, Blueprints, Entities, Scorecards, Teams, Users, Webhooks)
+- [ERROR] **Missing:** 6 resources (Apps, Integrations, Migrations, Organization, Pages, Authentication)
+- [WARNING] **Partial:** Several missing operations in implemented resources
 
 ### Success Criteria
 - [ ] 100% API coverage (all 15 resources)
@@ -21,13 +19,9 @@ This roadmap outlines the implementation plan for missing Port.io API resources 
 - [ ] Examples for each new resource
 - [ ] Documentation updated for all additions
 
----
+--- ## Phase 1: High-Priority Resources (Q4 2025)
 
-## Phase 1: High-Priority Resources (Q4 2025)
-
-### 1.1 Integrations Resource 🔴 **HIGH PRIORITY**
-
-**Why:** Core functionality for data ingestion from external sources
+### 1.1 Integrations Resource **HIGH PRIORITY** **Why:** Core functionality for data ingestion from external sources
 
 **Endpoints to Implement:**
 - `GET /v1/integration` - List all integrations
@@ -40,12 +34,12 @@ This roadmap outlines the implementation plan for missing Port.io API resources 
 **Resource Methods:**
 ```typescript
 class IntegrationResource {
-  async list(): Promise<Integration[]>
-  async get(identifier: string): Promise<Integration>
-  async update(identifier: string, data: UpdateIntegrationInput): Promise<Integration>
-  async delete(identifier: string): Promise<void>
-  async updateConfig(identifier: string, config: IntegrationConfig): Promise<Integration>
-  async getLogs(identifier: string, options?: LogQueryOptions): Promise<IntegrationLog[]>
+ async list(): Promise<Integration[]>
+ async get(identifier: string): Promise<Integration>
+ async update(identifier: string, data: UpdateIntegrationInput): Promise<Integration>
+ async delete(identifier: string): Promise<void>
+ async updateConfig(identifier: string, config: IntegrationConfig): Promise<Integration>
+ async getLogs(identifier: string, options?: LogQueryOptions): Promise<IntegrationLog[]>
 }
 ```
 
@@ -68,11 +62,7 @@ class IntegrationResource {
 - `smoke-tests/15-integrations-crud.ts`
 - `examples/26-integrations.ts`
 
----
-
-### 1.2 Organization Resource 🟡 **MEDIUM PRIORITY**
-
-**Why:** Essential for organization-wide settings and secrets management
+--- ### 1.2 Organization Resource **MEDIUM PRIORITY** **Why:** Essential for organization-wide settings and secrets management
 
 **Endpoints to Implement:**
 - `GET /v1/organization` - Get organization settings
@@ -85,16 +75,16 @@ class IntegrationResource {
 **Resource Methods:**
 ```typescript
 class OrganizationResource {
-  async get(): Promise<Organization>
-  async update(data: UpdateOrganizationInput): Promise<Organization>
-  
-  // Secrets sub-resource
-  readonly secrets: {
-    list(): Promise<OrganizationSecret[]>
-    create(data: CreateSecretInput): Promise<OrganizationSecret>
-    update(name: string, data: UpdateSecretInput): Promise<OrganizationSecret>
-    delete(name: string): Promise<void>
-  }
+ async get(): Promise<Organization>
+ async update(data: UpdateOrganizationInput): Promise<Organization>
+ 
+ // Secrets sub-resource
+ readonly secrets: {
+ list(): Promise<OrganizationSecret[]>
+ create(data: CreateSecretInput): Promise<OrganizationSecret>
+ update(name: string, data: UpdateSecretInput): Promise<OrganizationSecret>
+ delete(name: string): Promise<void>
+ }
 }
 ```
 
@@ -113,11 +103,7 @@ class OrganizationResource {
 - `smoke-tests/16-organization.ts`
 - `examples/27-organization-management.ts`
 
----
-
-### 1.3 Apps Resource 🟡 **MEDIUM PRIORITY**
-
-**Why:** Manage Port app installations and configurations
+--- ### 1.3 Apps Resource **MEDIUM PRIORITY** **Why:** Manage Port app installations and configurations
 
 **Endpoints to Implement:**
 - `GET /v1/apps` - List installed apps
@@ -128,10 +114,10 @@ class OrganizationResource {
 **Resource Methods:**
 ```typescript
 class AppResource {
-  async list(): Promise<App[]>
-  async get(id: string): Promise<App>
-  async delete(id: string): Promise<void>
-  async rotateSecret(id: string): Promise<AppSecret>
+ async list(): Promise<App[]>
+ async get(id: string): Promise<App>
+ async delete(id: string): Promise<void>
+ async rotateSecret(id: string): Promise<AppSecret>
 }
 ```
 
@@ -150,13 +136,9 @@ class AppResource {
 - `smoke-tests/17-apps.ts`
 - `examples/28-app-management.ts`
 
----
+--- ## Phase 2: Analytical & Advanced Features (Q1 2026)
 
-## Phase 2: Analytical & Advanced Features (Q1 2026)
-
-### 2.1 Entity Analytics Operations 🟢 **ENHANCEMENT**
-
-**Why:** Add missing analytical capabilities to existing Entities resource
+### 2.1 Entity Analytics Operations **ENHANCEMENT** **Why:** Add missing analytical capabilities to existing Entities resource
 
 **Endpoints to Implement:**
 - `GET /v1/blueprints/{blueprint}/all-entities` - Get all entities
@@ -169,18 +151,18 @@ class AppResource {
 ```typescript
 // Add to existing EntityResource
 class EntityResource {
-  // ... existing methods ...
-  
-  // New analytics methods
-  async getAllEntities(blueprint: string): Promise<Entity[]>
-  async count(blueprint: string, filters?: SearchQuery): Promise<number>
-  async aggregate(query: AggregateQuery): Promise<AggregateResult>
-  async aggregateOverTime(query: TimeSeriesQuery): Promise<TimeSeriesResult[]>
-  async getPropertyHistory(
-    blueprint: string,
-    identifier: string,
-    property: string
-  ): Promise<PropertyHistory[]>
+ // ... existing methods ...
+ 
+ // New analytics methods
+ async getAllEntities(blueprint: string): Promise<Entity[]>
+ async count(blueprint: string, filters?: SearchQuery): Promise<number>
+ async aggregate(query: AggregateQuery): Promise<AggregateResult>
+ async aggregateOverTime(query: TimeSeriesQuery): Promise<TimeSeriesResult[]>
+ async getPropertyHistory(
+ blueprint: string,
+ identifier: string,
+ property: string
+ ): Promise<PropertyHistory[]>
 }
 ```
 
@@ -192,11 +174,7 @@ class EntityResource {
 
 **Effort Estimate:** 3 days
 
----
-
-### 2.2 Blueprint Advanced Operations 🟢 **ENHANCEMENT**
-
-**Why:** Complete the Blueprints resource with rename and permissions
+--- ### 2.2 Blueprint Advanced Operations **ENHANCEMENT** **Why:** Complete the Blueprints resource with rename and permissions
 
 **Endpoints to Implement:**
 - `PUT /v1/blueprints/{blueprint_identifier}/permissions` - Manage permissions
@@ -208,25 +186,21 @@ class EntityResource {
 ```typescript
 // Add to existing BlueprintResource
 class BlueprintResource {
-  // ... existing methods ...
-  
-  // New methods
-  async updatePermissions(identifier: string, permissions: BlueprintPermissions): Promise<void>
-  async renameProperty(blueprint: string, oldName: string, newName: string): Promise<Blueprint>
-  async renameRelation(blueprint: string, oldName: string, newName: string): Promise<Blueprint>
-  async renameMirror(blueprint: string, oldName: string, newName: string): Promise<Blueprint>
+ // ... existing methods ...
+ 
+ // New methods
+ async updatePermissions(identifier: string, permissions: BlueprintPermissions): Promise<void>
+ async renameProperty(blueprint: string, oldName: string, newName: string): Promise<Blueprint>
+ async renameRelation(blueprint: string, oldName: string, newName: string): Promise<Blueprint>
+ async renameMirror(blueprint: string, oldName: string, newName: string): Promise<Blueprint>
 }
 ```
 
 **Effort Estimate:** 2 days
 
----
+--- ## Phase 3: Low-Priority Resources (Q1 2026)
 
-## Phase 3: Low-Priority Resources (Q1 2026)
-
-### 3.1 Pages Resource 🔵 **LOW PRIORITY**
-
-**Why:** Custom dashboards and portal pages (UI-focused)
+### 3.1 Pages Resource **LOW PRIORITY** **Why:** Custom dashboards and portal pages (UI-focused)
 
 **Endpoints to Implement:**
 - `GET /v1/pages` - List pages
@@ -243,30 +217,26 @@ class BlueprintResource {
 **Resource Methods:**
 ```typescript
 class PageResource {
-  async list(): Promise<Page[]>
-  async create(data: CreatePageInput): Promise<Page>
-  async get(identifier: string): Promise<Page>
-  async update(identifier: string, data: UpdatePageInput): Promise<Page>
-  async delete(identifier: string): Promise<void>
-  async updatePermissions(identifier: string, permissions: PagePermissions): Promise<void>
-  
-  // Widgets sub-resource
-  readonly widgets: {
-    list(pageIdentifier: string): Promise<Widget[]>
-    create(pageIdentifier: string, data: CreateWidgetInput): Promise<Widget>
-    update(pageIdentifier: string, widgetId: string, data: UpdateWidgetInput): Promise<Widget>
-    delete(pageIdentifier: string, widgetId: string): Promise<void>
-  }
+ async list(): Promise<Page[]>
+ async create(data: CreatePageInput): Promise<Page>
+ async get(identifier: string): Promise<Page>
+ async update(identifier: string, data: UpdatePageInput): Promise<Page>
+ async delete(identifier: string): Promise<void>
+ async updatePermissions(identifier: string, permissions: PagePermissions): Promise<void>
+ 
+ // Widgets sub-resource
+ readonly widgets: {
+ list(pageIdentifier: string): Promise<Widget[]>
+ create(pageIdentifier: string, data: CreateWidgetInput): Promise<Widget>
+ update(pageIdentifier: string, widgetId: string, data: UpdateWidgetInput): Promise<Widget>
+ delete(pageIdentifier: string, widgetId: string): Promise<void>
+ }
 }
 ```
 
 **Effort Estimate:** 4-5 days (complex with nested widgets)
 
----
-
-### 3.2 Migrations Resource 🔵 **LOW PRIORITY**
-
-**Why:** Bulk data transformations (occasional use)
+--- ### 3.2 Migrations Resource **LOW PRIORITY** **Why:** Bulk data transformations (occasional use)
 
 **Endpoints to Implement:**
 - `GET /v1/migrations` - List migrations
@@ -277,55 +247,51 @@ class PageResource {
 **Resource Methods:**
 ```typescript
 class MigrationResource {
-  async list(): Promise<Migration[]>
-  async create(data: CreateMigrationInput): Promise<Migration>
-  async get(migrationId: string): Promise<Migration>
-  async cancel(migrationId: string): Promise<void>
+ async list(): Promise<Migration[]>
+ async create(data: CreateMigrationInput): Promise<Migration>
+ async get(migrationId: string): Promise<Migration>
+ async cancel(migrationId: string): Promise<void>
 }
 ```
 
 **Effort Estimate:** 2 days
 
----
-
-## Implementation Timeline
+--- ## Implementation Timeline
 
 ### Q4 2025 (Oct-Dec)
 
 **October:**
-- ✅ Week 1-2: Integrations Resource (HIGH PRIORITY)
-- ✅ Week 3-4: Organization Resource (MEDIUM PRIORITY)
+- [OK] Week 1-2: Integrations Resource (HIGH PRIORITY)
+- [OK] Week 3-4: Organization Resource (MEDIUM PRIORITY)
 
 **November:**
-- ✅ Week 1: Apps Resource (MEDIUM PRIORITY)
-- ✅ Week 2-3: Entity Analytics Operations (ENHANCEMENT)
-- ✅ Week 4: Blueprint Advanced Operations (ENHANCEMENT)
+- [OK] Week 1: Apps Resource (MEDIUM PRIORITY)
+- [OK] Week 2-3: Entity Analytics Operations (ENHANCEMENT)
+- [OK] Week 4: Blueprint Advanced Operations (ENHANCEMENT)
 
 **December:**
-- ✅ Week 1-2: Pages Resource (LOW PRIORITY)
-- ✅ Week 3: Migrations Resource (LOW PRIORITY)
-- ✅ Week 4: Buffer week for bug fixes and testing
+- [OK] Week 1-2: Pages Resource (LOW PRIORITY)
+- [OK] Week 3: Migrations Resource (LOW PRIORITY)
+- [OK] Week 4: Buffer week for bug fixes and testing
 
 ### Q1 2026 (Jan-Mar)
 
 **January:**
-- 📝 Documentation updates
-- 🧪 Integration test expansion
-- 📊 Performance optimization
+- Documentation updates
+- Integration test expansion
+- Performance optimization
 
 **February:**
-- 🔒 Security audit
-- 🐛 Bug fixes from user feedback
-- 📈 Metrics and monitoring
+- Security audit
+- Bug fixes from user feedback
+- Metrics and monitoring
 
 **March:**
-- 🚀 v1.0.0 release preparation
-- 📚 Migration guides for breaking changes
-- 🎉 Release celebration
+- v1.0.0 release preparation
+- Migration guides for breaking changes
+- Release celebration
 
----
-
-## Resource Implementation Template
+--- ## Resource Implementation Template
 
 For each new resource, follow this checklist:
 
@@ -366,9 +332,7 @@ For each new resource, follow this checklist:
 
 **Total per resource:** 5-8 days depending on complexity
 
----
-
-## Success Metrics
+--- ## Success Metrics
 
 Track progress with these metrics:
 
@@ -387,31 +351,27 @@ Track progress with these metrics:
 - **Target:** <5% bug rate in new resources
 - **Measure:** GitHub issues and discussions
 
----
-
-## Risk Assessment
+--- ## Risk Assessment
 
 ### High Risks
 - **API changes:** Port.io API may change during implementation
-  - **Mitigation:** Use automated OpenAPI sync, version pinning
-  
+ - **Mitigation:** Use automated OpenAPI sync, version pinning
+ 
 - **Breaking changes:** New resources may require changes to existing code
-  - **Mitigation:** Follow semantic versioning, provide migration guides
+ - **Mitigation:** Follow semantic versioning, provide migration guides
 
 ### Medium Risks
 - **Complexity:** Some resources (Pages, Integrations) are complex
-  - **Mitigation:** Break into smaller milestones, allocate extra time
+ - **Mitigation:** Break into smaller milestones, allocate extra time
 
 - **Testing:** Integration testing requires real Port.io account
-  - **Mitigation:** Use smoke tests, create test workspace
+ - **Mitigation:** Use smoke tests, create test workspace
 
 ### Low Risks
 - **Documentation:** Keeping docs in sync
-  - **Mitigation:** Follow documentation-maintenance cursor rule
+ - **Mitigation:** Follow documentation-maintenance cursor rule
 
----
-
-## Dependencies
+--- ## Dependencies
 
 ### External Dependencies
 - Port.io API stability
@@ -424,9 +384,7 @@ Track progress with these metrics:
 - Error classes (`src/errors.ts`)
 - Type generation tools
 
----
-
-## Post-Implementation
+--- ## Post-Implementation
 
 After completing all resources:
 
@@ -445,15 +403,11 @@ After completing all resources:
 - Address user feedback and issues
 - Keep examples up to date
 
----
-
-## Questions & Feedback
+--- ## Questions & Feedback
 
 For questions or suggestions about this roadmap:
 - Open a GitHub Discussion
 - Create a GitHub Issue with label `roadmap`
 
----
-
-**Last Updated:** October 5, 2025  
+--- **Last Updated:** October 5, 2025 
 **Next Review:** November 1, 2025

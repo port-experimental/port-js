@@ -1,29 +1,25 @@
 # Port SDK - Missing Features TODO List
 
-**Generated:** December 9, 2025  
-**Based on:** OpenAPI Schema (`src/types/api.ts`)  
+**Generated:** December 9, 2025 
+**Based on:** OpenAPI Schema (`src/types/api.ts`) 
 **Current Coverage:** 9/15 resources (60%)
 
----
-
-## 📊 Summary
+--- ## Summary
 
 ### Current Implementation Status
-- ✅ **Fully Implemented Resources:** 9
-  - Actions, Action Runs, Audit Logs, Blueprints, Entities, Scorecards, Teams, Users, Webhooks
-- ❌ **Missing Resources:** 6
-  - Integrations, Organization, Apps, Pages, Migrations, Authentication
-- ⚠️ **Partially Implemented:** Multiple resources missing advanced operations
+- [OK] **Fully Implemented Resources:** 9
+ - Actions, Action Runs, Audit Logs, Blueprints, Entities, Scorecards, Teams, Users, Webhooks
+- [ERROR] **Missing Resources:** 6
+ - Integrations, Organization, Apps, Pages, Migrations, Authentication
+- [WARNING] **Partially Implemented:** Multiple resources missing advanced operations
 
 ### Priority Breakdown
-- 🔴 **HIGH:** 1 resource (Integrations)
-- 🟡 **MEDIUM:** 2 resources (Organization, Apps)
-- 🟢 **ENHANCEMENT:** 10 missing operations in existing resources
-- 🔵 **LOW:** 3 resources (Pages, Migrations, Auth)
+- **HIGH:** 1 resource (Integrations)
+- **MEDIUM:** 2 resources (Organization, Apps)
+- **ENHANCEMENT:** 10 missing operations in existing resources
+- **LOW:** 3 resources (Pages, Migrations, Auth)
 
----
-
-## 🔴 HIGH PRIORITY - New Resources
+--- ## HIGH PRIORITY - New Resources
 
 ### 1. Integrations Resource
 **Why:** Core functionality for data ingestion from external sources (AWS, GCP, Kubernetes, GitHub, etc.)
@@ -39,13 +35,13 @@
 **Resource Structure:**
 ```typescript
 class IntegrationResource {
-  async list(options?: { actionsProcessingEnabled?: boolean }): Promise<Integration[]>
-  async get(identifier: string, options?: { byField?: 'installationId' | 'logIngestId' }): Promise<Integration>
-  async update(identifier: string, data: UpdateIntegrationInput): Promise<Integration>
-  async delete(identifier: string): Promise<void>
-  async updateConfig(identifier: string, config: IntegrationConfig): Promise<Integration>
-  async getLogs(identifier: string, options?: IntegrationLogOptions): Promise<IntegrationLog[]>
-  async resync(identifier: string): Promise<Integration> // Helper: update with empty body
+ async list(options?: { actionsProcessingEnabled?: boolean }): Promise<Integration[]>
+ async get(identifier: string, options?: { byField?: 'installationId' | 'logIngestId' }): Promise<Integration>
+ async update(identifier: string, data: UpdateIntegrationInput): Promise<Integration>
+ async delete(identifier: string): Promise<void>
+ async updateConfig(identifier: string, config: IntegrationConfig): Promise<Integration>
+ async getLogs(identifier: string, options?: IntegrationLogOptions): Promise<IntegrationLog[]>
+ async resync(identifier: string): Promise<Integration> // Helper: update with empty body
 }
 ```
 
@@ -57,9 +53,7 @@ class IntegrationResource {
 
 **Effort:** 3-4 days
 
----
-
-## 🟡 MEDIUM PRIORITY - New Resources
+--- ## MEDIUM PRIORITY - New Resources
 
 ### 2. Organization Resource
 **Why:** Essential for organization-wide settings and secrets management
@@ -75,15 +69,15 @@ class IntegrationResource {
 **Resource Structure:**
 ```typescript
 class OrganizationResource {
-  async get(): Promise<Organization>
-  async update(data: UpdateOrganizationInput): Promise<Organization>
-  
-  readonly secrets: {
-    list(): Promise<OrganizationSecret[]>
-    create(data: CreateSecretInput): Promise<OrganizationSecret>
-    update(name: string, data: UpdateSecretInput): Promise<OrganizationSecret>
-    delete(name: string): Promise<void>
-  }
+ async get(): Promise<Organization>
+ async update(data: UpdateOrganizationInput): Promise<Organization>
+ 
+ readonly secrets: {
+ list(): Promise<OrganizationSecret[]>
+ create(data: CreateSecretInput): Promise<OrganizationSecret>
+ update(name: string, data: UpdateSecretInput): Promise<OrganizationSecret>
+ delete(name: string): Promise<void>
+ }
 }
 ```
 
@@ -95,9 +89,7 @@ class OrganizationResource {
 
 **Effort:** 2-3 days
 
----
-
-### 3. Apps Resource
+--- ### 3. Apps Resource
 **Why:** Manage Port app installations and configurations
 
 **Endpoints to Implement:**
@@ -109,10 +101,10 @@ class OrganizationResource {
 **Resource Structure:**
 ```typescript
 class AppResource {
-  async list(): Promise<App[]>
-  async get(id: string): Promise<App>
-  async delete(id: string): Promise<void>
-  async rotateSecret(id: string): Promise<AppSecret>
+ async list(): Promise<App[]>
+ async get(id: string): Promise<App>
+ async delete(id: string): Promise<void>
+ async rotateSecret(id: string): Promise<AppSecret>
 }
 ```
 
@@ -124,9 +116,7 @@ class AppResource {
 
 **Effort:** 2 days
 
----
-
-## 🟢 ENHANCEMENTS - Missing Operations in Existing Resources
+--- ## ENHANCEMENTS - Missing Operations in Existing Resources
 
 ### 4. Blueprint Resource Enhancements
 
@@ -176,19 +166,17 @@ async renameMirror(blueprint: string, oldName: string, newName: string): Promise
 **Add to BlueprintResource:**
 ```typescript
 readonly actions: {
-  list(blueprint: string): Promise<Action[]>
-  create(blueprint: string, data: CreateActionInput): Promise<Action>
-  get(blueprint: string, actionIdentifier: string): Promise<Action>
-  update(blueprint: string, actionIdentifier: string, data: UpdateActionInput): Promise<Action>
-  delete(blueprint: string, actionIdentifier: string): Promise<void>
+ list(blueprint: string): Promise<Action[]>
+ create(blueprint: string, data: CreateActionInput): Promise<Action>
+ get(blueprint: string, actionIdentifier: string): Promise<Action>
+ update(blueprint: string, actionIdentifier: string, data: UpdateActionInput): Promise<Action>
+ delete(blueprint: string, actionIdentifier: string): Promise<void>
 }
 ```
 
 **Effort:** 3-4 days total
 
----
-
-### 5. Entity Resource Enhancements
+--- ### 5. Entity Resource Enhancements
 
 #### 5.1 Analytics Operations
 - `GET /v1/entities/aggregate` - Aggregate queries
@@ -200,10 +188,10 @@ readonly actions: {
 async aggregate(query: AggregateQuery): Promise<AggregateResult>
 async aggregateOverTime(query: TimeSeriesQuery): Promise<TimeSeriesResult[]>
 async getPropertyHistory(
-  blueprint: string,
-  identifier: string,
-  property: string,
-  options?: HistoryOptions
+ blueprint: string,
+ identifier: string,
+ property: string,
+ options?: HistoryOptions
 ): Promise<PropertyHistory[]>
 ```
 
@@ -216,9 +204,7 @@ async getPropertyHistory(
 
 **Effort:** 2-3 days
 
----
-
-### 6. Action Resource Enhancements
+--- ### 6. Action Resource Enhancements
 
 #### 6.1 Permissions Management
 - `GET /v1/actions/{action_identifier}/permissions` - Get action permissions
@@ -232,9 +218,7 @@ async updatePermissions(identifier: string, permissions: ActionPermissions): Pro
 
 **Effort:** 1 day
 
----
-
-### 7. Action Run Resource Enhancements
+--- ### 7. Action Run Resource Enhancements
 
 #### 7.1 Approvers Management
 - `GET /v1/actions/runs/{run_id}/approvers` - Get action run approvers
@@ -246,9 +230,7 @@ async getApprovers(runId: string): Promise<ActionRunApprover[]>
 
 **Effort:** 0.5 days
 
----
-
-### 8. User Resource Enhancements
+--- ### 8. User Resource Enhancements
 
 #### 8.1 Credential Rotation
 - `POST /v1/rotate-credentials/{user_email}` - Rotate user credentials
@@ -260,9 +242,7 @@ async rotateCredentials(email: string): Promise<UserCredentials>
 
 **Effort:** 0.5 days
 
----
-
-## 🔵 LOW PRIORITY - New Resources
+--- ## LOW PRIORITY - New Resources
 
 ### 9. Pages Resource
 **Why:** Custom dashboards and portal pages (UI-focused, less critical for API automation)
@@ -282,27 +262,25 @@ async rotateCredentials(email: string): Promise<UserCredentials>
 **Resource Structure:**
 ```typescript
 class PageResource {
-  async list(): Promise<Page[]>
-  async create(data: CreatePageInput): Promise<Page>
-  async get(identifier: string): Promise<Page>
-  async update(identifier: string, data: UpdatePageInput): Promise<Page>
-  async delete(identifier: string): Promise<void>
-  async updatePermissions(identifier: string, permissions: PagePermissions): Promise<void>
-  
-  readonly widgets: {
-    list(pageIdentifier: string): Promise<Widget[]>
-    create(pageIdentifier: string, data: CreateWidgetInput): Promise<Widget>
-    update(pageIdentifier: string, widgetId: string, data: UpdateWidgetInput): Promise<Widget>
-    delete(pageIdentifier: string, widgetId: string): Promise<void>
-  }
+ async list(): Promise<Page[]>
+ async create(data: CreatePageInput): Promise<Page>
+ async get(identifier: string): Promise<Page>
+ async update(identifier: string, data: UpdatePageInput): Promise<Page>
+ async delete(identifier: string): Promise<void>
+ async updatePermissions(identifier: string, permissions: PagePermissions): Promise<void>
+ 
+ readonly widgets: {
+ list(pageIdentifier: string): Promise<Widget[]>
+ create(pageIdentifier: string, data: CreateWidgetInput): Promise<Widget>
+ update(pageIdentifier: string, widgetId: string, data: UpdateWidgetInput): Promise<Widget>
+ delete(pageIdentifier: string, widgetId: string): Promise<void>
+ }
 }
 ```
 
 **Effort:** 4-5 days (complex with nested widgets)
 
----
-
-### 10. Migrations Resource
+--- ### 10. Migrations Resource
 **Why:** Bulk data transformations (occasional use)
 
 **Endpoints to Implement:**
@@ -314,18 +292,16 @@ class PageResource {
 **Resource Structure:**
 ```typescript
 class MigrationResource {
-  async list(): Promise<Migration[]>
-  async create(data: CreateMigrationInput): Promise<Migration>
-  async get(migrationId: string): Promise<Migration>
-  async cancel(migrationId: string): Promise<void>
+ async list(): Promise<Migration[]>
+ async create(data: CreateMigrationInput): Promise<Migration>
+ async get(migrationId: string): Promise<Migration>
+ async cancel(migrationId: string): Promise<void>
 }
 ```
 
 **Effort:** 2 days
 
----
-
-### 11. Authentication Resource
+--- ### 11. Authentication Resource
 **Why:** Token management (though OAuth is handled in HttpClient, this endpoint may be useful)
 
 **Endpoints to Implement:**
@@ -335,9 +311,7 @@ class MigrationResource {
 
 **Effort:** 1 day (if needed)
 
----
-
-## 📋 Implementation Checklist Template
+--- ## Implementation Checklist Template
 
 For each feature, follow this checklist:
 
@@ -375,32 +349,28 @@ For each feature, follow this checklist:
 - [ ] Documentation is clear and accurate
 - [ ] No linter errors
 
----
-
-## 🎯 Recommended Implementation Order
+--- ## Recommended Implementation Order
 
 ### Phase 1: Critical Features (Week 1-2)
-1. ✅ Integrations Resource (HIGH PRIORITY)
-2. ✅ Organization Resource (MEDIUM PRIORITY)
+1. [OK] Integrations Resource (HIGH PRIORITY)
+2. [OK] Organization Resource (MEDIUM PRIORITY)
 
 ### Phase 2: Core Enhancements (Week 3-4)
-3. ✅ Blueprint Permissions & Bulk Operations
-4. ✅ Entity Analytics Operations
-5. ✅ Action Permissions
+3. [OK] Blueprint Permissions & Bulk Operations
+4. [OK] Entity Analytics Operations
+5. [OK] Action Permissions
 
 ### Phase 3: Additional Resources (Week 5-6)
-6. ✅ Apps Resource
-7. ✅ Blueprint Rename Operations
-8. ✅ Action Run Approvers & User Credential Rotation
+6. [OK] Apps Resource
+7. [OK] Blueprint Rename Operations
+8. [OK] Action Run Approvers & User Credential Rotation
 
 ### Phase 4: Low Priority (Week 7-8)
-9. ✅ Pages Resource
-10. ✅ Migrations Resource
-11. ✅ Authentication Resource (if needed)
+9. [OK] Pages Resource
+10. [OK] Migrations Resource
+11. [OK] Authentication Resource (if needed)
 
----
-
-## 📊 Progress Tracking
+--- ## Progress Tracking
 
 ### Resources
 - [ ] Integrations (0/6 endpoints)
@@ -420,9 +390,7 @@ For each feature, follow this checklist:
 - [ ] Action Run Approvers (0/1)
 - [ ] User Credential Rotation (0/1)
 
----
-
-## 📝 Notes
+--- ## Notes
 
 - All endpoints are based on the latest OpenAPI schema in `src/types/api.ts`
 - Some endpoints may have query parameters, request body schemas, or response types that need careful review
@@ -430,8 +398,6 @@ For each feature, follow this checklist:
 - Follow the existing patterns in `src/resources/` for consistency
 - Ensure all new features have proper TypeScript types and JSDoc documentation
 
----
-
-**Last Updated:** December 9, 2025  
+--- **Last Updated:** December 9, 2025 
 **Next Review:** After each major feature implementation
 

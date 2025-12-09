@@ -15,21 +15,21 @@ Complete, runnable examples demonstrating all features of the Port SDK.
 - [06 - Entity Batch Operations](./06-entities-batch.ts) - Bulk create/update/delete
 - [07 - Entity Relations](./07-entities-relations.ts) - Working with entity relationships
 
-### 🏗️ Working with Blueprints
+### Working with Blueprints
 - [08 - Blueprint CRUD](./08-blueprints-crud.ts) - Manage blueprint lifecycle
 
-### ⚡ Working with Actions
+### Working with Actions
 - [11 - Action CRUD](./11-actions-crud.ts) - Create and manage actions
 
 ### Working with Scorecards
 - [13 - Scorecard CRUD](./13-scorecards-crud.ts) - Manage scorecards
 
-### 🛠️ Advanced Features
+### ️ Advanced Features
 - [15 - Error Handling](./15-error-handling.ts) - Comprehensive error handling patterns
 - [16 - Logging & Debugging](./16-logging-debugging.ts) - Enable detailed logging
 - [17 - Proxy Configuration](./17-proxy-config.ts) - Use corporate proxies
 
-### 🪝 Working with Webhooks
+### Working with Webhooks
 - [23 - Webhook CRUD](./23-webhooks-crud.ts) - Create and manage webhooks
 
 ### Monitoring & Auditing
@@ -39,7 +39,7 @@ Complete, runnable examples demonstrating all features of the Port SDK.
 ### Complete Workflow
 - [18 - End-to-End](./18-end-to-end.ts) - Complete Port.io setup from scratch
 
-## 🏃 Running Examples
+## Running Examples
 
 ### Setup
 
@@ -99,13 +99,12 @@ pnpm tsx examples/25-action-runs.ts
 pnpm tsx examples/18-end-to-end.ts
 ```
 
-## 📚 Example Structure
+## Example Structure
 
 Each example follows a consistent structure:
 
 ```typescript
-/**
- * Example: [Title]
+/** * Example: [Title]
  * 
  * Description: [What this example demonstrates]
  * 
@@ -140,7 +139,7 @@ async function main() {
 main().catch(console.error);
 ```
 
-## 🎓 Learning Path
+## Learning Path
 
 ### Beginner
 
@@ -230,14 +229,14 @@ This is normal - examples make real API calls. You can:
 - Reduce the number of operations
 - Enable logging to see progress
 
-## 📖 Additional Resources
+## Additional Resources
 
 - [API Documentation](../docs/api/) - Detailed API reference
 - [Testing Guide](../docs/TESTING.md) - Write tests for your code
 - [Contributing Guide](../CONTRIBUTING.md) - Contribute examples
 - [Port Documentation](https://docs.port.io) - Official Port docs
 
-## 🤝 Contributing Examples
+## Contributing Examples
 
 Have a great example? We'd love to include it!
 
@@ -248,7 +247,7 @@ Have a great example? We'd love to include it!
 5. Update this README
 6. Submit a pull request
 
-## 📝 Example Checklist
+## Example Checklist
 
 When creating an example, ensure:
 
@@ -288,6 +287,4 @@ Need help with examples?
 - Open an [issue](https://github.com/port-experimental/port-js/issues)
 - Join [Port Community](https://port.io/community)
 
----
-
-**Happy coding!** 
+--- **Happy coding!** 

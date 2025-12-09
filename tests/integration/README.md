@@ -25,7 +25,7 @@ Create a `.env.local` file in the project root:
 ```bash
 PORT_CLIENT_ID=your_client_id_here
 PORT_CLIENT_SECRET=your_client_secret_here
-PORT_BASE_URL=https://api.port.io  # Optional, defaults to EU
+PORT_BASE_URL=https://api.port.io # Optional, defaults to EU
 ```
 
 ### 3. Permissions
@@ -62,12 +62,12 @@ pnpm test:integration --watch
 
 ```
 tests/integration/
-├── README.md                          # This file
-├── setup.ts                           # Global test setup
-├── client.integration.test.ts         # Client initialization & connectivity
-├── blueprints.integration.test.ts     # Blueprint CRUD operations
-├── entities.integration.test.ts       # Entity CRUD & search operations
-└── actions.integration.test.ts        # Action CRUD & execution (future)
+├── README.md # This file
+├── setup.ts # Global test setup
+├── client.integration.test.ts # Client initialization & connectivity
+├── blueprints.integration.test.ts # Blueprint CRUD operations
+├── entities.integration.test.ts # Entity CRUD & search operations
+└── actions.integration.test.ts # Action CRUD & execution (future)
 ```
 
 ## Test Behavior
@@ -76,12 +76,12 @@ tests/integration/
 Tests automatically skip if credentials are not available:
 ```typescript
 const hasCredentials = !!(
-  process.env.PORT_CLIENT_ID && 
-  process.env.PORT_CLIENT_SECRET
+ process.env.PORT_CLIENT_ID && 
+ process.env.PORT_CLIENT_SECRET
 );
 
 describe.skipIf(!hasCredentials)('Integration Test', () => {
-  // Tests only run when credentials are present
+ // Tests only run when credentials are present
 });
 ```
 
@@ -94,9 +94,9 @@ All tests include cleanup in `afterAll()` hooks to:
 Example:
 ```typescript
 afterAll(async () => {
-  // Clean up test resources
-  await client.entities.delete(testEntityId);
-  await client.blueprints.delete(testBlueprintId);
+ // Clean up test resources
+ await client.entities.delete(testEntityId);
+ await client.blueprints.delete(testBlueprintId);
 });
 ```
 
@@ -109,34 +109,34 @@ const testId = `test_entity_${Date.now()}`;
 ## Test Coverage
 
 ### Client Integration (`client.integration.test.ts`)
-- ✅ Client initialization with OAuth
-- ✅ Authentication failure handling
-- ✅ Region configuration (EU/US)
-- ✅ Resource availability
-- ✅ API connectivity
-- ✅ Error handling
+- [OK] Client initialization with OAuth
+- [OK] Authentication failure handling
+- [OK] Region configuration (EU/US)
+- [OK] Resource availability
+- [OK] API connectivity
+- [OK] Error handling
 
 ### Blueprint Integration (`blueprints.integration.test.ts`)
-- ✅ Create blueprint
-- ✅ Get blueprint
-- ✅ List blueprints
-- ✅ Update blueprint
-- ✅ Delete blueprint
-- ✅ Get blueprint relations
-- ✅ System blueprints (_team, _user)
-- ✅ 404 error handling
+- [OK] Create blueprint
+- [OK] Get blueprint
+- [OK] List blueprints
+- [OK] Update blueprint
+- [OK] Delete blueprint
+- [OK] Get blueprint relations
+- [OK] System blueprints (_team, _user)
+- [OK] 404 error handling
 
 ### Entity Integration (`entities.integration.test.ts`)
-- ✅ Create entity
-- ✅ Get entity
-- ✅ Update entity
-- ✅ Delete entity
-- ✅ List entities
-- ✅ Search entities
-- ✅ Batch create
-- ✅ Batch update
-- ✅ Batch delete
-- ✅ 404 error handling
+- [OK] Create entity
+- [OK] Get entity
+- [OK] Update entity
+- [OK] Delete entity
+- [OK] List entities
+- [OK] Search entities
+- [OK] Batch create
+- [OK] Batch update
+- [OK] Batch delete
+- [OK] 404 error handling
 
 ## Common Issues & Troubleshooting
 
@@ -169,11 +169,11 @@ cat .env.local
 **Problem**: Tests timeout after 10 seconds
 **Solution**: 
 - Increase timeout in test file:
-  ```typescript
-  it('slow test', async () => {
-    // ...
-  }, 30000); // 30 second timeout
-  ```
+ ```typescript
+ it('slow test', async () => {
+ // ...
+ }, 30000); // 30 second timeout
+ ```
 - Check network connectivity
 - Verify Port API is accessible
 
@@ -191,13 +191,13 @@ cat .env.local
 const createdIds: string[] = [];
 
 afterAll(async () => {
-  for (const id of createdIds) {
-    try {
-      await client.entities.delete(id);
-    } catch (error) {
-      console.warn(`Cleanup failed for ${id}:`, error);
-    }
-  }
+ for (const id of createdIds) {
+ try {
+ await client.entities.delete(id);
+ } catch (error) {
+ console.warn(`Cleanup failed for ${id}:`, error);
+ }
+ }
 });
 ```
 
@@ -208,26 +208,26 @@ const uniqueId = `test_${Date.now()}_${Math.random().toString(36).slice(2)}`;
 
 ### 3. Test One Thing at a Time
 ```typescript
-// ✅ GOOD - Clear, focused test
+// [OK] GOOD - Clear, focused test
 it('should create an entity', async () => {
-  const entity = await client.entities.create(data);
-  expect(entity.identifier).toBe(data.identifier);
+ const entity = await client.entities.create(data);
+ expect(entity.identifier).toBe(data.identifier);
 });
 
-// ❌ BAD - Testing multiple things
+// [ERROR] BAD - Testing multiple things
 it('should do everything', async () => {
-  const entity = await client.entities.create(data);
-  const updated = await client.entities.update(entity.id, changes);
-  await client.entities.delete(updated.id);
+ const entity = await client.entities.create(data);
+ const updated = await client.entities.update(entity.id, changes);
+ await client.entities.delete(updated.id);
 });
 ```
 
 ### 4. Handle Errors Gracefully
 ```typescript
 it('should handle 404 errors', async () => {
-  await expect(
-    client.entities.get('non_existent_id')
-  ).rejects.toThrow(PortNotFoundError);
+ await expect(
+ client.entities.get('non_existent_id')
+ ).rejects.toThrow(PortNotFoundError);
 });
 ```
 
@@ -250,26 +250,26 @@ Integration tests can run in CI with secrets:
 name: Integration Tests
 
 on:
-  schedule:
-    - cron: '0 0 * * *'  # Daily
-  workflow_dispatch:  # Manual trigger
+ schedule:
+ - cron: '0 0 * * *' # Daily
+ workflow_dispatch: # Manual trigger
 
 jobs:
-  integration:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-      - uses: pnpm/action-setup@v2
-      
-      - name: Install dependencies
-        run: pnpm install
-      
-      - name: Run integration tests
-        env:
-          PORT_CLIENT_ID: ${{ secrets.PORT_CLIENT_ID }}
-          PORT_CLIENT_SECRET: ${{ secrets.PORT_CLIENT_SECRET }}
-        run: pnpm test:integration
+ integration:
+ runs-on: ubuntu-latest
+ steps:
+ - uses: actions/checkout@v4
+ - uses: actions/setup-node@v4
+ - uses: pnpm/action-setup@v2
+ 
+ - name: Install dependencies
+ run: pnpm install
+ 
+ - name: Run integration tests
+ env:
+ PORT_CLIENT_ID: ${{ secrets.PORT_CLIENT_ID }}
+ PORT_CLIENT_SECRET: ${{ secrets.PORT_CLIENT_SECRET }}
+ run: pnpm test:integration
 ```
 
 ### Required Secrets
@@ -282,11 +282,11 @@ Add to GitHub repository secrets:
 ### Enable Verbose Logging
 ```typescript
 const client = new PortClient({
-  credentials: { /* ... */ },
-  logger: {
-    level: 4, // TRACE level
-    enabled: true,
-  },
+ credentials: { /* ... */ },
+ logger: {
+ level: 4, // TRACE level
+ enabled: true,
+ },
 });
 ```
 
@@ -301,8 +301,8 @@ pnpm test:integration
 Add console.log in tests:
 ```typescript
 it('debug test', async () => {
-  const response = await client.blueprints.list();
-  console.log('Response:', JSON.stringify(response, null, 2));
+ const response = await client.blueprints.list();
+ console.log('Response:', JSON.stringify(response, null, 2));
 });
 ```
 
@@ -330,7 +330,5 @@ it('debug test', async () => {
 - Run unit tests first to isolate SDK issues: `pnpm test`
 - Contact Port support for API-specific issues
 
----
-
-**Note**: Integration tests modify your Port workspace. Always use a development/test workspace, never production!
+--- **Note**: Integration tests modify your Port workspace. Always use a development/test workspace, never production!
 

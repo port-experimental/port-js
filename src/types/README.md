@@ -21,21 +21,21 @@ These files contain carefully organized, documented types for SDK users:
 
 ## Usage
 
-### ✅ Recommended: Import from organized files
+### [OK] Recommended: Import from organized files
 
 ```typescript
 import {
-  Entity,
-  CreateEntityInput,
-  EntityProperties,
-  EntityRelations,
+ Entity,
+ CreateEntityInput,
+ EntityProperties,
+ EntityRelations,
 } from '@port-experimental/port-sdk';
 
 // Or import from specific domain
 import { Entity } from '@port-experimental/port-sdk/types/entities';
 ```
 
-### ❌ Not Recommended: Import from api.ts
+### [ERROR] Not Recommended: Import from api.ts
 
 ```typescript
 // Don't do this - api.ts is for internal use
@@ -105,16 +105,15 @@ Example:
 
 ```typescript
 // In types/entities.ts
-/**
- * Entity metadata
+/** * Entity metadata
  * Contains audit information about entity changes
  */
 export interface EntityMetadata {
-  createdAt: Date;
-  updatedAt: Date;
-  createdBy: string;
-  updatedBy: string;
-  version: number;
+ createdAt: Date;
+ updatedAt: Date;
+ createdBy: string;
+ updatedBy: string;
+ version: number;
 }
 
 // In types/index.ts (already re-exported via export * from './entities')
@@ -146,10 +145,10 @@ All types are designed for TypeScript strict mode:
 ```typescript
 // tsconfig.json
 {
-  "compilerOptions": {
-    "strict": true,
-    "noUncheckedIndexedAccess": true
-  }
+ "compilerOptions": {
+ "strict": true,
+ "noUncheckedIndexedAccess": true
+ }
 }
 ```
 
@@ -158,14 +157,14 @@ All types are designed for TypeScript strict mode:
 Never use `any`. Use `unknown` if type is truly unknown:
 
 ```typescript
-// ❌ Bad
+// [ERROR] Bad
 function process(data: any) {}
 
-// ✅ Good
+// [OK] Good
 function process(data: unknown) {
-  if (isValidData(data)) {
-    // Now data is typed correctly
-  }
+ if (isValidData(data)) {
+ // Now data is typed correctly
+ }
 }
 ```
 
@@ -175,12 +174,12 @@ Create type guards for runtime validation:
 
 ```typescript
 export function isEntity(value: unknown): value is Entity {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    'identifier' in value &&
-    'blueprint' in value
-  );
+ return (
+ typeof value === 'object' &&
+ value !== null &&
+ 'identifier' in value &&
+ 'blueprint' in value
+ );
 }
 ```
 

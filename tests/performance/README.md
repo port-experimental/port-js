@@ -46,14 +46,14 @@ pnpm test:benchmark authentication
 
 ## Interpreting Results
 
-### ✅ Passing Tests
+### [OK] Passing Tests
 All operations complete within thresholds:
 ```
-✓ Authentication completed in 1234ms
-✓ GET request completed in 456ms
+ Authentication completed in 1234ms
+ GET request completed in 456ms
 ```
 
-### ❌ Failing Tests
+### [ERROR] Failing Tests
 Operations exceed thresholds - may indicate:
 - Network latency issues
 - API performance degradation
@@ -62,12 +62,12 @@ Operations exceed thresholds - may indicate:
 ### Performance Report
 At the end of the test run, a summary shows:
 ```
-📊 Performance Summary
+ Performance Summary
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Operation         | Threshold | Status
+Operation | Threshold | Status
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Authentication    | 3000ms    | ✓
-GET Single        | 1000ms    | ✓
+Authentication | 3000ms | 
+GET Single | 1000ms | 
 ...
 ```
 
@@ -99,27 +99,27 @@ Run benchmarks in CI to detect regressions:
 name: Performance Tests
 
 on:
-  push:
-    branches: [main]
-  schedule:
-    - cron: '0 0 * * 1'  # Weekly
+ push:
+ branches: [main]
+ schedule:
+ - cron: '0 0 * * 1' # Weekly
 
 jobs:
-  performance:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-      - uses: pnpm/action-setup@v2
-      
-      - name: Install dependencies
-        run: pnpm install
-      
-      - name: Run benchmarks
-        env:
-          PORT_CLIENT_ID: ${{ secrets.PORT_CLIENT_ID }}
-          PORT_CLIENT_SECRET: ${{ secrets.PORT_CLIENT_SECRET }}
-        run: pnpm test:benchmark
+ performance:
+ runs-on: ubuntu-latest
+ steps:
+ - uses: actions/checkout@v4
+ - uses: actions/setup-node@v4
+ - uses: pnpm/action-setup@v2
+ 
+ - name: Install dependencies
+ run: pnpm install
+ 
+ - name: Run benchmarks
+ env:
+ PORT_CLIENT_ID: ${{ secrets.PORT_CLIENT_ID }}
+ PORT_CLIENT_SECRET: ${{ secrets.PORT_CLIENT_SECRET }}
+ run: pnpm test:benchmark
 ```
 
 ### Tracking Trends
@@ -136,54 +136,48 @@ Compare results over time:
 
 If benchmarks fail:
 
-1. **Profile the code**
-   ```bash
-   node --inspect node_modules/.bin/vitest --run
-   ```
+1. **Profile the code** ```bash
+ node --inspect node_modules/.bin/vitest --run
+ ```
 
-2. **Check HTTP requests**
-   - Enable verbose logging
-   - Use network inspection tools
-   - Check for redundant requests
+2. **Check HTTP requests** - Enable verbose logging
+ - Use network inspection tools
+ - Check for redundant requests
 
-3. **Optimize data transformation**
-   - Reduce object spreading
-   - Cache computed values
-   - Minimize type conversions
+3. **Optimize data transformation** - Reduce object spreading
+ - Cache computed values
+ - Minimize type conversions
 
-4. **Batch operations**
-   - Use bulk endpoints when possible
-   - Parallelize independent requests
-   - Implement request pooling
+4. **Batch operations** - Use bulk endpoints when possible
+ - Parallelize independent requests
+ - Implement request pooling
 
 ### For SDK Users
 
 If operations are slow:
 
-1. **Use concurrent operations**
-   ```typescript
-   // ❌ Slow - sequential requests
-   for (const entity of entities) {
-     await client.entities.create(entity);
-   }
-   
-   // ✅ Fast - concurrent requests
-   await Promise.all(
-     entities.map(entity => client.entities.create(entity))
-   );
-   ```
+1. **Use concurrent operations** ```typescript
+ // [ERROR] Slow - sequential requests
+ for (const entity of entities) {
+ await client.entities.create(entity);
+ }
+ 
+ // [OK] Fast - concurrent requests
+ await Promise.all(
+ entities.map(entity => client.entities.create(entity))
+ );
+ ```
 
-2. **Choose closest region**
-   ```typescript
-   const client = new PortClient({
-     credentials,
-     region: 'us', // or 'eu'
-   });
-   ```
+2. **Choose closest region** ```typescript
+ const client = new PortClient({
+ credentials,
+ region: 'us', // or 'eu'
+ });
+ ```
 
 3. **Enable caching** (if applicable)
-   - Cache rarely-changing data (blueprints)
-   - Use local caching for repeated queries
+ - Cache rarely-changing data (blueprints)
+ - Use local caching for repeated queries
 
 ## Troubleshooting
 

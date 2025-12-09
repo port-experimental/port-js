@@ -71,9 +71,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [SECURITY] Dependency security auditing guidelines
 - [SECURITY] Comprehensive security cursor rules
 
----
-
-## Release Guidelines
+--- ## Release Guidelines
 
 ### Version Numbers
 
@@ -109,9 +107,7 @@ We follow [Semantic Versioning](https://semver.org/):
 - `client.entities.legacySearch()` - Use `client.entities.search()` instead
 ```
 
----
-
-For more information, see:
+--- For more information, see:
 - [GitHub Releases](https://github.com/port-experimental/port-sdk/releases)
 - [npm Package](https://www.npmjs.com/package/@port-experimental/port-sdk)
 
