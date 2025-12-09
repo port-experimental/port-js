@@ -21,6 +21,7 @@ import { TeamResource } from './resources/teams';
 import { UserResource } from './resources/users';
 import { AuditResource } from './resources/audit';
 import { WebhookResource } from './resources/webhooks';
+import { IntegrationResource } from './resources/integrations';
 
 /**
  * Check if the code is running in a browser environment
@@ -112,6 +113,7 @@ export class PortClient {
   private _users?: UserResource;
   private _audit?: AuditResource;
   private _webhooks?: WebhookResource;
+  private _integrations?: IntegrationResource;
 
   /**
    * Create a new Port SDK client
@@ -239,6 +241,13 @@ export class PortClient {
       this._webhooks = new WebhookResource(this.httpClient);
     }
     return this._webhooks;
+  }
+
+  public get integrations(): IntegrationResource {
+    if (!this._integrations) {
+      this._integrations = new IntegrationResource(this.httpClient);
+    }
+    return this._integrations;
   }
 
   /**

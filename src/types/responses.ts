@@ -7,6 +7,7 @@ import type { Blueprint } from './blueprints';
 import type { Entity } from './entities';
 import type { Action, ActionRun } from './actions';
 import type { Scorecard } from './scorecards';
+import type { Integration, IntegrationLog } from './integrations';
 
 /**
  * Single item response wrapper
@@ -124,6 +125,32 @@ export interface ApiScorecardsResponse {
  * Raw API Scorecard type (before transformation)
  */
 export interface ApiScorecard extends Omit<Scorecard, 'createdAt' | 'updatedAt'> {
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/**
+ * Integration API responses
+ */
+export interface ApiIntegrationResponse {
+  integration: Integration | ApiIntegration;
+  ok?: boolean;
+}
+
+export interface ApiIntegrationsResponse {
+  integrations: (Integration | ApiIntegration)[];
+  ok?: boolean;
+}
+
+export interface ApiIntegrationLogsResponse {
+  logs: IntegrationLog[];
+  ok?: boolean;
+}
+
+/**
+ * Raw API Integration type (before transformation)
+ */
+export interface ApiIntegration extends Omit<Integration, 'createdAt' | 'updatedAt'> {
   createdAt?: string;
   updatedAt?: string;
 }
