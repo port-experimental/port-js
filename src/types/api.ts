@@ -88,7 +88,8 @@ export interface paths {
                                 /** @description List of roles that are allowed to perform the action. */
                                 roles?: string[];
                                 ownedByTeam?: boolean;
-                                /** @example {
+                                /**
+                                 * @example {
                                  *       "combinator": "and",
                                  *       "rules": [
                                  *         {
@@ -112,7 +113,8 @@ export interface paths {
                                  *           ]
                                  *         }
                                  *       ]
-                                 *     } */
+                                 *     }
+                                 */
                                 policy?: {
                                     /**
                                      * @description The combinator to use for the rules.
@@ -2652,9 +2654,11 @@ export interface paths {
                                                 authorizationUrl: string;
                                                 /** Format: url */
                                                 tokenUrl: string;
-                                                /** @default [
+                                                /**
+                                                 * @default [
                                                  *       "openid"
-                                                 *     ] */
+                                                 *     ]
+                                                 */
                                                 authorizationScope: string[];
                                             };
                                         };
@@ -2698,9 +2702,11 @@ export interface paths {
                                             authorizationUrl: string;
                                             /** Format: url */
                                             tokenUrl: string;
-                                            /** @default [
+                                            /**
+                                             * @default [
                                              *       "openid"
-                                             *     ] */
+                                             *     ]
+                                             */
                                             authorizationScope: string[];
                                         };
                                         /** @description Whether the property is colorized. */
@@ -2959,9 +2965,11 @@ export interface paths {
                                         authorizationUrl: string;
                                         /** Format: url */
                                         tokenUrl: string;
-                                        /** @default [
+                                        /**
+                                         * @default [
                                          *       "openid"
-                                         *     ] */
+                                         *     ]
+                                         */
                                         authorizationScope?: string[];
                                     };
                                 };
@@ -3005,9 +3013,11 @@ export interface paths {
                                     authorizationUrl: string;
                                     /** Format: url */
                                     tokenUrl: string;
-                                    /** @default [
+                                    /**
+                                     * @default [
                                      *       "openid"
-                                     *     ] */
+                                     *     ]
+                                     */
                                     authorizationScope?: string[];
                                 };
                                 /** @description Whether the property is colorized. */
@@ -3224,9 +3234,11 @@ export interface paths {
                                                 authorizationUrl: string;
                                                 /** Format: url */
                                                 tokenUrl: string;
-                                                /** @default [
+                                                /**
+                                                 * @default [
                                                  *       "openid"
-                                                 *     ] */
+                                                 *     ]
+                                                 */
                                                 authorizationScope: string[];
                                             };
                                         };
@@ -3270,9 +3282,11 @@ export interface paths {
                                             authorizationUrl: string;
                                             /** Format: url */
                                             tokenUrl: string;
-                                            /** @default [
+                                            /**
+                                             * @default [
                                              *       "openid"
-                                             *     ] */
+                                             *     ]
+                                             */
                                             authorizationScope: string[];
                                         };
                                         /** @description Whether the property is colorized. */
@@ -3580,9 +3594,11 @@ export interface paths {
                                                 authorizationUrl: string;
                                                 /** Format: url */
                                                 tokenUrl: string;
-                                                /** @default [
+                                                /**
+                                                 * @default [
                                                  *       "openid"
-                                                 *     ] */
+                                                 *     ]
+                                                 */
                                                 authorizationScope: string[];
                                             };
                                         };
@@ -3626,9 +3642,11 @@ export interface paths {
                                             authorizationUrl: string;
                                             /** Format: url */
                                             tokenUrl: string;
-                                            /** @default [
+                                            /**
+                                             * @default [
                                              *       "openid"
-                                             *     ] */
+                                             *     ]
+                                             */
                                             authorizationScope: string[];
                                         };
                                         /** @description Whether the property is colorized. */
@@ -3886,9 +3904,11 @@ export interface paths {
                                         authorizationUrl: string;
                                         /** Format: url */
                                         tokenUrl: string;
-                                        /** @default [
+                                        /**
+                                         * @default [
                                          *       "openid"
-                                         *     ] */
+                                         *     ]
+                                         */
                                         authorizationScope?: string[];
                                     };
                                 };
@@ -3932,9 +3952,11 @@ export interface paths {
                                     authorizationUrl: string;
                                     /** Format: url */
                                     tokenUrl: string;
-                                    /** @default [
+                                    /**
+                                     * @default [
                                      *       "openid"
-                                     *     ] */
+                                     *     ]
+                                     */
                                     authorizationScope?: string[];
                                 };
                                 /** @description Whether the property is colorized. */
@@ -4151,9 +4173,11 @@ export interface paths {
                                                 authorizationUrl: string;
                                                 /** Format: url */
                                                 tokenUrl: string;
-                                                /** @default [
+                                                /**
+                                                 * @default [
                                                  *       "openid"
-                                                 *     ] */
+                                                 *     ]
+                                                 */
                                                 authorizationScope: string[];
                                             };
                                         };
@@ -4197,9 +4221,11 @@ export interface paths {
                                             authorizationUrl: string;
                                             /** Format: url */
                                             tokenUrl: string;
-                                            /** @default [
+                                            /**
+                                             * @default [
                                              *       "openid"
-                                             *     ] */
+                                             *     ]
+                                             */
                                             authorizationScope: string[];
                                         };
                                         /** @description Whether the property is colorized. */
@@ -4575,9 +4601,11 @@ export interface paths {
                                         authorizationUrl: string;
                                         /** Format: url */
                                         tokenUrl: string;
-                                        /** @default [
+                                        /**
+                                         * @default [
                                          *       "openid"
-                                         *     ] */
+                                         *     ]
+                                         */
                                         authorizationScope?: string[];
                                     };
                                 };
@@ -4621,9 +4649,11 @@ export interface paths {
                                     authorizationUrl: string;
                                     /** Format: url */
                                     tokenUrl: string;
-                                    /** @default [
+                                    /**
+                                     * @default [
                                      *       "openid"
-                                     *     ] */
+                                     *     ]
+                                     */
                                     authorizationScope?: string[];
                                 };
                                 /** @description Whether the property is colorized. */
@@ -4840,9 +4870,11 @@ export interface paths {
                                                 authorizationUrl: string;
                                                 /** Format: url */
                                                 tokenUrl: string;
-                                                /** @default [
+                                                /**
+                                                 * @default [
                                                  *       "openid"
-                                                 *     ] */
+                                                 *     ]
+                                                 */
                                                 authorizationScope: string[];
                                             };
                                         };
@@ -4886,9 +4918,11 @@ export interface paths {
                                             authorizationUrl: string;
                                             /** Format: url */
                                             tokenUrl: string;
-                                            /** @default [
+                                            /**
+                                             * @default [
                                              *       "openid"
-                                             *     ] */
+                                             *     ]
+                                             */
                                             authorizationScope: string[];
                                         };
                                         /** @description Whether the property is colorized. */
@@ -5207,9 +5241,11 @@ export interface paths {
                                                 authorizationUrl: string;
                                                 /** Format: url */
                                                 tokenUrl: string;
-                                                /** @default [
+                                                /**
+                                                 * @default [
                                                  *       "openid"
-                                                 *     ] */
+                                                 *     ]
+                                                 */
                                                 authorizationScope: string[];
                                             };
                                         };
@@ -5253,9 +5289,11 @@ export interface paths {
                                             authorizationUrl: string;
                                             /** Format: url */
                                             tokenUrl: string;
-                                            /** @default [
+                                            /**
+                                             * @default [
                                              *       "openid"
-                                             *     ] */
+                                             *     ]
+                                             */
                                             authorizationScope: string[];
                                         };
                                         /** @description Whether the property is colorized. */
@@ -5574,9 +5612,11 @@ export interface paths {
                                                 authorizationUrl: string;
                                                 /** Format: url */
                                                 tokenUrl: string;
-                                                /** @default [
+                                                /**
+                                                 * @default [
                                                  *       "openid"
-                                                 *     ] */
+                                                 *     ]
+                                                 */
                                                 authorizationScope: string[];
                                             };
                                         };
@@ -5620,9 +5660,11 @@ export interface paths {
                                             authorizationUrl: string;
                                             /** Format: url */
                                             tokenUrl: string;
-                                            /** @default [
+                                            /**
+                                             * @default [
                                              *       "openid"
-                                             *     ] */
+                                             *     ]
+                                             */
                                             authorizationScope: string[];
                                         };
                                         /** @description Whether the property is colorized. */
@@ -5941,9 +5983,11 @@ export interface paths {
                                                 authorizationUrl: string;
                                                 /** Format: url */
                                                 tokenUrl: string;
-                                                /** @default [
+                                                /**
+                                                 * @default [
                                                  *       "openid"
-                                                 *     ] */
+                                                 *     ]
+                                                 */
                                                 authorizationScope: string[];
                                             };
                                         };
@@ -5987,9 +6031,11 @@ export interface paths {
                                             authorizationUrl: string;
                                             /** Format: url */
                                             tokenUrl: string;
-                                            /** @default [
+                                            /**
+                                             * @default [
                                              *       "openid"
-                                             *     ] */
+                                             *     ]
+                                             */
                                             authorizationScope: string[];
                                         };
                                         /** @description Whether the property is colorized. */
@@ -11544,6 +11590,7 @@ export interface paths {
                              *     }
                              */
                             query: {
+                                blueprint?: string;
                                 /**
                                  * @description The combinator to use for the rules.
                                  * @enum {unknown}
@@ -13818,7 +13865,8 @@ export interface paths {
                          */
                         section?: "software_catalog" | "organization";
                         pageFilters?: {
-                            /** @example {
+                            /**
+                             * @example {
                              *       "combinator": "and",
                              *       "rules": [
                              *         {
@@ -13827,8 +13875,10 @@ export interface paths {
                              *           "value": "service"
                              *         }
                              *       ]
-                             *     } */
+                             *     }
+                             */
                             query: {
+                                blueprint?: string;
                                 /**
                                  * @description The combinator to use for the rules.
                                  * @enum {unknown}
