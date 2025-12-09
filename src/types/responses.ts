@@ -14,6 +14,7 @@ import type {
   OrganizationSettings,
 } from './organization';
 import type { App, AppSecret } from './apps';
+import type { Migration } from './migrations';
 
 /**
  * Single item response wrapper
@@ -228,5 +229,37 @@ export interface ApiApp extends Omit<App, 'createdAt' | 'updatedAt'> {
 export interface ApiAppSecret extends Omit<AppSecret, 'createdAt' | 'updatedAt'> {
   createdAt?: string;
   updatedAt?: string;
+}
+
+/**
+ * Migration API responses
+ */
+export interface ApiMigrationsResponse {
+  migrations: (Migration | ApiMigration)[];
+  ok?: boolean;
+}
+
+export interface ApiMigrationResponse {
+  migration: Migration | ApiMigration;
+  ok?: boolean;
+}
+
+/**
+ * Raw API Migration type (before transformation)
+ */
+export interface ApiMigration extends Omit<Migration, 'createdAt' | 'updatedAt' | 'completedAt'> {
+  createdAt?: string;
+  updatedAt?: string;
+  completedAt?: string;
+}
+
+/**
+ * Authentication API responses
+ */
+export interface ApiAccessTokenResponse {
+  accessToken: string;
+  expiresIn: number;
+  tokenType: string;
+  ok?: boolean;
 }
 

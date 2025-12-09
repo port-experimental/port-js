@@ -22,6 +22,8 @@ export * from './webhooks';
 export * from './integrations';
 export * from './organization';
 export * from './apps';
+export * from './migrations';
+export * from './auth';
 export * from './responses';
 
 /**

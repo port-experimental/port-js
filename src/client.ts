@@ -24,6 +24,8 @@ import { WebhookResource } from './resources/webhooks';
 import { IntegrationResource } from './resources/integrations';
 import { OrganizationResource } from './resources/organization';
 import { AppResource } from './resources/apps';
+import { MigrationResource } from './resources/migrations';
+import { AuthResource } from './resources/auth';
 
 /**
  * Check if the code is running in a browser environment
@@ -118,6 +120,8 @@ export class PortClient {
   private _integrations?: IntegrationResource;
   private _organization?: OrganizationResource;
   private _apps?: AppResource;
+  private _migrations?: MigrationResource;
+  private _auth?: AuthResource;
 
   /**
    * Create a new Port SDK client
@@ -266,6 +270,20 @@ export class PortClient {
       this._apps = new AppResource(this.httpClient);
     }
     return this._apps;
+  }
+
+  public get migrations(): MigrationResource {
+    if (!this._migrations) {
+      this._migrations = new MigrationResource(this.httpClient);
+    }
+    return this._migrations;
+  }
+
+  public get auth(): AuthResource {
+    if (!this._auth) {
+      this._auth = new AuthResource(this.httpClient);
+    }
+    return this._auth;
   }
 
   /**

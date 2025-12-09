@@ -24,6 +24,8 @@ export { WebhookResource } from './resources/webhooks';
 export { IntegrationResource } from './resources/integrations';
 export { OrganizationResource } from './resources/organization';
 export { AppResource } from './resources/apps';
+export { MigrationResource } from './resources/migrations';
+export { AuthResource } from './resources/auth';
 
 // HTTP Client (for advanced usage)
 export { HttpClient } from './http-client';
