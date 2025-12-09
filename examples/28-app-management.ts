@@ -1,0 +1,192 @@
+/**
+ * Example: App Management
+ * 
+ * This example demonstrates how to:
+ * - List all installed apps
+ * - Get app details
+ * - Update app name
+ * - Rotate app secrets
+ * - Delete apps
+ * 
+ * Run with: pnpm tsx examples/28-app-management.ts
+ */
+
+import { PortClient } from '../src';
+
+async function main() {
+  // Initialize the client (uses credentials from environment variables)
+  const client = new PortClient();
+
+  console.log('📱 App Management Example\n');
+  console.log('━'.repeat(60));
+
+  try {
+    // ============================================================
+    // Example 1: List All Apps
+    // ============================================================
+    console.log('\n📋 Example 1: List all apps');
+    console.log('─'.repeat(60));
+    
+    const allApps = await client.apps.list();
+    
+    console.log(`✅ Found ${allApps.length} app(s):`);
+    allApps.forEach((app, idx) => {
+      console.log(`   ${idx + 1}. ${app.name || 'Unnamed'}`);
+      console.log(`      ID: ${app.id}`);
+      console.log(`      Enabled: ${app.enabled ? 'Yes' : 'No'}`);
+      if (app.createdAt) {
+        console.log(`      Created: ${app.createdAt.toISOString()}`);
+      }
+      if (app.updatedAt) {
+        console.log(`      Updated: ${app.updatedAt.toISOString()}`);
+      }
+      // Note: Secret is only shown if explicitly requested in fields
+      if (app.secret) {
+        console.log(`      Secret: ${app.secret.substring(0, 10)}... (truncated)`);
+      }
+    });
+
+    // ============================================================
+    // Example 2: List Apps with Specific Fields
+    // ============================================================
+    console.log('\n🔍 Example 2: List apps with specific fields');
+    console.log('─'.repeat(60));
+    
+    const appsWithFields = await client.apps.list({
+      fields: ['id', 'name', 'enabled'],
+    });
+    
+    console.log(`✅ Found ${appsWithFields.length} app(s) with selected fields:`);
+    appsWithFields.forEach((app, idx) => {
+      console.log(`   ${idx + 1}. ${app.name || 'Unnamed'} (${app.id})`);
+      console.log(`      Enabled: ${app.enabled ? 'Yes' : 'No'}`);
+    });
+
+    // ============================================================
+    // Example 3: Get App Details
+    // ============================================================
+    if (allApps.length > 0) {
+      const firstApp = allApps[0];
+      
+      console.log('\n🔍 Example 3: Get app details');
+      console.log('─'.repeat(60));
+      
+      const app = await client.apps.get(firstApp.id);
+      
+      console.log(`✅ App details for: ${app.id}`);
+      console.log(`   Name: ${app.name || 'N/A'}`);
+      console.log(`   Enabled: ${app.enabled ? 'Yes' : 'No'}`);
+      if (app.createdAt) {
+        console.log(`   Created: ${app.createdAt.toISOString()}`);
+      }
+      if (app.updatedAt) {
+        console.log(`   Updated: ${app.updatedAt.toISOString()}`);
+      }
+      if (app.secret) {
+        console.log(`   Secret: ${app.secret.substring(0, 10)}... (truncated)`);
+      }
+      console.log(`   Note: get() fetches all apps and filters by ID.`);
+      console.log(`   For better performance, use list() and filter client-side.`);
+
+      // ============================================================
+      // Example 4: Update App Name
+      // ============================================================
+      console.log('\n✏️  Example 4: Update app name');
+      console.log('─'.repeat(60));
+      
+      // Note: This example shows the structure but doesn't actually update
+      // to avoid modifying your app names
+      console.log('ℹ️  Example update structure:');
+      console.log(`   await client.apps.update('${app.id}', {`);
+      console.log(`     name: 'Updated App Name',`);
+      console.log(`   });`);
+
+      // ============================================================
+      // Example 5: Rotate App Secret
+      // ============================================================
+      console.log('\n🔄 Example 5: Rotate app secret');
+      console.log('─'.repeat(60));
+      
+      // Note: This example shows the structure but doesn't actually rotate
+      // to avoid invalidating your app credentials
+      console.log('ℹ️  Example secret rotation:');
+      console.log(`   const rotated = await client.apps.rotateSecret('${app.id}');`);
+      console.log(`   console.log('New secret:', rotated.secret);`);
+      console.log(`   ⚠️  Save this secret immediately - it won't be returned again!`);
+      console.log(`   `);
+      console.log(`   Note: Secret rotation is irreversible.`);
+      console.log(`   The old secret will no longer work after rotation.`);
+
+      // ============================================================
+      // Example 6: Filter Apps by Status
+      // ============================================================
+      console.log('\n🔍 Example 6: Filter apps by status');
+      console.log('─'.repeat(60));
+      
+      const enabledApps = allApps.filter((a) => a.enabled);
+      const disabledApps = allApps.filter((a) => !a.enabled);
+      
+      console.log(`✅ App summary:`);
+      console.log(`   Total: ${allApps.length}`);
+      console.log(`   Enabled: ${enabledApps.length}`);
+      console.log(`   Disabled: ${disabledApps.length}`);
+      
+      if (enabledApps.length > 0) {
+        console.log(`   Enabled apps:`);
+        enabledApps.forEach((app, idx) => {
+          console.log(`     ${idx + 1}. ${app.name || 'Unnamed'} (${app.id})`);
+        });
+      }
+
+      // ============================================================
+      // Example 7: List Apps with Secret Field
+      // ============================================================
+      console.log('\n🔐 Example 7: List apps with secret field');
+      console.log('─'.repeat(60));
+      
+      // Note: Including 'secret' in fields will return the secret value
+      // This should be used carefully as secrets are sensitive
+      console.log('ℹ️  To include secrets in the response:');
+      console.log(`   const apps = await client.apps.list({`);
+      console.log(`     fields: ['id', 'name', 'secret'],`);
+      console.log(`   });`);
+      console.log(`   `);
+      console.log(`   ⚠️  Warning: Secrets are sensitive data.`);
+      console.log(`   Only request secrets when absolutely necessary.`);
+
+      // ============================================================
+      // Example 8: Delete App
+      // ============================================================
+      console.log('\n🗑️  Example 8: Delete app');
+      console.log('─'.repeat(60));
+      
+      // Note: This example shows the structure but doesn't actually delete
+      // to avoid removing your apps
+      console.log('ℹ️  Example delete structure:');
+      console.log(`   await client.apps.delete('${app.id}');`);
+      console.log(`   `);
+      console.log(`   ⚠️  Warning: Deletion is permanent and cannot be undone.`);
+    } else {
+      console.log('\n⚠️  No apps found. Skipping app-specific examples.');
+      console.log('   Install an app in Port.io first to see full functionality.');
+    }
+
+    console.log('\n━'.repeat(60));
+    console.log('✅ All app operations completed successfully!\n');
+
+  } catch (error) {
+    console.error('\n❌ Error:', error);
+    
+    if (error instanceof Error) {
+      console.error(`   Message: ${error.message}`);
+      if ('statusCode' in error) {
+        console.error(`   Status Code: ${(error as { statusCode?: number }).statusCode}`);
+      }
+    }
+    
+    process.exit(1);
+  }
+}
+
+main();
+

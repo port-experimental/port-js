@@ -21,6 +21,7 @@ export * from './audit';
 export * from './webhooks';
 export * from './integrations';
 export * from './organization';
+export * from './apps';
 export * from './responses';
 
 /**

@@ -13,6 +13,7 @@ import type {
   OrganizationSecret,
   OrganizationSettings,
 } from './organization';
+import type { App, AppSecret } from './apps';
 
 /**
  * Single item response wrapper
@@ -191,6 +192,40 @@ export interface ApiOrganization extends Omit<Organization, 'settings'> {
  * Raw API Organization Secret type (before transformation)
  */
 export interface ApiOrganizationSecret extends Omit<OrganizationSecret, 'createdAt' | 'updatedAt'> {
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/**
+ * App API responses
+ */
+export interface ApiAppsResponse {
+  apps: (App | ApiApp)[];
+  ok?: boolean;
+}
+
+export interface ApiAppResponse {
+  app: App | ApiApp;
+  ok?: boolean;
+}
+
+export interface ApiAppSecretResponse {
+  app: AppSecret | ApiAppSecret;
+  ok?: boolean;
+}
+
+/**
+ * Raw API App type (before transformation)
+ */
+export interface ApiApp extends Omit<App, 'createdAt' | 'updatedAt'> {
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/**
+ * Raw API App Secret type (before transformation)
+ */
+export interface ApiAppSecret extends Omit<AppSecret, 'createdAt' | 'updatedAt'> {
   createdAt?: string;
   updatedAt?: string;
 }

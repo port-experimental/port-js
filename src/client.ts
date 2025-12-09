@@ -23,6 +23,7 @@ import { AuditResource } from './resources/audit';
 import { WebhookResource } from './resources/webhooks';
 import { IntegrationResource } from './resources/integrations';
 import { OrganizationResource } from './resources/organization';
+import { AppResource } from './resources/apps';
 
 /**
  * Check if the code is running in a browser environment
@@ -116,6 +117,7 @@ export class PortClient {
   private _webhooks?: WebhookResource;
   private _integrations?: IntegrationResource;
   private _organization?: OrganizationResource;
+  private _apps?: AppResource;
 
   /**
    * Create a new Port SDK client
@@ -257,6 +259,13 @@ export class PortClient {
       this._organization = new OrganizationResource(this.httpClient);
     }
     return this._organization;
+  }
+
+  public get apps(): AppResource {
+    if (!this._apps) {
+      this._apps = new AppResource(this.httpClient);
+    }
+    return this._apps;
   }
 
   /**

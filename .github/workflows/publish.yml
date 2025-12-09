@@ -38,6 +38,7 @@ jobs:
     permissions:
       contents: write
       id-token: write  # Required for npm provenance
+      issues: write  # Required to create issues on publish failure
     
     steps:
       - name: Checkout repository
@@ -121,17 +122,40 @@ jobs:
       - name: Update package.json version
         run: |
           VERSION="${{ steps.version.outputs.version }}"
+          
+          # Remove 'v' prefix if present (npm version doesn't accept it)
+          VERSION="${VERSION#v}"
+          
           echo "Updating package.json to version $VERSION"
-          npm version $VERSION --no-git-tag-version
           
-          # Verify version was updated
-          PACKAGE_VERSION=$(node -p "require('./package.json').version")
-          if [ "$PACKAGE_VERSION" != "$VERSION" ]; then
-            echo "❌ Version mismatch: expected $VERSION, got $PACKAGE_VERSION"
-            exit 1
+          # Check if version is already set (to avoid unnecessary update)
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          if [ "$CURRENT_VERSION" = "$VERSION" ]; then
+            echo "✅ Version already set to $VERSION, skipping update"
+          else
+            # Update version using npm version command
+            npm version "$VERSION" --no-git-tag-version || {
+              echo "❌ Failed to update version with npm version command"
+              echo "Attempting manual update..."
+              
+              # Fallback: manually update package.json
+              node -e "
+                const fs = require('fs');
+                const pkg = require('./package.json');
+                pkg.version = '$VERSION';
+                fs.writeFileSync('./package.json', JSON.stringify(pkg, null, 2) + '\n');
+              "
+            }
+            
+            # Verify version was updated
+            PACKAGE_VERSION=$(node -p "require('./package.json').version")
+            if [ "$PACKAGE_VERSION" != "$VERSION" ]; then
+              echo "❌ Version mismatch: expected $VERSION, got $PACKAGE_VERSION"
+              exit 1
+            fi
+            
+            echo "✅ package.json version updated to: $PACKAGE_VERSION"
           fi
-          
-          echo "✅ package.json version: $PACKAGE_VERSION"
       
       - name: Security audit
         id: audit
@@ -379,49 +403,65 @@ jobs:
       - name: Create issue on publish failure
         if: failure() && github.event.inputs.dry_run != 'true'
         uses: actions/github-script@v7
+        continue-on-error: true
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: '❌ npm Publish Failed for v${{ steps.version.outputs.version }}',
-              body: `## 🚨 Publish Failure Alert
+            try {
+              const version = '${{ steps.version.outputs.version }}' || 'unknown';
+              const tag = '${{ steps.npm-tag.outputs.tag }}' || 'latest';
+              const workflowUrl = `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
               
-              The automated npm publish workflow failed.
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `❌ npm Publish Failed for v${version}`,
+                body: `## 🚨 Publish Failure Alert
+                
+                The automated npm publish workflow failed.
+                
+                ### Details
+                - **Version:** ${version}
+                - **Tag:** ${tag}
+                - **Workflow Run:** ${workflowUrl}
+                - **Triggered By:** ${{ github.event_name }}
+                
+                ### Possible Causes
+                - npm authentication failed (check NPM_TOKEN secret)
+                - Version already exists on npm
+                - Build or test failures
+                - Network issues
+                - Version format issues
+                
+                ### Action Required
+                1. Review the workflow logs: ${workflowUrl}
+                2. Check npm authentication token in repository secrets
+                3. Verify version doesn't already exist: \`npm view @port-experimental/port-sdk@${version}\`
+                4. Fix the issue and re-run the workflow
+                
+                ### Manual Publish
+                If urgent, publish manually:
+                \`\`\`bash
+                pnpm install
+                pnpm type-check
+                pnpm test
+                pnpm build
+                npm version ${version} --no-git-tag-version
+                npm publish --access public --tag ${tag}
+                \`\`\`
+                
+                ---
+                **Date:** ${new Date().toISOString()}
+                `,
+                labels: ['bug', 'publish-failure', 'urgent']
+              });
               
-              ### Details
-              - **Version:** ${{ steps.version.outputs.version }}
-              - **Tag:** ${{ steps.npm-tag.outputs.tag }}
-              - **Workflow Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-              - **Triggered By:** ${{ github.event_name }}
-              
-              ### Possible Causes
-              - npm authentication failed
-              - Version already exists on npm
-              - Build or test failures
-              - Network issues
-              
-              ### Action Required
-              1. Review the workflow logs
-              2. Fix the issue
-              3. Re-run the workflow or publish manually
-              
-              ### Manual Publish
-              If urgent, publish manually:
-              \`\`\`bash
-              pnpm install
-              pnpm type-check
-              pnpm test
-              pnpm build
-              npm version ${{ steps.version.outputs.version }} --no-git-tag-version
-              npm publish --access public --tag ${{ steps.npm-tag.outputs.tag }}
-              \`\`\`
-              
-              ---
-              **Date:** ${new Date().toISOString()}
-              `,
-              labels: ['bug', 'publish-failure', 'urgent']
-            });
+              console.log('✅ Issue created successfully');
+            } catch (error) {
+              console.error('❌ Failed to create issue:', error.message);
+              console.log('This is a non-critical failure - workflow will continue');
+              // Don't throw - this is a notification step, not critical
+            }
       
       - name: Summary
         if: always()
