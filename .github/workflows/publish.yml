@@ -90,6 +90,15 @@ jobs:
             VERSION="${VERSION#v}"
           else
             echo "❌ Could not determine version"
+            echo "Event: ${{ github.event_name }}"
+            echo "Ref: ${{ github.ref }}"
+            exit 1
+          fi
+          
+          # Validate version format (semver: x.y.z or x.y.z-prerelease)
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?$ ]]; then
+            echo "❌ Invalid version format: $VERSION"
+            echo "Expected format: x.y.z or x.y.z-prerelease (e.g., 1.2.3 or 1.2.3-beta.1)"
             exit 1
           fi
           
@@ -285,6 +294,42 @@ jobs:
           echo "Package contents:"
           npm pack --dry-run
       
+      - name: Verify npm authentication
+        if: github.event.inputs.dry_run != 'true'
+        run: |
+          if [ -z "${{ secrets.NPM_TOKEN }}" ]; then
+            echo "❌ NPM_TOKEN secret is not set"
+            echo "Please configure NPM_TOKEN in repository settings > Secrets and variables > Actions"
+            exit 1
+          fi
+          
+          # Verify token is valid (check npm whoami)
+          echo "🔐 Verifying npm authentication..."
+          npm whoami --registry=https://registry.npmjs.org || {
+            echo "❌ npm authentication failed"
+            echo "Please check that NPM_TOKEN is valid and has publish permissions"
+            exit 1
+          }
+          echo "✅ npm authentication verified"
+      
+      - name: Check if version already exists
+        if: github.event.inputs.dry_run != 'true'
+        run: |
+          PACKAGE_NAME=$(node -p 'require("./package.json").name')
+          VERSION="${{ steps.version.outputs.version }}"
+          
+          echo "🔍 Checking if version $VERSION already exists on npm..."
+          EXISTING_VERSION=$(npm view $PACKAGE_NAME@$VERSION version 2>/dev/null || echo "")
+          
+          if [ -n "$EXISTING_VERSION" ]; then
+            echo "⚠️  Version $VERSION already exists on npm"
+            echo "Existing version: $EXISTING_VERSION"
+            echo "Skipping publish to avoid duplicate version error"
+            exit 1
+          else
+            echo "✅ Version $VERSION is available for publishing"
+          fi
+      
       - name: Publish to npm
         if: github.event.inputs.dry_run != 'true'
         run: |
@@ -296,7 +341,16 @@ jobs:
           echo ""
           
           # Publish with provenance (supply chain security)
-          npm publish --access public --tag ${{ steps.npm-tag.outputs.tag }} --provenance
+          npm publish --access public --tag ${{ steps.npm-tag.outputs.tag }} --provenance || {
+            echo "❌ npm publish failed"
+            echo ""
+            echo "Common issues:"
+            echo "1. Version already exists: npm view @port-experimental/port-sdk@${{ steps.version.outputs.version }}"
+            echo "2. Authentication failed: Check NPM_TOKEN secret"
+            echo "3. Package name/scope permissions: Verify @port-experimental scope access"
+            echo "4. Network issues: Check npm registry connectivity"
+            exit 1
+          }
           
           echo "✅ Published successfully!"
         env:
