@@ -20,6 +20,7 @@ export * from './users';
 export * from './audit';
 export * from './webhooks';
 export * from './integrations';
+export * from './organization';
 export * from './responses';
 
 /**

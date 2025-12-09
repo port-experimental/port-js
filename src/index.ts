@@ -22,6 +22,7 @@ export { UserResource } from './resources/users';
 export { AuditResource } from './resources/audit';
 export { WebhookResource } from './resources/webhooks';
 export { IntegrationResource } from './resources/integrations';
+export { OrganizationResource } from './resources/organization';
 
 // HTTP Client (for advanced usage)
 export { HttpClient } from './http-client';

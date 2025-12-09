@@ -8,6 +8,11 @@ import type { Entity } from './entities';
 import type { Action, ActionRun } from './actions';
 import type { Scorecard } from './scorecards';
 import type { Integration, IntegrationLog } from './integrations';
+import type {
+  Organization,
+  OrganizationSecret,
+  OrganizationSettings,
+} from './organization';
 
 /**
  * Single item response wrapper
@@ -151,6 +156,41 @@ export interface ApiIntegrationLogsResponse {
  * Raw API Integration type (before transformation)
  */
 export interface ApiIntegration extends Omit<Integration, 'createdAt' | 'updatedAt'> {
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/**
+ * Organization API responses
+ */
+export interface ApiOrganizationResponse {
+  organization: Organization | ApiOrganization;
+  ok?: boolean;
+}
+
+export interface ApiOrganizationSecretsResponse {
+  secrets: (OrganizationSecret | ApiOrganizationSecret)[];
+  ok?: boolean;
+}
+
+export interface ApiOrganizationSecretResponse {
+  secret: OrganizationSecret | ApiOrganizationSecret;
+  ok?: boolean;
+}
+
+/**
+ * Raw API Organization type (before transformation)
+ */
+export interface ApiOrganization extends Omit<Organization, 'settings'> {
+  settings?: Omit<OrganizationSettings, 'supportUserExpiresAt'> & {
+    supportUserExpiresAt?: string;
+  };
+}
+
+/**
+ * Raw API Organization Secret type (before transformation)
+ */
+export interface ApiOrganizationSecret extends Omit<OrganizationSecret, 'createdAt' | 'updatedAt'> {
   createdAt?: string;
   updatedAt?: string;
 }
