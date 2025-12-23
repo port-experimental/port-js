@@ -26,6 +26,7 @@ export { OrganizationResource } from './resources/organization';
 export { AppResource } from './resources/apps';
 export { MigrationResource } from './resources/migrations';
 export { AuthResource } from './resources/auth';
+export { PageResource } from './resources/pages';
 
 // HTTP Client (for advanced usage)
 export { HttpClient } from './http-client';

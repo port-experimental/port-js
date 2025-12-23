@@ -26,6 +26,7 @@ import { OrganizationResource } from './resources/organization';
 import { AppResource } from './resources/apps';
 import { MigrationResource } from './resources/migrations';
 import { AuthResource } from './resources/auth';
+import { PageResource } from './resources/pages';
 
 /**
  * Check if the code is running in a browser environment
@@ -38,12 +39,12 @@ function isBrowserEnvironment(): boolean {
   if (typeof (globalThis as { window?: unknown }).window !== 'undefined') {
     return true;
   }
-  
+
   // Check for document object (browser environment)
   if (typeof (globalThis as { document?: unknown }).document !== 'undefined') {
     return true;
   }
-  
+
   return false;
 }
 
@@ -122,6 +123,7 @@ export class PortClient {
   private _apps?: AppResource;
   private _migrations?: MigrationResource;
   private _auth?: AuthResource;
+  private _pages?: PageResource;
 
   /**
    * Create a new Port SDK client
@@ -284,6 +286,13 @@ export class PortClient {
       this._auth = new AuthResource(this.httpClient);
     }
     return this._auth;
+  }
+
+  public get pages(): PageResource {
+    if (!this._pages) {
+      this._pages = new PageResource(this.httpClient);
+    }
+    return this._pages;
   }
 
   /**

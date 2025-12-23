@@ -105,6 +105,12 @@ describe('EntityResource', () => {
         .rejects
         .toThrow(PortValidationError);
     });
+
+    it('should fetch an entity by identifier with blueprint', async () => {
+      vi.mocked(mockHttpClient.get).mockResolvedValue({ entity: { identifier: 'e1' } });
+      await entityResource.get('e1', 'b1');
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/v1/blueprints/b1/entities/e1', undefined);
+    });
   });
 
   describe('update', () => {
@@ -134,6 +140,16 @@ describe('EntityResource', () => {
       );
       expect(result.title).toBe('Updated Title');
     });
+
+    it('should update an entity with blueprint', async () => {
+      vi.mocked(mockHttpClient.patch).mockResolvedValue({ entity: { identifier: 'e1' } });
+      await entityResource.update('e1', { title: 'T' }, 'b1');
+      expect(mockHttpClient.patch).toHaveBeenCalledWith(
+        '/v1/blueprints/b1/entities/e1',
+        { title: 'T' },
+        undefined
+      );
+    });
   });
 
   describe('delete', () => {
@@ -143,6 +159,17 @@ describe('EntityResource', () => {
       await entityResource.delete('test-entity');
 
       expect(mockHttpClient.delete).toHaveBeenCalledWith('/v1/entities/test-entity', undefined);
+    });
+
+    it('should delete an entity with blueprint', async () => {
+      vi.mocked(mockHttpClient.delete).mockResolvedValue(undefined);
+
+      await entityResource.delete('test-entity', 'service');
+
+      expect(mockHttpClient.delete).toHaveBeenCalledWith(
+        '/v1/blueprints/service/entities/test-entity',
+        undefined
+      );
     });
   });
 
@@ -159,6 +186,30 @@ describe('EntityResource', () => {
 
       expect(result.data).toHaveLength(2);
       expect(result.pagination).toBeDefined();
+    });
+
+    it('should list entities with blueprint', async () => {
+      vi.mocked(mockHttpClient.get).mockResolvedValue({ entities: [] });
+      await entityResource.list({ blueprint: 'service' });
+      expect(mockHttpClient.get).toHaveBeenCalledWith(
+        '/v1/blueprints/service/entities'
+      );
+    });
+  });
+
+  describe('aggregateOverTime', () => {
+    it('should aggregate entities over time', async () => {
+      const input = {
+        func: 'count' as const,
+        query: { blueprint: 'service' },
+      };
+      const expected = { ok: true, aggregation: { value: 10 } };
+      vi.mocked(mockHttpClient.post).mockResolvedValue(expected);
+
+      const result = await entityResource.aggregateOverTime(input);
+
+      expect(mockHttpClient.post).toHaveBeenCalledWith('/v1/entities/aggregate-over-time', input, undefined);
+      expect(result.value).toBe(10);
     });
   });
 
@@ -201,7 +252,7 @@ describe('EntityResource', () => {
   describe('batchUpdate', () => {
     it('should update multiple entities', async () => {
       const updates = [
-        { 
+        {
           identifier: 'entity-1',
           data: {
             properties: { stringProps: { status: 'active' } }
@@ -241,6 +292,107 @@ describe('EntityResource', () => {
 
       expect(result).toHaveLength(1);
     });
+
+    it('should get related entities with blueprint', async () => {
+      vi.mocked(mockHttpClient.get).mockResolvedValue({ entities: [] });
+      await entityResource.getRelated('e1', 'r1', 'b1');
+      expect(mockHttpClient.get).toHaveBeenCalledWith(
+        '/v1/blueprints/b1/entities/e1/relations/r1',
+        undefined
+      );
+    });
+  });
+
+  describe('aggregate', () => {
+    it('should aggregate entities', async () => {
+      const input = {
+        func: 'count' as const,
+        query: { blueprint: 'service' },
+      };
+      const expected = { ok: true, aggregation: { value: 10 } };
+      vi.mocked(mockHttpClient.post).mockResolvedValue(expected);
+
+      const result = await entityResource.aggregate(input);
+
+      expect(mockHttpClient.post).toHaveBeenCalledWith('/v1/entities/aggregate', input, undefined);
+      expect(result.value).toBe(10);
+    });
+  });
+
+  describe('getCount', () => {
+    it('should get entity count for a blueprint', async () => {
+      vi.mocked(mockHttpClient.get).mockResolvedValue({ ok: true, count: 42 });
+
+      const result = await entityResource.getCount('service');
+
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/v1/blueprints/service/entities-count', undefined);
+      expect(result).toBe(42);
+    });
+  });
+
+  describe('bulk operations', () => {
+    it('should bulk delete entities', async () => {
+      const identifiers = ['e1', 'e2'];
+      vi.mocked(mockHttpClient.post).mockResolvedValue({ ok: true, deletedEntities: identifiers });
+
+      const result = await entityResource.bulkDelete('service', identifiers, { delete_dependents: true });
+
+      expect(mockHttpClient.post).toHaveBeenCalledWith(
+        '/v1/blueprints/service/bulk/entities/delete?delete_dependents=true',
+        { entities: identifiers },
+        undefined
+      );
+      expect(result).toEqual(identifiers);
+    });
+
+    it('should delete all entities of a blueprint', async () => {
+      vi.mocked(mockHttpClient.delete).mockResolvedValue({ ok: true });
+
+      await entityResource.deleteAll('service', { delete_blueprint: true });
+
+      expect(mockHttpClient.delete).toHaveBeenCalledWith(
+        '/v1/blueprints/service/all-entities?delete_blueprint=true',
+        undefined
+      );
+    });
+  });
+
+  describe('getPropertiesHistory', () => {
+    it('should return history property from response', async () => {
+      const history = [{ value: 1 }];
+      vi.mocked(mockHttpClient.post).mockResolvedValue({ ok: true, history });
+      const result = await entityResource.getPropertiesHistory({
+        entityIdentifier: 'e1',
+        blueprintIdentifier: 'b1',
+        propertyNames: ['p1']
+      });
+      expect(result).toEqual(history);
+    });
+
+    it('should return raw response if history is missing', async () => {
+      const expected = { ok: true, something: 'else' };
+      vi.mocked(mockHttpClient.post).mockResolvedValue(expected);
+      const result = await entityResource.getPropertiesHistory({
+        entityIdentifier: 'e1',
+        blueprintIdentifier: 'b1',
+        propertyNames: ['p1']
+      });
+      expect(result).toEqual(expected);
+    });
+  });
+
+  describe('Validation edge cases', () => {
+    it('should throw PortValidationError for invalid identifier format in create', async () => {
+      await expect(entityResource.create({ identifier: 'invalid space', blueprint: 'b1' }))
+        .rejects
+        .toThrow(PortValidationError);
+    });
+
+    it('should throw PortValidationError for invalid identifier format in validateIdentifier', async () => {
+      await expect(entityResource.get('invalid space'))
+        .rejects
+        .toThrow(PortValidationError);
+    });
   });
 
   describe('Date transformation', () => {
@@ -257,6 +409,72 @@ describe('EntityResource', () => {
 
       expect(result.createdAt).toBeInstanceOf(Date);
     });
+
+    it('should transform updatedAt string to Date', async () => {
+      const entity = {
+        identifier: 'test',
+        blueprint: 'service',
+        updatedAt: '2025-10-04T00:00:00Z',
+      };
+
+      vi.mocked(mockHttpClient.get).mockResolvedValue({ entity });
+
+      const result = await entityResource.get('test');
+
+      expect(result.updatedAt).toBeInstanceOf(Date);
+    });
+  });
+
+  describe('stream', () => {
+    it('should yield entities one by one', async () => {
+      const page1 = {
+        entities: [{ identifier: 'e1', blueprint: 's1' }],
+        total: 2,
+        limit: 1,
+        offset: 0,
+        hasMore: true,
+      };
+      const page2 = {
+        entities: [{ identifier: 'e2', blueprint: 's1' }],
+        total: 2,
+        limit: 1,
+        offset: 1,
+        hasMore: false,
+      };
+
+      vi.mocked(mockHttpClient.get)
+        .mockResolvedValueOnce(page1)
+        .mockResolvedValueOnce(page2);
+
+      const items: any[] = [];
+      for await (const item of entityResource.stream({ blueprint: 's1' })) {
+        items.push(item);
+      }
+
+      expect(items).toHaveLength(2);
+      expect(items[0].identifier).toBe('e1');
+      expect(items[1].identifier).toBe('e2');
+      expect(mockHttpClient.get).toHaveBeenCalledTimes(2);
+    });
+
+    it('should yield entities one by one without blueprint', async () => {
+      const page = {
+        entities: [{ identifier: 'e1', blueprint: 's1' }],
+        total: 1,
+        limit: 1,
+        offset: 0,
+        hasMore: false,
+      };
+
+      vi.mocked(mockHttpClient.get).mockResolvedValue(page);
+
+      const items: any[] = [];
+      for await (const item of entityResource.stream()) {
+        items.push(item);
+      }
+
+      expect(items).toHaveLength(1);
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/v1/entities?offset=0');
+    });
   });
 });
-

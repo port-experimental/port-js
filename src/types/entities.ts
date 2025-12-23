@@ -94,3 +94,33 @@ export interface BatchUpdateEntityInput {
   data: UpdateEntityInput;
 }
 
+/**
+ * Entity aggregation input
+ */
+export interface EntityAggregationInput {
+  func: 'count' | 'average' | 'sum' | 'min' | 'max' | 'median' | 'countValues';
+  property?: string;
+  relation?: string;
+  scorecard?: string;
+  averageOf?: 'hour' | 'day' | 'week' | 'month' | 'total';
+  measureTimeBy?: string;
+  calculationBy?: string;
+  query: EntitySearchQuery;
+}
+
+/**
+ * Entity properties history input
+ */
+export interface EntityPropertiesHistoryInput {
+  entityIdentifier: string;
+  blueprintIdentifier: string;
+  propertyNames: string[];
+  timeInterval?: 'hour' | 'day' | 'isoWeek' | 'month';
+  timeRange?: {
+    preset?: string;
+    from?: string;
+    to?: string;
+    timeZone?: string;
+  };
+}
+

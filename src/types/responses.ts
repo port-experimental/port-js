@@ -15,6 +15,7 @@ import type {
 } from './organization';
 import type { App, AppSecret } from './apps';
 import type { Migration } from './migrations';
+import type { Page, PageWidget } from './pages';
 
 /**
  * Single item response wrapper
@@ -251,6 +252,43 @@ export interface ApiMigration extends Omit<Migration, 'createdAt' | 'updatedAt' 
   createdAt?: string;
   updatedAt?: string;
   completedAt?: string;
+}
+
+/**
+ * Page API responses
+ */
+export interface ApiPageResponse {
+  page: Page | ApiPage;
+  ok?: boolean;
+}
+
+export interface ApiPagesResponse {
+  pages: (Page | ApiPage)[];
+  ok?: boolean;
+}
+
+/**
+ * Raw API Page type (before transformation)
+ */
+export interface ApiPage extends Omit<Page, 'createdAt' | 'updatedAt'> {
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/**
+ * Widget API responses
+ */
+export interface ApiWidgetResponse {
+  widget: PageWidget | ApiWidget;
+  ok?: boolean;
+}
+
+/**
+ * Raw API Widget type (before transformation)
+ */
+export interface ApiWidget extends Omit<PageWidget, 'createdAt' | 'updatedAt'> {
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 /**

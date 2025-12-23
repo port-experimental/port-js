@@ -16931,7 +16931,14 @@ export interface paths {
         };
         /**
          * Get all integrations
-         * @description This route allows you to fetch all integrations in your Port organization.<br/><br/>To learn more about integrations, check out the [documentation](https://docs.port.io/build-your-software-catalog/sync-data-to-catalog/).
+         * @description This route allows you to fetch all integrations in your Port organization.
+         *     To learn more about integrations, check out the [documentation](https://docs.port.io/build-your-software-catalog/sync-data-to-catalog/).
+         *     :::warning Permission requirements
+         *
+         *     To use this endpoint, you must have a `moderator` or `admin` role in your Port organization.
+         *     To learn more about the different roles and permissions, please refer to the [documentation](/sso-rbac/users-and-teams/manage-users-teams#roles--permissions).
+         *     If you already have an existing Port account, this requirement will be enforced starting **January 1st, 2026**.
+         *     :::
          */
         get: {
             parameters: {
@@ -16992,7 +16999,14 @@ export interface paths {
         };
         /**
          * Get an integration
-         * @description This route allows you to fetch a specific integration in your Port organization.<br/><br/>To learn more about integrations, check out the [documentation](https://docs.port.io/build-your-software-catalog/sync-data-to-catalog/).
+         * @description This route allows you to fetch a specific integration in your Port organization.
+         *     To learn more about integrations, check out the [documentation](https://docs.port.io/build-your-software-catalog/sync-data-to-catalog/).
+         *     :::warning Permission requirements
+         *
+         *     To use this endpoint, you must have a `moderator` or `admin` role in your Port organization.
+         *     To learn more about the different roles and permissions, please refer to the [documentation](/sso-rbac/users-and-teams/manage-users-teams#roles--permissions).
+         *     If you already have an existing Port account, this requirement will be enforced starting **January 1st, 2026**.
+         *     :::
          */
         get: {
             parameters: {
@@ -17304,7 +17318,14 @@ export interface paths {
         };
         /**
          * Get an integration's audit logs
-         * @description This route allows you to fetch the audit logs of a specific integration in your Port organization.<br/><br/>To learn more about integrations, check out the [documentation](https://docs.port.io/build-your-software-catalog/sync-data-to-catalog/).
+         * @description This route allows you to fetch the audit logs of a specific integration in your Port organization.
+         *     To learn more about integrations, check out the [documentation](https://docs.port.io/build-your-software-catalog/sync-data-to-catalog/).
+         *     :::warning Permission requirements
+         *
+         *     To use this endpoint, you must have a `moderator` or `admin` role in your Port organization.
+         *     To learn more about the different roles and permissions, please refer to the [documentation](/sso-rbac/users-and-teams/manage-users-teams#roles--permissions).
+         *     If you already have an existing Port account, this requirement will be enforced starting **January 1st, 2026**.
+         *     :::
          */
         get: {
             parameters: {
@@ -17317,6 +17338,10 @@ export interface paths {
                     log_id?: string;
                     /** @description Determines whether to fetch logs before or after the specified timestamp. */
                     direction?: "up" | "down";
+                    /** @description Filter logs belonging to a specific event. */
+                    eventId?: string | null;
+                    /** @description Filter logs by severity level. */
+                    level?: ("DEBUG" | "INFO" | "WARNING" | "ERROR" | "FATAL")[] | null;
                 };
                 header?: never;
                 path: {
@@ -17531,7 +17556,13 @@ export interface paths {
         };
         /**
          * Get all webhooks
-         * @description This route allows you to fetch all webhooks configured in your Port organization. You can also see them in the [data sources page](https://app.getport.io/settings/data-sources) of your Port account.<br/><br/>To learn more about webhooks, check out the [documentation](https://docs.port.io/build-your-software-catalog/custom-integration/webhook/).<br/><br/>:::warning Permission requirements<br/>To use this endpoint, you must have a `moderator` or `admin` role in your Port organization.<br/><br/>To learn more about the different roles and permissions, please refer to the [documentation](/sso-rbac/users-and-teams/manage-users-teams#roles--permissions).<br/><br/>If you already have an existing Port account, this requirement will be enforced starting **November 15th, 2025**.<br/>:::
+         * @description This route allows you to fetch all webhooks configured in your Port organization. You can also see them in the [data sources page](https://app.getport.io/settings/data-sources) of your Port account.
+         *     To learn more about webhooks, check out the [documentation](https://docs.port.io/build-your-software-catalog/custom-integration/webhook/).
+         *     :::warning Permission requirements
+         *     To use this endpoint, you must have a `moderator` or `admin` role in your Port organization.
+         *     To learn more about the different roles and permissions, please refer to the [documentation](/sso-rbac/users-and-teams/manage-users-teams#roles--permissions).
+         *     If you already have an existing Port account, this requirement will be enforced starting **January 1st, 2026**.
+         *     :::
          */
         get: {
             parameters: {
@@ -17699,7 +17730,13 @@ export interface paths {
         };
         /**
          * Get a webhook
-         * @description This route allows you to fetch a specific webhook in your Port organization. You can also see it in the [data sources page](https://app.getport.io/settings/data-sources) of your Port account.<br/><br/>To learn more about webhooks, check out the [documentation](https://docs.port.io/build-your-software-catalog/custom-integration/webhook/).<br/><br/>:::warning Permission requirements<br/>To use this endpoint, you must have a `moderator` or `admin` role in your Port organization.<br/><br/>To learn more about the different roles and permissions, please refer to the [documentation](/sso-rbac/users-and-teams/manage-users-teams#roles--permissions).<br/><br/>If you already have an existing Port account, this requirement will be enforced starting **November 15th, 2025**.<br/>:::
+         * @description This route allows you to fetch a specific webhook in your Port organization. You can also see it in the [data sources page](https://app.getport.io/settings/data-sources) of your Port account.
+         *     To learn more about webhooks, check out the [documentation](https://docs.port.io/build-your-software-catalog/custom-integration/webhook/).
+         *     :::warning Permission requirements
+         *     To use this endpoint, you must have a `moderator` or `admin` role in your Port organization.
+         *     To learn more about the different roles and permissions, please refer to the [documentation](/sso-rbac/users-and-teams/manage-users-teams#roles--permissions).
+         *     If you already have an existing Port account, this requirement will be enforced starting **January 1st, 2026**.
+         *     :::
          */
         get: {
             parameters: {

@@ -270,6 +270,84 @@ describe('BlueprintResource', () => {
     });
   });
 
+  describe('permissions', () => {
+    it('should get blueprint permissions', async () => {
+      const permissions = {
+        entities: {
+          read: { users: ['test@port.io'] },
+        },
+      };
+
+      vi.mocked(mockHttpClient.get).mockResolvedValue({ permissions });
+
+      const result = await blueprintResource.getPermissions('service');
+
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/v1/blueprints/service/permissions', undefined);
+      expect(result).toEqual(permissions);
+    });
+
+    it('should update blueprint permissions', async () => {
+      const permissions = {
+        entities: {
+          read: { roles: ['Admin'] },
+        },
+      };
+
+      vi.mocked(mockHttpClient.patch).mockResolvedValue({ permissions });
+
+      const result = await blueprintResource.updatePermissions('service', permissions);
+
+      expect(mockHttpClient.patch).toHaveBeenCalledWith(
+        '/v1/blueprints/service/permissions',
+        permissions,
+        undefined
+      );
+      expect(result).toEqual(permissions);
+    });
+  });
+
+  describe('rename', () => {
+    it('should rename a property', async () => {
+      const expected = { identifier: 'service', title: 'Service' };
+      vi.mocked(mockHttpClient.patch).mockResolvedValue({ blueprint: expected });
+
+      const result = await blueprintResource.renameProperty('service', 'old-prop', 'new-prop');
+
+      expect(mockHttpClient.patch).toHaveBeenCalledWith(
+        '/v1/blueprints/service/properties/old-prop/rename',
+        { newPropertyName: 'new-prop' },
+        undefined
+      );
+      expect(result.identifier).toBe('service');
+    });
+
+    it('should rename a mirror property', async () => {
+      const expected = { identifier: 'service', title: 'Service' };
+      vi.mocked(mockHttpClient.patch).mockResolvedValue({ blueprint: expected });
+
+      const result = await blueprintResource.renameMirrorProperty('service', 'old-mirror', 'new-mirror');
+
+      expect(mockHttpClient.patch).toHaveBeenCalledWith(
+        '/v1/blueprints/service/mirror/old-mirror/rename',
+        { newMirrorName: 'new-mirror' },
+        undefined
+      );
+    });
+
+    it('should rename a relation', async () => {
+      const expected = { identifier: 'service', title: 'Service' };
+      vi.mocked(mockHttpClient.patch).mockResolvedValue({ blueprint: expected });
+
+      const result = await blueprintResource.renameRelation('service', 'old-rel', 'new-rel');
+
+      expect(mockHttpClient.patch).toHaveBeenCalledWith(
+        '/v1/blueprints/service/relations/old-rel/rename',
+        { newRelationIdentifier: 'new-rel' },
+        undefined
+      );
+    });
+  });
+
   describe('Validation', () => {
     it('should validate identifier format allows alphanumeric, hyphens, underscores', () => {
       const validIdentifiers = [
