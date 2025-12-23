@@ -49,9 +49,10 @@ const entity = await client.entities.create({
 The SDK provides resource-based access:
 
 ```typescript
-client.entities // Create, read, update, delete entities
-client.blueprints // Manage blueprints
+client.entities // Create, read, update, delete, aggregate and stream entities
+client.blueprints // Manage blueprints and permissions
 client.actions // Execute actions
+client.pages // Manage pages and dashboards
 client.teams // Manage teams
 client.users // Manage users
 client.webhooks // Configure webhooks
@@ -84,15 +85,29 @@ await client.entities.update('my-service', 'service', {
 
 // Search
 const results = await client.entities.search({
- combinator: 'and',
- rules: [
- { property: '$blueprint', operator: '=', value: 'service' },
- { property: 'environment', operator: '=', value: 'production' },
- ],
+  combinator: 'and',
+  rules: [
+    { property: '$blueprint', operator: '=', value: 'service' },
+    { property: 'environment', operator: '=', value: 'production' },
+  ],
+});
+
+// Stream (Async Iterator)
+for await (const entity of client.entities.stream({ blueprint: 'service' })) {
+  console.log(entity.identifier);
+}
+
+// Aggregate
+const stats = await client.entities.aggregate({
+  blueprint: 'service',
+  aggregations: {
+    total_count: { func: 'count' },
+  },
 });
 
 // Delete
 await client.entities.delete('my-service', 'service');
+await client.entities.deleteAll('service'); // Delete all entities in a blueprint
 ```
 
 ### Blueprints
@@ -106,13 +121,88 @@ const blueprint = await client.blueprints.get('service');
 
 // Create
 await client.blueprints.create({
- identifier: 'microservice',
- title: 'Microservice',
- schema: {
- properties: {
- name: { type: 'string', title: 'Name' },
- },
- },
+  identifier: 'microservice',
+  title: 'Microservice',
+  schema: {
+    properties: {
+      name: { type: 'string', title: 'Name' },
+    },
+  },
+});
+
+// Permissions
+const perms = await client.blueprints.getPermissions('service');
+await client.blueprints.updatePermissions('service', {
+  read: { users: ['admin@port.io'] },
+});
+```
+
+### Pages
+
+```typescript
+// List all pages
+const pages = await client.pages.list();
+
+// Get a page by ID
+const page = await client.pages.get('my-page-id');
+
+// Create a new page
+await client.pages.create({
+  identifier: 'new-page',
+  title: 'My New Page',
+  blueprint: 'service',
+  widgets: [], // Add widgets here
+});
+
+// Update a page
+await client.pages.update('new-page', {
+  title: 'Updated Page Title',
+});
+
+// Delete a page
+await client.pages.delete('new-page');
+```
+
+### Widgets
+
+```typescript
+// Add a widget to a page
+await client.pages.addWidget('my-page-id', {
+  type: 'scorecard',
+  title: 'Service Scorecard',
+  scorecard: 'my-scorecard-id',
+});
+
+// Update a widget on a page
+await client.pages.updateWidget('my-page-id', 'widget-id-123', {
+  title: 'Updated Scorecard Title',
+});
+
+// Delete a widget from a page
+await client.pages.deleteWidget('my-page-id', 'widget-id-123');
+```
+
+### Advanced Operations
+
+```typescript
+// Execute a custom action
+await client.actions.execute('my-action-id', {
+  properties: {
+    entity: 'my-service',
+  },
+});
+
+// Get audit logs
+const auditLogs = await client.audit.list({
+  from: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // Last 7 days
+});
+
+// Webhooks
+const webhooks = await client.webhooks.list();
+await client.webhooks.create({
+  identifier: 'my-webhook',
+  url: 'https://my-service.com/webhook',
+  events: ['entity_created', 'entity_updated'],
 });
 ```
 

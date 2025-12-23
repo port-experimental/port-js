@@ -163,14 +163,20 @@ const client = new PortClient({
 ## Available Resources
 
 ```typescript
-client.entities // Create, read, update, delete entities
-client.blueprints // Manage blueprints
+client.entities // Create, read, update, delete, aggregate and stream entities
+client.blueprints // Manage blueprints and permissions
 client.actions // Execute actions
+client.pages // Manage pages and dashboards
 client.teams // Manage teams
 client.users // Manage users
 client.webhooks // Configure webhooks
-client.scorecards // Work with scorecards
+client.scorecards // Manage scorecards
 client.audit // Query audit logs
+client.integrations // Manage integrations
+client.organization // Manage organization settings
+client.apps // Manage Port apps
+client.migrations // Manage data migrations
+client.auth // Custom authentication operations
 ```
 
 ## Examples
