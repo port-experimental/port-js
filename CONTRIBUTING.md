@@ -2,11 +2,11 @@
 
 Thank you for your interest in contributing to the Port SDK! This document provides guidelines and instructions for contributing.
 
-## 🌟 Code of Conduct
+## Code of Conduct
 
 Be respectful, inclusive, and professional. We're all here to build great software together.
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -52,7 +52,7 @@ pnpm test:ui
 PORT_CLIENT_ID=xxx PORT_CLIENT_SECRET=yyy pnpm test:integration
 ```
 
-## 📋 Development Guidelines
+## Development Guidelines
 
 ### 1. Security First
 
@@ -69,17 +69,17 @@ Key security principles:
 ### 2. TypeScript Standards
 
 ```typescript
-// ✅ GOOD - Strict typing
+// [OK] GOOD - Strict typing
 function processEntity(entity: Entity): ProcessedEntity {
-  if (!isValidEntity(entity)) {
-    throw new ValidationError('Invalid entity');
-  }
-  return transform(entity);
+ if (!isValidEntity(entity)) {
+ throw new ValidationError('Invalid entity');
+ }
+ return transform(entity);
 }
 
-// ❌ BAD - Using any
+// [ERROR] BAD - Using any
 function processEntity(entity: any): any {
-  return entity;
+ return entity;
 }
 ```
 
@@ -96,15 +96,15 @@ All contributions must include tests:
 ```typescript
 // Unit test example
 describe('EntityResource.create()', () => {
-  it('should create entity with valid data', async () => {
-    const entity = await resource.create(validData);
-    expect(entity.identifier).toBe(validData.identifier);
-  });
+ it('should create entity with valid data', async () => {
+ const entity = await resource.create(validData);
+ expect(entity.identifier).toBe(validData.identifier);
+ });
 
-  it('should throw ValidationError for invalid data', async () => {
-    await expect(resource.create(invalidData))
-      .rejects.toThrow(PortValidationError);
-  });
+ it('should throw ValidationError for invalid data', async () => {
+ await expect(resource.create(invalidData))
+ .rejects.toThrow(PortValidationError);
+ });
 });
 ```
 
@@ -170,7 +170,7 @@ BREAKING CHANGE: Node 20+ is now required
 - [Commit Message Cheatsheet](./docs/development/COMMIT_MESSAGES.md) - Quick reference
 - [Complete Guidelines](./.cursor/rules/changelog-automation.mdc) - Full documentation
 
-## 🔧 Contributing Process
+## Contributing Process
 
 ### 1. Create an Issue
 
@@ -246,7 +246,7 @@ Before submitting:
 - [ ] No credentials or secrets in code
 - [ ] Security guidelines followed (`.cursorrules`)
 
-## 📚 Documentation
+## Documentation
 
 ### Adding Documentation
 
@@ -258,8 +258,7 @@ Before submitting:
 ### Documentation Style
 
 ```typescript
-/**
- * Creates a new entity in Port
+/** * Creates a new entity in Port
  * 
  * @param data - The entity data conforming to its blueprint schema
  * @returns The created entity with server-assigned fields
@@ -270,37 +269,37 @@ Before submitting:
  * @example
  * ```typescript
  * const entity = await client.entities.create({
- *   identifier: 'my-service',
- *   blueprint: 'service',
- *   title: 'My Service',
+ * identifier: 'my-service',
+ * blueprint: 'service',
+ * title: 'My Service',
  * });
  * ```
  */
 async create(data: CreateEntityInput): Promise<Entity> {
-  // Implementation
+ // Implementation
 }
 ```
 
-## 🧪 Testing Guidelines
+## Testing Guidelines
 
 ### Writing Tests
 
 ```typescript
 // Organize tests by functionality
 describe('EntityResource', () => {
-  describe('create()', () => {
-    it('should create entity with valid data', () => {});
-    it('should validate required fields', () => {});
-    it('should handle network errors', () => {});
-  });
+ describe('create()', () => {
+ it('should create entity with valid data', () => {});
+ it('should validate required fields', () => {});
+ it('should handle network errors', () => {});
+ });
 
-  describe('update()', () => {
-    // Update tests
-  });
+ describe('update()', () => {
+ // Update tests
+ });
 });
 ```
 
-## 🔍 Code Review Process
+## Code Review Process
 
 ### Pull Request Template
 
@@ -349,30 +348,27 @@ Closes #XXX
 
 #### During Development
 
-1. **Keep PRs focused**
-   - One feature or fix per PR
-   - Avoid mixing refactoring with features
-   - Split large changes into smaller PRs
+1. **Keep PRs focused** - One feature or fix per PR
+ - Avoid mixing refactoring with features
+ - Split large changes into smaller PRs
 
-2. **Write descriptive commits**
-   ```bash
-   # Good
-   feat(entities): add batch update operation
-   fix(http): prevent token refresh race condition
-   
-   # Bad
-   update code
-   fix bug
-   ```
+2. **Write descriptive commits** ```bash
+ # Good
+ feat(entities): add batch update operation
+ fix(http): prevent token refresh race condition
+ 
+ # Bad
+ update code
+ fix bug
+ ```
 
-3. **Test thoroughly**
-   ```bash
-   # Before pushing
-   pnpm test
-   pnpm type-check
-   pnpm build
-   pnpm audit --prod
-   ```
+3. **Test thoroughly** ```bash
+ # Before pushing
+ pnpm test
+ pnpm type-check
+ pnpm build
+ pnpm audit --prod
+ ```
 
 #### Responding to Reviews
 
@@ -403,69 +399,69 @@ Added retry logic with exponential backoff. Also added test coverage for this sc
 #### Review Priorities
 
 1. **Security** (Critical)
-   - No hardcoded credentials
-   - Proper input validation
-   - Safe error handling
-   - No sensitive data in logs
+ - No hardcoded credentials
+ - Proper input validation
+ - Safe error handling
+ - No sensitive data in logs
 
 2. **Correctness** (Critical)
-   - Logic is correct
-   - Edge cases handled
-   - No breaking changes (unless intentional)
+ - Logic is correct
+ - Edge cases handled
+ - No breaking changes (unless intentional)
 
 3. **Testing** (High)
-   - Tests exist and are meaningful
-   - Tests actually test the right thing
+ - Tests exist and are meaningful
+ - Tests actually test the right thing
 
 4. **Code Quality** (High)
-   - Follows style guidelines
-   - TypeScript strict mode compliance
-   - Clear naming
-   - Reasonable complexity
+ - Follows style guidelines
+ - TypeScript strict mode compliance
+ - Clear naming
+ - Reasonable complexity
 
 5. **Documentation** (Medium)
-   - Public APIs documented
-   - README updated if needed
-   - Examples provided for new features
+ - Public APIs documented
+ - README updated if needed
+ - Examples provided for new features
 
 #### Review Checklist
 
 ```markdown
-### Security ⚠️
+### Security [WARNING]
 - [ ] No credentials or secrets in code
 - [ ] Input validation present
 - [ ] Error messages don't leak sensitive info
 - [ ] Dependencies are from trusted sources
 - [ ] No `eval()` or unsafe code execution
 
-### Functionality ✅
+### Functionality [OK]
 - [ ] Code works as intended
 - [ ] Edge cases handled
 - [ ] Error paths tested
 - [ ] No obvious bugs
 - [ ] Breaking changes documented
 
-### Code Quality 📝
+### Code Quality 
 - [ ] TypeScript strict mode (no `any`)
 - [ ] Clear naming
 - [ ] Reasonable complexity
 - [ ] No code duplication
 - [ ] Follows existing patterns
 
-### Testing 🧪
+### Testing 
 - [ ] Unit tests present
 - [ ] Integration tests if needed
 - [ ] Tests are clear and focused
 - [ ] Tests actually run and pass
 
-### Documentation 📚
+### Documentation 
 - [ ] JSDoc for public APIs
 - [ ] README updated if needed
 - [ ] CHANGELOG updated
 - [ ] Examples provided
 - [ ] Clear commit messages
 
-### Performance ⚡
+### Performance 
 - [ ] No obvious performance issues
 - [ ] Async operations handled correctly
 - [ ] No memory leaks
@@ -474,37 +470,31 @@ Added retry logic with exponential backoff. Also added test coverage for this sc
 
 #### Providing Feedback
 
-**Be constructive and specific:**
-
-```markdown
-# ✅ Good feedback
+**Be constructive and specific:** ```markdown
+# [OK] Good feedback
 Consider using `Promise.all()` here to parallelize these requests.
 This would reduce the total time from ~5s to ~1s.
 
-# ❌ Vague feedback
+# [ERROR] Vague feedback
 This is slow.
 ```
 
-**Distinguish between blocking and non-blocking:**
-
-```markdown
+**Distinguish between blocking and non-blocking:** ```markdown
 # Blocking (must fix)
-⚠️ **Blocking**: This exposes the API token in error messages.
+[WARNING] **Blocking**: This exposes the API token in error messages.
 Please sanitize before logging.
 
 # Non-blocking (suggestion)
-💡 **Suggestion**: Consider extracting this logic into a helper function
+ **Suggestion**: Consider extracting this logic into a helper function
 for better reusability. Not blocking, but would improve maintainability.
 ```
 
-**Recognize good work:**
-
-```markdown
+**Recognize good work:** ```markdown
 Nice! This is a much cleaner approach than what we had before.
 
 Great tests for this edge case!
 
-Love the detailed JSDoc comments here. 👍
+Love the detailed JSDoc comments here. 
 ```
 
 #### Review Timeline
@@ -527,7 +517,7 @@ At least **2 approvals** required for:
 - Security-related changes
 - Major new features
 
-## 🐛 Reporting Bugs
+## Reporting Bugs
 
 ### Security Vulnerabilities
 
@@ -542,7 +532,7 @@ Open an issue with:
 - Environment details (Node version, OS, etc.)
 - Code samples or error messages
 
-## 💡 Feature Requests
+## Feature Requests
 
 Open an issue with:
 - Clear description of the feature
@@ -550,7 +540,7 @@ Open an issue with:
 - Proposed API or implementation
 - Willingness to contribute
 
-## 📦 Release Process
+## Release Process
 
 (For maintainers)
 
@@ -566,32 +556,27 @@ We follow [Semantic Versioning](https://semver.org/):
 
 Before releasing:
 
-1. **All tests pass**
-   ```bash
-   pnpm test
-   pnpm test:integration
-   ```
+1. **All tests pass** ```bash
+ pnpm test
+ pnpm test:integration
+ ```
 
-2. **No security vulnerabilities**
-   ```bash
-   pnpm audit --prod
-   ```
+2. **No security vulnerabilities** ```bash
+ pnpm audit --prod
+ ```
 
-3. **Build succeeds**
-   ```bash
-   pnpm build
-   ```
+3. **Build succeeds** ```bash
+ pnpm build
+ ```
 
-4. **Type checking passes**
-   ```bash
-   pnpm type-check
-   pnpm types:check
-   ```
+4. **Type checking passes** ```bash
+ pnpm type-check
+ pnpm types:check
+ ```
 
-5. **Documentation updated**
-   - README.md
-   - CHANGELOG.md
-   - API documentation
+5. **Documentation updated** - README.md
+ - CHANGELOG.md
+ - API documentation
 
 ### Release Steps
 
@@ -709,17 +694,15 @@ npm publish
 npm unpublish @port-experimental/port-sdk@x.x.x
 ```
 
-## 🤝 Community
+## Community
 
-- 💬 [Slack Community](https://www.getport.io/community)
-- 🐛 [GitHub Issues](https://github.com/port-experimental/port-sdk/issues)
-- 📖 [Documentation](https://docs.getport.io)
+- [Slack Community](https://www.getport.io/community)
+- [GitHub Issues](https://github.com/port-experimental/port-sdk/issues)
+- [Documentation](https://docs.getport.io)
 
-## 📄 License
+## License
 
 By contributing, you agree that your contributions will be licensed under the MIT License.
 
----
-
-Thank you for contributing to Port SDK! 🎉
+--- Thank you for contributing to Port SDK! 
 

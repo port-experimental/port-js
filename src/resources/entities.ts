@@ -18,9 +18,12 @@ import type {
   EntitySearchQuery,
   PaginatedResponse,
   BatchUpdateEntityInput,
+  EntityAggregationInput,
+  EntityPropertiesHistoryInput,
   ApiEntity,
   ApiEntityResponse,
   ApiEntitiesResponse,
+  ApiItemResponse,
 } from '../types';
 import type { RequestOptions } from '../http-client';
 
@@ -79,7 +82,7 @@ export class EntityResource extends BaseResource {
    */
   async create(data: CreateEntityInput, options?: RequestOptions): Promise<Entity> {
     this.validateCreateInput(data);
-    
+
     const response = await this.httpClient.post<ApiEntityResponse>(
       `${this.basePath}/${encodeURIComponent(data.blueprint)}/entities`,
       data,
@@ -211,7 +214,7 @@ export class EntityResource extends BaseResource {
    */
   async list(options?: ListEntityOptions): Promise<PaginatedResponse<Entity>> {
     let path: string;
-    
+
     if (options?.blueprint) {
       path = this.buildUrl(
         `${this.basePath}/${encodeURIComponent(options.blueprint)}/entities`,
@@ -238,6 +241,33 @@ export class EntityResource extends BaseResource {
   }
 
   /**
+   * Stream all entities using an async generator
+   * 
+   * @param options - Filter and pagination options
+   * @yields Entities one by one
+   * 
+   * @example
+   * ```typescript
+   * for await (const entity of client.entities.stream({ blueprint: 'service' })) {
+   *   console.log(entity.identifier);
+   * }
+   * ```
+   */
+  async *stream(options?: ListEntityOptions): AsyncIterableIterator<Entity> {
+    let path: string;
+
+    if (options?.blueprint) {
+      path = `${this.basePath}/${encodeURIComponent(options.blueprint)}/entities`;
+    } else {
+      path = '/v1/entities';
+    }
+
+    for await (const entity of super.streamPaginated<Entity>(path, options, 'entities')) {
+      yield this.transformEntity(entity);
+    }
+  }
+
+  /**
    * Search entities with advanced filtering
    * 
    * @param query - Search query with rules and filters
@@ -259,7 +289,7 @@ export class EntityResource extends BaseResource {
    */
   async search(query: EntitySearchQuery, options?: RequestOptions): Promise<Entity[]> {
     const path = '/v1/entities/search';
-    
+
     const response = await this.httpClient.post<ApiEntitiesResponse>(
       path,
       query,
@@ -323,6 +353,116 @@ export class EntityResource extends BaseResource {
     );
 
     return response.entities.map(e => this.transformEntity(e));
+  }
+
+  /**
+   * Aggregate entities based on rules
+   * 
+   * @param input - Aggregation configuration
+   * @param options - Optional request options
+   * @returns Aggregation results
+   */
+  async aggregate(input: EntityAggregationInput, options?: RequestOptions): Promise<any> {
+    const response = await this.httpClient.post<any>('/v1/entities/aggregate', input, options);
+    return response.aggregation || response;
+  }
+
+  /**
+   * Aggregate entities over time
+   * 
+   * @param input - Aggregation configuration
+   * @param options - Optional request options
+   * @returns Aggregation over time results
+   */
+  async aggregateOverTime(input: EntityAggregationInput, options?: RequestOptions): Promise<any> {
+    const response = await this.httpClient.post<any>(
+      '/v1/entities/aggregate-over-time',
+      input,
+      options
+    );
+    return response.aggregation || response;
+  }
+
+  /**
+   * Fetch history of entity properties
+   * 
+   * @param input - History request configuration
+   * @param options - Optional request options
+   * @returns Historical property values
+   */
+  async getPropertiesHistory(
+    input: EntityPropertiesHistoryInput,
+    options?: RequestOptions
+  ): Promise<any> {
+    const response = await this.httpClient.post<any>(
+      '/v1/entities/properties-history',
+      input,
+      options
+    );
+    return response.history || response;
+  }
+
+  /**
+   * Get entity count for a blueprint
+   * 
+   * @param blueprintIdentifier - Blueprint identifier
+   * @param options - Optional request options
+   * @returns Number of entities in the blueprint
+   */
+  async getCount(blueprintIdentifier: string, options?: RequestOptions): Promise<number> {
+    const response = await this.httpClient.get<ApiItemResponse<number>>(
+      `/v1/blueprints/${encodeURIComponent(blueprintIdentifier)}/entities-count`,
+      options
+    );
+    return response.count as number;
+  }
+
+  /**
+   * Delete all entities of a blueprint
+   * 
+   * @param blueprintIdentifier - Blueprint identifier
+   * @param options - Deletion options (run_id, delete_blueprint)
+   */
+  async deleteAll(
+    blueprintIdentifier: string,
+    options?: { run_id?: string; delete_blueprint?: boolean; requestOptions?: RequestOptions }
+  ): Promise<void> {
+    const url = this.buildUrl(
+      `/v1/blueprints/${encodeURIComponent(blueprintIdentifier)}/all-entities`,
+      {
+        run_id: options?.run_id,
+        delete_blueprint: options?.delete_blueprint,
+      }
+    );
+    await this.httpClient.delete(url, options?.requestOptions);
+  }
+
+  /**
+   * Bulk delete entities of a blueprint
+   * 
+   * @param blueprintIdentifier - Blueprint identifier
+   * @param identifiers - Array of entity identifiers to delete
+   * @param options - Deletion options (delete_dependents, run_id)
+   * @returns Array of deleted entity identifiers
+   */
+  async bulkDelete(
+    blueprintIdentifier: string,
+    identifiers: string[],
+    options?: { delete_dependents?: boolean; run_id?: string; requestOptions?: RequestOptions }
+  ): Promise<string[]> {
+    const url = this.buildUrl(
+      `/v1/blueprints/${encodeURIComponent(blueprintIdentifier)}/bulk/entities/delete`,
+      {
+        delete_dependents: options?.delete_dependents ?? false,
+        run_id: options?.run_id,
+      }
+    );
+    const response = await this.httpClient.post<any>(
+      url,
+      { entities: identifiers },
+      options?.requestOptions
+    );
+    return response.deletedEntities || [];
   }
 
   /**

@@ -21,6 +21,12 @@ import { TeamResource } from './resources/teams';
 import { UserResource } from './resources/users';
 import { AuditResource } from './resources/audit';
 import { WebhookResource } from './resources/webhooks';
+import { IntegrationResource } from './resources/integrations';
+import { OrganizationResource } from './resources/organization';
+import { AppResource } from './resources/apps';
+import { MigrationResource } from './resources/migrations';
+import { AuthResource } from './resources/auth';
+import { PageResource } from './resources/pages';
 
 /**
  * Check if the code is running in a browser environment
@@ -33,12 +39,12 @@ function isBrowserEnvironment(): boolean {
   if (typeof (globalThis as { window?: unknown }).window !== 'undefined') {
     return true;
   }
-  
+
   // Check for document object (browser environment)
   if (typeof (globalThis as { document?: unknown }).document !== 'undefined') {
     return true;
   }
-  
+
   return false;
 }
 
@@ -112,6 +118,12 @@ export class PortClient {
   private _users?: UserResource;
   private _audit?: AuditResource;
   private _webhooks?: WebhookResource;
+  private _integrations?: IntegrationResource;
+  private _organization?: OrganizationResource;
+  private _apps?: AppResource;
+  private _migrations?: MigrationResource;
+  private _auth?: AuthResource;
+  private _pages?: PageResource;
 
   /**
    * Create a new Port SDK client
@@ -239,6 +251,48 @@ export class PortClient {
       this._webhooks = new WebhookResource(this.httpClient);
     }
     return this._webhooks;
+  }
+
+  public get integrations(): IntegrationResource {
+    if (!this._integrations) {
+      this._integrations = new IntegrationResource(this.httpClient);
+    }
+    return this._integrations;
+  }
+
+  public get organization(): OrganizationResource {
+    if (!this._organization) {
+      this._organization = new OrganizationResource(this.httpClient);
+    }
+    return this._organization;
+  }
+
+  public get apps(): AppResource {
+    if (!this._apps) {
+      this._apps = new AppResource(this.httpClient);
+    }
+    return this._apps;
+  }
+
+  public get migrations(): MigrationResource {
+    if (!this._migrations) {
+      this._migrations = new MigrationResource(this.httpClient);
+    }
+    return this._migrations;
+  }
+
+  public get auth(): AuthResource {
+    if (!this._auth) {
+      this._auth = new AuthResource(this.httpClient);
+    }
+    return this._auth;
+  }
+
+  public get pages(): PageResource {
+    if (!this._pages) {
+      this._pages = new PageResource(this.httpClient);
+    }
+    return this._pages;
   }
 
   /**

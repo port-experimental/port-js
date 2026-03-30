@@ -7,6 +7,15 @@ import type { Blueprint } from './blueprints';
 import type { Entity } from './entities';
 import type { Action, ActionRun } from './actions';
 import type { Scorecard } from './scorecards';
+import type { Integration, IntegrationLog } from './integrations';
+import type {
+  Organization,
+  OrganizationSecret,
+  OrganizationSettings,
+} from './organization';
+import type { App, AppSecret } from './apps';
+import type { Migration } from './migrations';
+import type { Page, PageWidget } from './pages';
 
 /**
  * Single item response wrapper
@@ -126,5 +135,169 @@ export interface ApiScorecardsResponse {
 export interface ApiScorecard extends Omit<Scorecard, 'createdAt' | 'updatedAt'> {
   createdAt?: string;
   updatedAt?: string;
+}
+
+/**
+ * Integration API responses
+ */
+export interface ApiIntegrationResponse {
+  integration: Integration | ApiIntegration;
+  ok?: boolean;
+}
+
+export interface ApiIntegrationsResponse {
+  integrations: (Integration | ApiIntegration)[];
+  ok?: boolean;
+}
+
+export interface ApiIntegrationLogsResponse {
+  logs: IntegrationLog[];
+  ok?: boolean;
+}
+
+/**
+ * Raw API Integration type (before transformation)
+ */
+export interface ApiIntegration extends Omit<Integration, 'createdAt' | 'updatedAt'> {
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/**
+ * Organization API responses
+ */
+export interface ApiOrganizationResponse {
+  organization: Organization | ApiOrganization;
+  ok?: boolean;
+}
+
+export interface ApiOrganizationSecretsResponse {
+  secrets: (OrganizationSecret | ApiOrganizationSecret)[];
+  ok?: boolean;
+}
+
+export interface ApiOrganizationSecretResponse {
+  secret: OrganizationSecret | ApiOrganizationSecret;
+  ok?: boolean;
+}
+
+/**
+ * Raw API Organization type (before transformation)
+ */
+export interface ApiOrganization extends Omit<Organization, 'settings'> {
+  settings?: Omit<OrganizationSettings, 'supportUserExpiresAt'> & {
+    supportUserExpiresAt?: string;
+  };
+}
+
+/**
+ * Raw API Organization Secret type (before transformation)
+ */
+export interface ApiOrganizationSecret extends Omit<OrganizationSecret, 'createdAt' | 'updatedAt'> {
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/**
+ * App API responses
+ */
+export interface ApiAppsResponse {
+  apps: (App | ApiApp)[];
+  ok?: boolean;
+}
+
+export interface ApiAppResponse {
+  app: App | ApiApp;
+  ok?: boolean;
+}
+
+export interface ApiAppSecretResponse {
+  app: AppSecret | ApiAppSecret;
+  ok?: boolean;
+}
+
+/**
+ * Raw API App type (before transformation)
+ */
+export interface ApiApp extends Omit<App, 'createdAt' | 'updatedAt'> {
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/**
+ * Raw API App Secret type (before transformation)
+ */
+export interface ApiAppSecret extends Omit<AppSecret, 'createdAt' | 'updatedAt'> {
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/**
+ * Migration API responses
+ */
+export interface ApiMigrationsResponse {
+  migrations: (Migration | ApiMigration)[];
+  ok?: boolean;
+}
+
+export interface ApiMigrationResponse {
+  migration: Migration | ApiMigration;
+  ok?: boolean;
+}
+
+/**
+ * Raw API Migration type (before transformation)
+ */
+export interface ApiMigration extends Omit<Migration, 'createdAt' | 'updatedAt' | 'completedAt'> {
+  createdAt?: string;
+  updatedAt?: string;
+  completedAt?: string;
+}
+
+/**
+ * Page API responses
+ */
+export interface ApiPageResponse {
+  page: Page | ApiPage;
+  ok?: boolean;
+}
+
+export interface ApiPagesResponse {
+  pages: (Page | ApiPage)[];
+  ok?: boolean;
+}
+
+/**
+ * Raw API Page type (before transformation)
+ */
+export interface ApiPage extends Omit<Page, 'createdAt' | 'updatedAt'> {
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/**
+ * Widget API responses
+ */
+export interface ApiWidgetResponse {
+  widget: PageWidget | ApiWidget;
+  ok?: boolean;
+}
+
+/**
+ * Raw API Widget type (before transformation)
+ */
+export interface ApiWidget extends Omit<PageWidget, 'createdAt' | 'updatedAt'> {
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/**
+ * Authentication API responses
+ */
+export interface ApiAccessTokenResponse {
+  accessToken: string;
+  expiresIn: number;
+  tokenType: string;
+  ok?: boolean;
 }
 

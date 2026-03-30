@@ -38,6 +38,7 @@ jobs:
     permissions:
       contents: write
       id-token: write  # Required for npm provenance
+      issues: write  # Required to create issues on publish failure
     
     steps:
       - name: Checkout repository
@@ -89,6 +90,15 @@ jobs:
             VERSION="${VERSION#v}"
           else
             echo "❌ Could not determine version"
+            echo "Event: ${{ github.event_name }}"
+            echo "Ref: ${{ github.ref }}"
+            exit 1
+          fi
+          
+          # Validate version format (semver: x.y.z or x.y.z-prerelease)
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?$ ]]; then
+            echo "❌ Invalid version format: $VERSION"
+            echo "Expected format: x.y.z or x.y.z-prerelease (e.g., 1.2.3 or 1.2.3-beta.1)"
             exit 1
           fi
           
@@ -121,17 +131,66 @@ jobs:
       - name: Update package.json version
         run: |
           VERSION="${{ steps.version.outputs.version }}"
+          
+          # Remove 'v' prefix if present (npm version doesn't accept it)
+          VERSION="${VERSION#v}"
+          
           echo "Updating package.json to version $VERSION"
-          npm version $VERSION --no-git-tag-version
           
-          # Verify version was updated
-          PACKAGE_VERSION=$(node -p "require('./package.json').version")
-          if [ "$PACKAGE_VERSION" != "$VERSION" ]; then
-            echo "❌ Version mismatch: expected $VERSION, got $PACKAGE_VERSION"
-            exit 1
+          # Check if version is already set (to avoid unnecessary update)
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          if [ "$CURRENT_VERSION" = "$VERSION" ]; then
+            echo "[OK] Version already set to $VERSION, skipping update"
+          else
+            # Update version using npm version command
+            npm version "$VERSION" --no-git-tag-version || {
+              echo "[ERROR] Failed to update version with npm version command"
+              echo "Attempting manual update..."
+              
+              # Fallback: manually update package.json
+              # SECURITY: Pass version via environment variable to prevent code injection
+              # Environment variables are safely handled by the shell and Node.js
+              VERSION_TO_SET="$VERSION" node -e "
+                const fs = require('fs');
+                const pkg = require('./package.json');
+                // Get version from environment variable (safely escaped by shell)
+                const version = process.env.VERSION_TO_SET;
+                if (!version || typeof version !== 'string') {
+                  console.error('[ERROR] Invalid version from environment');
+                  process.exit(1);
+                }
+                // Validate version format (semver) to prevent injection
+                if (!/^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?$/.test(version)) {
+                  console.error('[ERROR] Invalid version format:', version);
+                  process.exit(1);
+                }
+                // Set version (already validated and from environment, so safe)
+                pkg.version = version;
+                fs.writeFileSync('./package.json', JSON.stringify(pkg, null, 2) + '\n');
+              "
+            }
+            
+            # Verify version was updated
+            # SECURITY: Use environment variable to safely pass version for comparison
+            PACKAGE_VERSION=$(node -p "require('./package.json').version")
+            VERSION_TO_VERIFY="$VERSION" node -e "
+              const pkg = require('./package.json');
+              const expected = process.env.VERSION_TO_VERIFY;
+              if (!expected || typeof expected !== 'string') {
+                console.error('[ERROR] Invalid version from environment');
+                process.exit(1);
+              }
+              if (pkg.version !== expected) {
+                console.error('[ERROR] Version mismatch: expected', JSON.stringify(expected), 'got', JSON.stringify(pkg.version));
+                process.exit(1);
+              }
+            " || {
+              echo "[ERROR] Version mismatch: expected $VERSION, got $PACKAGE_VERSION"
+              exit 1
+            }
+            
+            echo "[OK] package.json version updated to: $PACKAGE_VERSION"
           fi
-          
-          echo "✅ package.json version: $PACKAGE_VERSION"
       
       - name: Security audit
         id: audit
@@ -261,6 +320,42 @@ jobs:
           echo "Package contents:"
           npm pack --dry-run
       
+      - name: Verify npm authentication
+        if: github.event.inputs.dry_run != 'true'
+        run: |
+          if [ -z "${{ secrets.NPM_TOKEN }}" ]; then
+            echo "❌ NPM_TOKEN secret is not set"
+            echo "Please configure NPM_TOKEN in repository settings > Secrets and variables > Actions"
+            exit 1
+          fi
+          
+          # Verify token is valid (check npm whoami)
+          echo "🔐 Verifying npm authentication..."
+          npm whoami --registry=https://registry.npmjs.org || {
+            echo "❌ npm authentication failed"
+            echo "Please check that NPM_TOKEN is valid and has publish permissions"
+            exit 1
+          }
+          echo "✅ npm authentication verified"
+      
+      - name: Check if version already exists
+        if: github.event.inputs.dry_run != 'true'
+        run: |
+          PACKAGE_NAME=$(node -p 'require("./package.json").name')
+          VERSION="${{ steps.version.outputs.version }}"
+          
+          echo "🔍 Checking if version $VERSION already exists on npm..."
+          EXISTING_VERSION=$(npm view $PACKAGE_NAME@$VERSION version 2>/dev/null || echo "")
+          
+          if [ -n "$EXISTING_VERSION" ]; then
+            echo "⚠️  Version $VERSION already exists on npm"
+            echo "Existing version: $EXISTING_VERSION"
+            echo "Skipping publish to avoid duplicate version error"
+            exit 1
+          else
+            echo "✅ Version $VERSION is available for publishing"
+          fi
+      
       - name: Publish to npm
         if: github.event.inputs.dry_run != 'true'
         run: |
@@ -272,7 +367,16 @@ jobs:
           echo ""
           
           # Publish with provenance (supply chain security)
-          npm publish --access public --tag ${{ steps.npm-tag.outputs.tag }} --provenance
+          npm publish --access public --tag ${{ steps.npm-tag.outputs.tag }} --provenance || {
+            echo "❌ npm publish failed"
+            echo ""
+            echo "Common issues:"
+            echo "1. Version already exists: npm view @port-experimental/port-sdk@${{ steps.version.outputs.version }}"
+            echo "2. Authentication failed: Check NPM_TOKEN secret"
+            echo "3. Package name/scope permissions: Verify @port-experimental scope access"
+            echo "4. Network issues: Check npm registry connectivity"
+            exit 1
+          }
           
           echo "✅ Published successfully!"
         env:
@@ -304,11 +408,23 @@ jobs:
           startsWith(github.ref, 'refs/tags/v') &&
           github.event.inputs.dry_run != 'true'
         uses: actions/github-script@v7
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          TAG: ${{ github.ref_name }}
+          NPM_TAG: ${{ steps.npm-tag.outputs.tag }}
         with:
           script: |
             const fs = require('fs');
-            const version = '${{ steps.version.outputs.version }}';
-            const tag = '${{ github.ref_name }}';
+            // SECURITY: Get version from environment variable to prevent code injection
+            const version = process.env.VERSION || '';
+            const tag = process.env.TAG || '';
+            const npmTag = process.env.NPM_TAG || 'latest';
+            
+            // Validate version format
+            if (!version || !/^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?$/.test(version)) {
+              console.error('[ERROR] Invalid version format:', version);
+              process.exit(1);
+            }
             
             // Read changelog
             let changelog = 'Release v' + version;
@@ -324,12 +440,12 @@ jobs:
               repo: context.repo.repo,
               tag_name: tag,
               name: `v${version}`,
-              body: `## Changes\n\n${changelog}\n\n## Installation\n\n\`\`\`bash\nnpm install @port-experimental/port-sdk@${version}\n\`\`\`\n\n## Links\n\n- 📦 [npm Package](https://www.npmjs.com/package/@port-experimental/port-sdk/v/${version})\n- 📚 [Documentation](https://github.com/${context.repo.owner}/${context.repo.repo}#readme)\n- 📋 [Changelog](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/CHANGELOG.md)`,
+              body: `## Changes\n\n${changelog}\n\n## Installation\n\n\`\`\`bash\nnpm install @port-experimental/port-sdk@${version}\n\`\`\`\n\n## Links\n\n- [npm Package](https://www.npmjs.com/package/@port-experimental/port-sdk/v/${version})\n- [Documentation](https://github.com/${context.repo.owner}/${context.repo.repo}#readme)\n- [Changelog](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/CHANGELOG.md)`,
               draft: false,
-              prerelease: '${{ steps.npm-tag.outputs.tag }}' !== 'latest'
+              prerelease: npmTag !== 'latest'
             });
             
-            console.log('✅ GitHub release created');
+            console.log('[OK] GitHub release created');
       
       - name: Update package.json to next dev version
         if: |
@@ -379,49 +495,78 @@ jobs:
       - name: Create issue on publish failure
         if: failure() && github.event.inputs.dry_run != 'true'
         uses: actions/github-script@v7
+        continue-on-error: true
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          NPM_TAG: ${{ steps.npm-tag.outputs.tag }}
+          WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          EVENT_NAME: ${{ github.event_name }}
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: '❌ npm Publish Failed for v${{ steps.version.outputs.version }}',
-              body: `## 🚨 Publish Failure Alert
+            try {
+              // SECURITY: Get values from environment variables to prevent code injection
+              const version = process.env.VERSION || 'unknown';
+              const tag = process.env.NPM_TAG || 'latest';
+              const workflowUrl = process.env.WORKFLOW_URL || '';
+              const eventName = process.env.EVENT_NAME || 'unknown';
               
-              The automated npm publish workflow failed.
+              // Validate version format if not 'unknown'
+              if (version !== 'unknown' && !/^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?$/.test(version)) {
+                console.error('[ERROR] Invalid version format:', version);
+                // Continue anyway with 'unknown' version
+              }
               
-              ### Details
-              - **Version:** ${{ steps.version.outputs.version }}
-              - **Tag:** ${{ steps.npm-tag.outputs.tag }}
-              - **Workflow Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-              - **Triggered By:** ${{ github.event_name }}
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `[ERROR] npm Publish Failed for v${version}`,
+                body: `## Publish Failure Alert
+                
+                The automated npm publish workflow failed.
+                
+                ### Details
+                - **Version:** ${version}
+                - **Tag:** ${tag}
+                - **Workflow Run:** ${workflowUrl}
+                - **Triggered By:** ${eventName}
+                
+                ### Possible Causes
+                - npm authentication failed (check NPM_TOKEN secret)
+                - Version already exists on npm
+                - Build or test failures
+                - Network issues
+                - Version format issues
+                
+                ### Action Required
+                1. Review the workflow logs: ${workflowUrl}
+                2. Check npm authentication token in repository secrets
+                3. Verify version doesn't already exist: \`npm view @port-experimental/port-sdk@${version}\`
+                4. Fix the issue and re-run the workflow
+                
+                ### Manual Publish
+                If urgent, publish manually:
+                \`\`\`bash
+                pnpm install
+                pnpm type-check
+                pnpm test
+                pnpm build
+                npm version ${version} --no-git-tag-version
+                npm publish --access public --tag ${tag}
+                \`\`\`
+                
+                ---
+                **Date:** ${new Date().toISOString()}
+                `,
+                labels: ['bug', 'publish-failure', 'urgent']
+              });
               
-              ### Possible Causes
-              - npm authentication failed
-              - Version already exists on npm
-              - Build or test failures
-              - Network issues
-              
-              ### Action Required
-              1. Review the workflow logs
-              2. Fix the issue
-              3. Re-run the workflow or publish manually
-              
-              ### Manual Publish
-              If urgent, publish manually:
-              \`\`\`bash
-              pnpm install
-              pnpm type-check
-              pnpm test
-              pnpm build
-              npm version ${{ steps.version.outputs.version }} --no-git-tag-version
-              npm publish --access public --tag ${{ steps.npm-tag.outputs.tag }}
-              \`\`\`
-              
-              ---
-              **Date:** ${new Date().toISOString()}
-              `,
-              labels: ['bug', 'publish-failure', 'urgent']
-            });
+              console.log('[OK] Issue created successfully');
+            } catch (error) {
+              console.error('[ERROR] Failed to create issue:', error.message);
+              console.log('This is a non-critical failure - workflow will continue');
+              // Don't throw - this is a notification step, not critical
+            }
       
       - name: Summary
         if: always()

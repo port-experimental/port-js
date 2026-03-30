@@ -155,3 +155,27 @@ export interface CreateBlueprintInput {
  */
 export type UpdateBlueprintInput = Partial<CreateBlueprintInput>;
 
+/**
+ * Blueprint permissions
+ */
+export interface BlueprintPermissions {
+  entities?: {
+    read?: PermissionRule;
+    create?: PermissionRule;
+    update?: PermissionRule;
+    delete?: PermissionRule;
+  };
+  [key: string]: any;
+}
+
+/**
+ * Permission rule
+ */
+export interface PermissionRule {
+  users?: string[];
+  teams?: string[];
+  roles?: string[];
+  ownedByTeam?: boolean;
+  policy?: Record<string, any>;
+}
+

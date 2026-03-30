@@ -5,12 +5,18 @@
 
 import { BaseResource } from './base';
 import { PortValidationError } from '../errors';
-import type { Blueprint, CreateBlueprintInput, UpdateBlueprintInput } from '../types/blueprints';
+import type {
+  Blueprint,
+  CreateBlueprintInput,
+  UpdateBlueprintInput,
+  BlueprintPermissions,
+} from '../types/blueprints';
 import type {
   ApiBlueprintResponse,
   ApiBlueprintsResponse,
   ApiBlueprintRelationsResponse,
   ApiBlueprint,
+  ApiItemResponse,
 } from '../types/responses';
 import type { RequestOptions } from '../http-client';
 
@@ -141,6 +147,104 @@ export class BlueprintResource extends BaseResource {
   async list(options?: RequestOptions): Promise<Blueprint[]> {
     const response = await this.httpClient.get<ApiBlueprintsResponse>(this.basePath, options);
     return (response.blueprints || []).map((bp) => this.transformBlueprint(bp));
+  }
+
+  /**
+   * Get blueprint permissions
+   * 
+   * @param identifier - Blueprint identifier
+   * @param options - Optional request options
+   * @returns The blueprint permissions
+   */
+  async getPermissions(identifier: string, options?: RequestOptions): Promise<BlueprintPermissions> {
+    this.validateIdentifier(identifier);
+    const response = await this.httpClient.get<ApiItemResponse<BlueprintPermissions>>(
+      `${this.basePath}/${encodeURIComponent(identifier)}/permissions`,
+      options
+    );
+    return (response.permissions || response) as BlueprintPermissions;
+  }
+
+  /**
+   * Update blueprint permissions
+   * 
+   * @param identifier - Blueprint identifier
+   * @param permissions - Permissions configuration
+   * @param options - Optional request options
+   * @returns The updated blueprint permissions
+   */
+  async updatePermissions(
+    identifier: string,
+    permissions: BlueprintPermissions,
+    options?: RequestOptions
+  ): Promise<BlueprintPermissions> {
+    this.validateIdentifier(identifier);
+    const response = await this.httpClient.patch<ApiItemResponse<BlueprintPermissions>>(
+      `${this.basePath}/${encodeURIComponent(identifier)}/permissions`,
+      permissions,
+      options
+    );
+    return (response.permissions || response) as BlueprintPermissions;
+  }
+
+  /**
+   * Rename a property in a blueprint
+   */
+  async renameProperty(
+    blueprintIdentifier: string,
+    propertyIdentifier: string,
+    newPropertyName: string,
+    options?: RequestOptions
+  ): Promise<Blueprint> {
+    this.validateIdentifier(blueprintIdentifier);
+    const response = await this.httpClient.patch<ApiBlueprintResponse>(
+      `${this.basePath}/${encodeURIComponent(blueprintIdentifier)}/properties/${encodeURIComponent(
+        propertyIdentifier
+      )}/rename`,
+      { newPropertyName },
+      options
+    );
+    return this.transformBlueprint(response.blueprint);
+  }
+
+  /**
+   * Rename a mirror property in a blueprint
+   */
+  async renameMirrorProperty(
+    blueprintIdentifier: string,
+    propertyIdentifier: string,
+    newMirrorName: string,
+    options?: RequestOptions
+  ): Promise<Blueprint> {
+    this.validateIdentifier(blueprintIdentifier);
+    const response = await this.httpClient.patch<ApiBlueprintResponse>(
+      `${this.basePath}/${encodeURIComponent(blueprintIdentifier)}/mirror/${encodeURIComponent(
+        propertyIdentifier
+      )}/rename`,
+      { newMirrorName },
+      options
+    );
+    return this.transformBlueprint(response.blueprint);
+  }
+
+  /**
+   * Rename a relation in a blueprint
+   */
+  async renameRelation(
+    blueprintIdentifier: string,
+    relationIdentifier: string,
+    newRelationIdentifier: string,
+    options?: RequestOptions
+  ): Promise<Blueprint> {
+    this.validateIdentifier(blueprintIdentifier);
+    const response = await this.httpClient.patch<ApiBlueprintResponse>(
+      `${this.basePath}/${encodeURIComponent(blueprintIdentifier)}/relations/${encodeURIComponent(
+        relationIdentifier
+      )}/rename`,
+      { newRelationIdentifier },
+      options
+    );
+    return this.transformBlueprint(response.blueprint);
   }
 
   /**

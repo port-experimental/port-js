@@ -34,7 +34,7 @@ interface ApiPaginatedResponse<T> {
  * The return type depends on what the Port API provides for that endpoint.
  */
 export abstract class BaseResource {
-  constructor(protected httpClient: HttpClient) {}
+  constructor(protected httpClient: HttpClient) { }
 
   /**
    * Build URL with query parameters
@@ -86,6 +86,48 @@ export abstract class BaseResource {
         nextCursor: response.nextCursor,
       },
     };
+  }
+
+  /**
+   * Iterate through all pages of results
+   *
+   * @param path - API path
+   * @param options - Pagination options
+   * @param dataKey - Key in response containing the data array
+   * @yields Items from each page
+   */
+  protected async *streamPaginated<T>(
+    path: string,
+    options?: PaginationOptions,
+    dataKey: keyof ApiPaginatedResponse<T> = 'entities' as keyof ApiPaginatedResponse<T>
+  ): AsyncIterableIterator<T> {
+    let currentOffset = options?.offset || 0;
+    let currentCursor = options?.cursor;
+    let hasMore = true;
+
+    while (hasMore) {
+      const response = await this.paginate<T>(
+        path,
+        {
+          ...options,
+          offset: currentOffset,
+          cursor: currentCursor,
+        },
+        dataKey
+      );
+
+      for (const item of response.data) {
+        yield item;
+      }
+
+      hasMore = response.pagination.hasMore;
+      currentCursor = response.pagination.nextCursor;
+      currentOffset += response.data.length;
+
+      if (!hasMore || response.data.length === 0) {
+        break;
+      }
+    }
   }
 }
 

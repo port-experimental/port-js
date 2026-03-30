@@ -6,80 +6,73 @@
 
 Type-safe SDK for the Port.io API. Built for Node.js backend environments.
 
-## ⚠️ Backend Only
+## [WARNING] Backend Only
 
 **This SDK is for backend/server use only.** Do not use in browser applications.
 
-✅ Node.js, Express, NestJS, serverless functions  
-❌ React, Vue, Angular, browser apps
+[OK] Node.js, Express, NestJS, serverless functions 
+[ERROR] React, Vue, Angular, browser apps
 
----
-
-## Installation
+--- ## Installation
 
 ```bash
 npm install @port-experimental/port-sdk
 ```
 
----
-
-## Quick Start
+--- ## Quick Start
 
 ```typescript
 import { PortClient } from '@port-experimental/port-sdk';
 
 // Initialize
 const client = new PortClient({
-  credentials: {
-    clientId: process.env.PORT_CLIENT_ID!,
-    clientSecret: process.env.PORT_CLIENT_SECRET!,
-  },
+ credentials: {
+ clientId: process.env.PORT_CLIENT_ID!,
+ clientSecret: process.env.PORT_CLIENT_SECRET!,
+ },
 });
 
 // Use
 const blueprints = await client.blueprints.list();
 const entity = await client.entities.create({
-  identifier: 'my-service',
-  blueprint: 'service',
-  title: 'My Service',
-  properties: {
-    stringProps: { environment: 'production' },
-  },
+ identifier: 'my-service',
+ blueprint: 'service',
+ title: 'My Service',
+ properties: {
+ stringProps: { environment: 'production' },
+ },
 });
 ```
 
----
-
-## API Overview
+--- ## API Overview
 
 The SDK provides resource-based access:
 
 ```typescript
-client.entities    // Create, read, update, delete entities
-client.blueprints  // Manage blueprints
-client.actions     // Execute actions
-client.teams       // Manage teams
-client.users       // Manage users
-client.webhooks    // Configure webhooks
-client.scorecards  // Work with scorecards
-client.audit       // Query audit logs
+client.entities // Create, read, update, delete, aggregate and stream entities
+client.blueprints // Manage blueprints and permissions
+client.actions // Execute actions
+client.pages // Manage pages and dashboards
+client.teams // Manage teams
+client.users // Manage users
+client.webhooks // Configure webhooks
+client.scorecards // Work with scorecards
+client.audit // Query audit logs
 ```
 
----
-
-## Common Operations
+--- ## Common Operations
 
 ### Entities
 
 ```typescript
 // Create
 const entity = await client.entities.create({
-  identifier: 'my-service',
-  blueprint: 'service',
-  title: 'My Service',
-  properties: {
-    stringProps: { environment: 'production' },
-  },
+ identifier: 'my-service',
+ blueprint: 'service',
+ title: 'My Service',
+ properties: {
+ stringProps: { environment: 'production' },
+ },
 });
 
 // Get
@@ -87,7 +80,7 @@ const service = await client.entities.get('my-service', 'service');
 
 // Update
 await client.entities.update('my-service', 'service', {
-  properties: { stringProps: { status: 'active' } },
+ properties: { stringProps: { status: 'active' } },
 });
 
 // Search
@@ -99,8 +92,22 @@ const results = await client.entities.search({
   ],
 });
 
+// Stream (Async Iterator)
+for await (const entity of client.entities.stream({ blueprint: 'service' })) {
+  console.log(entity.identifier);
+}
+
+// Aggregate
+const stats = await client.entities.aggregate({
+  blueprint: 'service',
+  aggregations: {
+    total_count: { func: 'count' },
+  },
+});
+
 // Delete
 await client.entities.delete('my-service', 'service');
+await client.entities.deleteAll('service'); // Delete all entities in a blueprint
 ```
 
 ### Blueprints
@@ -122,32 +129,105 @@ await client.blueprints.create({
     },
   },
 });
+
+// Permissions
+const perms = await client.blueprints.getPermissions('service');
+await client.blueprints.updatePermissions('service', {
+  read: { users: ['admin@port.io'] },
+});
 ```
 
----
+### Pages
 
-## Configuration
+```typescript
+// List all pages
+const pages = await client.pages.list();
+
+// Get a page by ID
+const page = await client.pages.get('my-page-id');
+
+// Create a new page
+await client.pages.create({
+  identifier: 'new-page',
+  title: 'My New Page',
+  blueprint: 'service',
+  widgets: [], // Add widgets here
+});
+
+// Update a page
+await client.pages.update('new-page', {
+  title: 'Updated Page Title',
+});
+
+// Delete a page
+await client.pages.delete('new-page');
+```
+
+### Widgets
+
+```typescript
+// Add a widget to a page
+await client.pages.addWidget('my-page-id', {
+  type: 'scorecard',
+  title: 'Service Scorecard',
+  scorecard: 'my-scorecard-id',
+});
+
+// Update a widget on a page
+await client.pages.updateWidget('my-page-id', 'widget-id-123', {
+  title: 'Updated Scorecard Title',
+});
+
+// Delete a widget from a page
+await client.pages.deleteWidget('my-page-id', 'widget-id-123');
+```
+
+### Advanced Operations
+
+```typescript
+// Execute a custom action
+await client.actions.execute('my-action-id', {
+  properties: {
+    entity: 'my-service',
+  },
+});
+
+// Get audit logs
+const auditLogs = await client.audit.list({
+  from: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // Last 7 days
+});
+
+// Webhooks
+const webhooks = await client.webhooks.list();
+await client.webhooks.create({
+  identifier: 'my-webhook',
+  url: 'https://my-service.com/webhook',
+  events: ['entity_created', 'entity_updated'],
+});
+```
+
+--- ## Configuration
 
 ### Environment Variables
 
 ```bash
 PORT_CLIENT_ID=your_client_id
 PORT_CLIENT_SECRET=your_client_secret
-PORT_REGION=eu              # Optional: eu or us (default: eu)
-PORT_LOG_LEVEL=info        # Optional: error, warn, info, debug, trace
+PORT_REGION=eu # Optional: eu or us (default: eu)
+PORT_LOG_LEVEL=info # Optional: error, warn, info, debug, trace
 ```
 
 ### Programmatic
 
 ```typescript
 const client = new PortClient({
-  credentials: {
-    clientId: 'your-client-id',
-    clientSecret: 'your-client-secret',
-  },
-  region: 'eu',           // or 'us'
-  timeout: 30000,         // Request timeout in ms
-  maxRetries: 3,          // Retry attempts
+ credentials: {
+ clientId: 'your-client-id',
+ clientSecret: 'your-client-secret',
+ },
+ region: 'eu', // or 'us'
+ timeout: 30000, // Request timeout in ms
+ maxRetries: 3, // Retry attempts
 });
 ```
 
@@ -156,44 +236,40 @@ const client = new PortClient({
 ```typescript
 // OAuth2 (recommended)
 credentials: {
-  clientId: process.env.PORT_CLIENT_ID!,
-  clientSecret: process.env.PORT_CLIENT_SECRET!,
+ clientId: process.env.PORT_CLIENT_ID!,
+ clientSecret: process.env.PORT_CLIENT_SECRET!,
 }
 
 // JWT token
 credentials: {
-  accessToken: 'your-jwt-token',
+ accessToken: 'your-jwt-token',
 }
 ```
 
----
-
-## Error Handling
+--- ## Error Handling
 
 ```typescript
 import {
-  PortAuthError,
-  PortNotFoundError,
-  PortValidationError,
-  PortRateLimitError,
+ PortAuthError,
+ PortNotFoundError,
+ PortValidationError,
+ PortRateLimitError,
 } from '@port-experimental/port-sdk';
 
 try {
-  await client.entities.get('unknown-id', 'service');
+ await client.entities.get('unknown-id', 'service');
 } catch (error) {
-  if (error instanceof PortNotFoundError) {
-    console.log('Entity not found');
-  } else if (error instanceof PortAuthError) {
-    console.log('Authentication failed');
-  } else if (error instanceof PortRateLimitError) {
-    console.log('Rate limited');
-  }
+ if (error instanceof PortNotFoundError) {
+ console.log('Entity not found');
+ } else if (error instanceof PortAuthError) {
+ console.log('Authentication failed');
+ } else if (error instanceof PortRateLimitError) {
+ console.log('Rate limited');
+ }
 }
 ```
 
----
-
-## Examples
+--- ## Examples
 
 See the [`examples/`](./examples/) directory for complete examples:
 
@@ -208,9 +284,7 @@ Run an example:
 pnpm tsx examples/01-basic-usage.ts
 ```
 
----
-
-## Troubleshooting
+--- ## Troubleshooting
 
 ### Authentication Issues
 
@@ -265,11 +339,11 @@ Enable verbose logging:
 
 ```typescript
 const client = new PortClient({
-  credentials: { /* ... */ },
-  logger: {
-    level: LogLevel.DEBUG,
-    enabled: true,
-  },
+ credentials: { /* ... */ },
+ logger: {
+ level: LogLevel.DEBUG,
+ enabled: true,
+ },
 });
 ```
 
@@ -278,29 +352,21 @@ Or set environment variable:
 export PORT_LOG_LEVEL=debug
 ```
 
----
-
-## Documentation
+--- ## Documentation
 
 - [Getting Started Guide](./docs/getting-started.md) - Install and use the SDK
 - [API Reference](./docs/api/) - Auto-generated TypeDoc documentation
 
----
+--- ## Support
 
-## Support
+- [Port.io Documentation](https://docs.port.io)
+- [Community Slack](https://port.io/community)
+- [GitHub Issues](https://github.com/port-experimental/port-js/issues)
 
-- 📖 [Port.io Documentation](https://docs.port.io)
-- 💬 [Community Slack](https://port.io/community)
-- 🐛 [GitHub Issues](https://github.com/port-experimental/port-js/issues)
-
----
-
-## Contributing
+--- ## Contributing
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
 
----
-
-## License
+--- ## License
 
 [Apache-2.0](./LICENSE)

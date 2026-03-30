@@ -21,6 +21,12 @@ export { TeamResource } from './resources/teams';
 export { UserResource } from './resources/users';
 export { AuditResource } from './resources/audit';
 export { WebhookResource } from './resources/webhooks';
+export { IntegrationResource } from './resources/integrations';
+export { OrganizationResource } from './resources/organization';
+export { AppResource } from './resources/apps';
+export { MigrationResource } from './resources/migrations';
+export { AuthResource } from './resources/auth';
+export { PageResource } from './resources/pages';
 
 // HTTP Client (for advanced usage)
 export { HttpClient } from './http-client';
