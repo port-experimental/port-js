@@ -18,6 +18,21 @@ export type PageWidgetType =
   | 'users-table'
   | 'teams-table'
   | 'runs-table'
+  | 'workflow-runs-history-table'
+  | 'run-info'
+  | 'user-info'
+  | 'graph-entities-explorer'
+  | 'bar-chart'
+  | 'entities-pie-chart'
+  | 'line-chart'
+  | 'entities-number-chart'
+  | 'iframe-widget'
+  | 'markdown'
+  | 'team-info'
+  | 'recently-viewed-entities'
+  | 'recently-used-actions'
+  | 'my-entities'
+  | 'grouper'
   | 'markdown-widget'
   | 'v2-pie-chart-widget'
   | 'v2-bar-chart-widget'
@@ -30,11 +45,27 @@ export type PageWidgetType =
  */
 export interface PageWidget {
   id?: string;
-  type: PageWidgetType | string;
+  type: PageWidgetType | (string & {});
   title?: string;
   description?: string;
   icon?: string;
-  [key: string]: any;
+  blueprint?: string;
+  entity?: string;
+  agentIdentifier?: string;
+  useMCP?: boolean;
+  actions?: Array<{ action: string }>;
+  links?: Array<{ title: string; description?: string; url: string; icon?: string }>;
+  dataset?: Record<string, unknown>;
+  calculationBy?: 'entities' | 'property';
+  unit?: 'none' | '$' | '€' | '£' | '%' | 'custom' | (string & {});
+  chartType?: string;
+  timeInterval?: 'hour' | 'day' | 'isoWeek' | 'month' | 'quarter' | (string & {});
+  timeRange?: {
+    preset: string;
+  };
+  query?: Record<string, unknown>;
+  tableConfig?: Record<string, unknown>;
+  [key: string]: unknown;
 }
 
 /**
@@ -52,6 +83,9 @@ export interface Page {
   locked?: boolean;
   requiredQueryParams?: string[];
   widgets?: PageWidget[];
+  layout?: Record<string, unknown>[];
+  showInSidebar?: boolean;
+  section?: string;
   createdAt?: Date;
   updatedAt?: Date;
   createdBy?: string;
@@ -73,6 +107,9 @@ export interface CreatePageInput {
   locked?: boolean;
   requiredQueryParams?: string[];
   widgets?: PageWidget[];
+  layout?: Record<string, unknown>[];
+  showInSidebar?: boolean;
+  section?: string;
 }
 
 /**

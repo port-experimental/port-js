@@ -136,7 +136,7 @@ export interface paths {
                                             to: string;
                                         } | {
                                             /** @enum {string} */
-                                            preset: "today" | "tomorrow" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                            preset: "today" | "tomorrow" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years" | "nextDay" | "nextWeek" | "next2Weeks" | "nextMonth" | "next3Months" | "next6Months" | "next12Months";
                                         } | {
                                             property: string;
                                             /** @enum {string} */
@@ -340,6 +340,185 @@ export interface paths {
                 };
             };
         };
+        trace?: never;
+    };
+    "/v1/blueprints/{blueprint_identifier}/permissions/simulate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Simulate permissions for a user
+         * @description This route allows you to simulate what permissions a specific user would have for entities in a blueprint.</br>Provide a userIdentifier and operation to see which entities are accessible, or additionally provide an entityIdentifier to see detailed permission checks for that specific entity.</br></br>To learn more, see the [permission simulator documentation](https://docs.port.io/build-your-software-catalog/set-catalog-rbac#permission-simulator).
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description The identifier of the blueprint to operate on. */
+                    blueprint_identifier: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** @description The identifier of the user to simulate permissions for. */
+                        userIdentifier: string;
+                        /**
+                         * @description The operation to simulate permissions for.
+                         * @enum {string}
+                         */
+                        operation: "read" | "register" | "update" | "unregister";
+                        /** @description The identifier of the entity to simulate permissions for. */
+                        entityIdentifier?: string;
+                        /** @description The permissions to simulate. */
+                        permissions?: {
+                            entities?: {
+                                /** @description The read permissions to simulate. */
+                                read?: {
+                                    /** @description The roles to simulate permissions for. */
+                                    roles?: string[];
+                                    /** @description The users to simulate permissions for. */
+                                    users?: string[];
+                                    /** @description The teams to simulate permissions for. */
+                                    teams?: string[];
+                                    /** @description The owned by team to simulate permissions for. */
+                                    ownedByTeam?: boolean;
+                                    /** @description The policy to simulate permissions for. */
+                                    policy?: {
+                                        /** @enum {string} */
+                                        combinator: "and" | "or";
+                                        rules: unknown[];
+                                    };
+                                };
+                                register?: {
+                                    /** @description The roles to simulate permissions for. */
+                                    roles?: string[];
+                                    /** @description The users to simulate permissions for. */
+                                    users?: string[];
+                                    /** @description The teams to simulate permissions for. */
+                                    teams?: string[];
+                                    /** @description The owned by team to simulate permissions for. */
+                                    ownedByTeam?: boolean;
+                                };
+                                update?: {
+                                    /** @description The roles to simulate permissions for. */
+                                    roles?: string[];
+                                    /** @description The users to simulate permissions for. */
+                                    users?: string[];
+                                    /** @description The teams to simulate permissions for. */
+                                    teams?: string[];
+                                    /** @description The owned by team to simulate permissions for. */
+                                    ownedByTeam?: boolean;
+                                };
+                                unregister?: {
+                                    /** @description The roles to simulate permissions for. */
+                                    roles?: string[];
+                                    /** @description The users to simulate permissions for. */
+                                    users?: string[];
+                                    /** @description The teams to simulate permissions for. */
+                                    teams?: string[];
+                                    /** @description The owned by team to simulate permissions for. */
+                                    ownedByTeam?: boolean;
+                                };
+                                updateProperties?: {
+                                    [key: string]: {
+                                        /** @description The roles to simulate permissions for. */
+                                        roles?: string[];
+                                        /** @description The users to simulate permissions for. */
+                                        users?: string[];
+                                        /** @description The teams to simulate permissions for. */
+                                        teams?: string[];
+                                        /** @description The owned by team to simulate permissions for. */
+                                        ownedByTeam?: boolean;
+                                    };
+                                };
+                                updateRelations?: {
+                                    [key: string]: {
+                                        /** @description The roles to simulate permissions for. */
+                                        roles?: string[];
+                                        /** @description The users to simulate permissions for. */
+                                        users?: string[];
+                                        /** @description The teams to simulate permissions for. */
+                                        teams?: string[];
+                                        /** @description The owned by team to simulate permissions for. */
+                                        ownedByTeam?: boolean;
+                                    };
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @constant */
+                            ok: false;
+                            error: string;
+                            message?: string;
+                        };
+                    };
+                };
+                /** @description A resource with the provided identifier was not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @constant */
+                            ok: false;
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Request body is too large (limit is 1MiB) */
+                413: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @constant */
+                            ok: false;
+                            error: string;
+                            message?: string;
+                        };
+                    };
+                };
+                /** @description The json provided does not match the route's schema */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @constant */
+                            ok: false;
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/v1/pages/{page_identifier}/permissions": {
@@ -711,6 +890,10 @@ export interface paths {
                     merge?: boolean;
                     /** @description You can provide a `run_id` to associate the created entities with a specific [action run](https://docs.port.io/create-self-service-experiences/reflect-action-progress/#tying-entities-to-an-action-run). */
                     run_id?: string;
+                    /** @description Resync run identifier. Only valid when `ocean_info_event_type` is `resync`. */
+                    ocean_info_resync_id?: string;
+                    /** @description How the operation was triggered. */
+                    ocean_info_event_type?: "http_request" | "resync" | "start";
                 };
                 header?: never;
                 path: {
@@ -862,6 +1045,10 @@ export interface paths {
                     merge?: boolean;
                     /** @description You can provide a `run_id` to associate the created entities with a specific [action run](https://docs.port.io/create-self-service-experiences/reflect-action-progress/#tying-entities-to-an-action-run). */
                     run_id?: string;
+                    /** @description Resync run identifier. Only valid when `ocean_info_event_type` is `resync`. */
+                    ocean_info_resync_id?: string;
+                    /** @description How the operation was triggered. */
+                    ocean_info_event_type?: "http_request" | "resync" | "start";
                 };
                 header?: never;
                 path: {
@@ -905,6 +1092,7 @@ export interface paths {
                     content: {
                         "application/json": {
                             ok: boolean;
+                            maxBulkSize?: number;
                             entities: {
                                 created: boolean;
                                 identifier: string;
@@ -932,6 +1120,7 @@ export interface paths {
                     content: {
                         "application/json": {
                             ok: boolean;
+                            maxBulkSize?: number;
                             entities: {
                                 created: boolean;
                                 identifier: string;
@@ -1121,6 +1310,10 @@ export interface paths {
                     create_missing_related_entities?: boolean;
                     /** @description You can provide a `run_id` to associate the created entities with a specific [action run](https://docs.port.io/create-self-service-experiences/reflect-action-progress/#tying-entities-to-an-action-run). */
                     run_id?: string;
+                    /** @description Resync run identifier. Only valid when `ocean_info_event_type` is `resync`. */
+                    ocean_info_resync_id?: string;
+                    /** @description How the operation was triggered. */
+                    ocean_info_event_type?: "http_request" | "resync" | "start";
                 };
                 header?: never;
                 path: {
@@ -1256,6 +1449,10 @@ export interface paths {
                     delete_dependents: boolean;
                     /** @description You can provide a `run_id` to associate the created entities with a specific [action run](https://docs.port.io/create-self-service-experiences/reflect-action-progress/#tying-entities-to-an-action-run). */
                     run_id?: string;
+                    /** @description Resync run identifier. Only valid when `ocean_info_event_type` is `resync`. */
+                    ocean_info_resync_id?: string;
+                    /** @description How the operation was triggered. */
+                    ocean_info_event_type?: "http_request" | "resync" | "start";
                 };
                 header?: never;
                 path: {
@@ -1351,6 +1548,10 @@ export interface paths {
                     create_missing_related_entities?: boolean;
                     /** @description You can provide a `run_id` to associate the created entities with a specific [action run](https://docs.port.io/create-self-service-experiences/reflect-action-progress/#tying-entities-to-an-action-run). */
                     run_id?: string;
+                    /** @description Resync run identifier. Only valid when `ocean_info_event_type` is `resync`. */
+                    ocean_info_resync_id?: string;
+                    /** @description How the operation was triggered. */
+                    ocean_info_event_type?: "http_request" | "resync" | "start";
                 };
                 header?: never;
                 path: {
@@ -1564,6 +1765,10 @@ export interface paths {
                 query?: {
                     /** @description You can provide a `run_id` to associate the deleted entities with a specific [action run](https://docs.port.io/create-self-service-experiences/reflect-action-progress/#tying-entities-to-an-action-run). */
                     run_id?: string;
+                    /** @description Resync run identifier. Only valid when `ocean_info_event_type` is `resync`. */
+                    ocean_info_resync_id?: string;
+                    /** @description How the operation was triggered. */
+                    ocean_info_event_type?: "http_request" | "resync" | "start";
                     /** @description If `true`, this call will also delete the blueprint itself. */
                     delete_blueprint?: boolean;
                 };
@@ -1671,6 +1876,10 @@ export interface paths {
                     delete_dependents: boolean;
                     /** @description You can provide a `run_id` to associate the created entities with a specific [action run](https://docs.port.io/create-self-service-experiences/reflect-action-progress/#tying-entities-to-an-action-run). */
                     run_id?: string;
+                    /** @description Resync run identifier. Only valid when `ocean_info_event_type` is `resync`. */
+                    ocean_info_resync_id?: string;
+                    /** @description How the operation was triggered. */
+                    ocean_info_event_type?: "http_request" | "resync" | "start";
                 };
                 header?: never;
                 path: {
@@ -1699,6 +1908,7 @@ export interface paths {
                             ok: true;
                             /** @description Array of deleted entity IDs */
                             deletedEntities: string[];
+                            maxBulkSize?: number;
                         };
                     };
                 };
@@ -1777,7 +1987,7 @@ export interface paths {
         put?: never;
         /**
          * Search entities
-         * @description This route allows you to search for entities in your software catalog based on a given set of rules.<br/><br/>To learn more about entities, check out the [documentation](https://docs.port.io/build-your-software-catalog/sync-data-to-catalog/#entities).<br/><br/>For more details about Port's search mechanism, rules, and operators - see the [search & query documentation](https://docs.port.io/search-and-query/).
+         * @description This route allows you to search for entities in your software catalog based on a given set of rules.<br/><br/>To learn more about entities, check out the [documentation](https://docs.port.io/build-your-software-catalog/sync-data-to-catalog/#entities).<br/><br/>For more details about Port's search mechanism, rules, and operators - see the [search & query documentation](https://docs.port.io/search-and-query/overview).
          */
         post: {
             parameters: {
@@ -1820,7 +2030,7 @@ export interface paths {
                                 to: string;
                             } | {
                                 /** @enum {string} */
-                                preset: "today" | "tomorrow" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                preset: "today" | "tomorrow" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years" | "nextDay" | "nextWeek" | "next2Weeks" | "nextMonth" | "next3Months" | "next6Months" | "next12Months";
                             } | {
                                 property: string;
                                 /** @enum {string} */
@@ -2010,7 +2220,7 @@ export interface paths {
         put?: never;
         /**
          * Search a blueprint's entities
-         * @description This route allows you to search your software catalog for a specific blueprint's entities, based on a given set of rules.<br/>The returned entities are paginated for improved performance.<br/><br/>To learn more about entities, check out the [entity documentation](https://docs.port.io/build-your-software-catalog/sync-data-to-catalog/#entities).<br/><br/>For more details about Port's search mechanism, rules, and operators - see the [search & query documentation](https://docs.port.io/search-and-query/).
+         * @description This route allows you to search your software catalog for a specific blueprint's entities, based on a given set of rules.<br/>The returned entities are paginated for improved performance.<br/><br/>To learn more about entities, check out the [entity documentation](https://docs.port.io/build-your-software-catalog/sync-data-to-catalog/#entities).<br/><br/>For more details about Port's search mechanism, rules, and operators - see the [search & query documentation](https://docs.port.io/search-and-query/overview).
          */
         post: {
             parameters: {
@@ -2025,7 +2235,7 @@ export interface paths {
             requestBody?: {
                 content: {
                     "application/json": {
-                        /** @description A [search query](https://docs.getport.io/search-and-query) used to filter the returned entities. */
+                        /** @description A [search query](https://docs.getport.io/search-and-query/overview) used to filter the returned entities. */
                         query?: components["schemas"]["def-7"];
                         /** @description An array of [properties](https://docs.getport.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties) and/or [relations](https://docs.getport.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/relations) to include in the search, using their identifiers.<br/>Note that for [meta-properties](https://docs.getport.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/meta-properties) (e.g. `$createdAt`, `$updatedAt`), the `$` prefix must be used. */
                         include?: string[];
@@ -2148,7 +2358,7 @@ export interface paths {
         put?: never;
         /**
          * Aggregate entities
-         * @description This route allows you to perform an aggregation function on a blueprint's entities based on a given set of rules.<br/><br/>To learn more about entities, check out the [documentation](https://docs.port.io/build-your-software-catalog/sync-data-to-catalog/#entities).<br/><br/>For more details about Port's search mechanism, rules, and operators - see the [search & query documentation](https://docs.port.io/search-and-query/).
+         * @description This route allows you to perform an aggregation function on a blueprint's entities based on a given set of rules.<br/><br/>To learn more about entities, check out the [documentation](https://docs.port.io/build-your-software-catalog/sync-data-to-catalog/#entities).<br/><br/>For more details about Port's search mechanism, rules, and operators - see the [search & query documentation](https://docs.port.io/search-and-query/overview).
          */
         post: {
             parameters: {
@@ -2167,7 +2377,7 @@ export interface paths {
                         /** @description A property of type `datetime`, by which the average will be calculated. Relevant only for the `average` function. */
                         measureTimeBy?: string;
                         calculationBy?: string;
-                        /** @description A [search query](https://docs.getport.io/search-and-query) used to filter the entities before the aggregation is calculated. */
+                        /** @description A [search query](https://docs.getport.io/search-and-query/overview) used to filter the entities before the aggregation is calculated. */
                         query: components["schemas"]["def-1"];
                     } | {
                         /** @description A property of type `number`, by which the aggregation will be calculated. */
@@ -2179,7 +2389,7 @@ export interface paths {
                         /** @description A property of type `datetime`, by which the average will be calculated. Relevant only for the `average` function. */
                         measureTimeBy?: string;
                         calculationBy?: string;
-                        /** @description A [search query](https://docs.getport.io/search-and-query) used to filter the entities before the aggregation is calculated. */
+                        /** @description A [search query](https://docs.getport.io/search-and-query/overview) used to filter the entities before the aggregation is calculated. */
                         query: components["schemas"]["def-1"];
                     } | ({
                         /** @enum {unknown} */
@@ -2312,7 +2522,7 @@ export interface paths {
         put?: never;
         /**
          * Aggregate entities over time
-         * @description This route allows you to perform an aggregation function on a blueprint's entities over a given time range.<br/><br/>To learn more about entities, check out the [entity documentation](https://docs.port.io/build-your-software-catalog/sync-data-to-catalog/#entities).<br/><br/>For more details about Port's search mechanism, rules, and operators - see the [search & query documentation](https://docs.port.io/search-and-query/).
+         * @description This route allows you to perform an aggregation function on a blueprint's entities over a given time range.<br/><br/>To learn more about entities, check out the [entity documentation](https://docs.port.io/build-your-software-catalog/sync-data-to-catalog/#entities).<br/><br/>For more details about Port's search mechanism, rules, and operators - see the [search & query documentation](https://docs.port.io/search-and-query/overview).
          */
         post: {
             parameters: {
@@ -2323,47 +2533,51 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": {
+                    "application/json": ({
                         /** @description The blueprint whose entities you wish to aggregate. */
                         blueprint?: string;
                         timeRange?: {
                             /** @enum {string} */
-                            preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                            preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years" | "specific";
                             timeZone?: string;
                         };
                         /** @enum {string} */
-                        timeInterval?: "hour" | "day" | "isoWeek" | "month";
-                        /** @description A [search query](https://docs.getport.io/search-and-query) used to filter the entities before the aggregation is calculated. */
+                        timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
+                        /** @description A [search query](https://docs.getport.io/search-and-query/overview) used to filter the entities before the aggregation is calculated. */
                         query?: components["schemas"]["def-1"];
                         /** @description A property of type `datetime` by which the aggregation will be calculated. */
                         measureTimeBy?: string;
+                        /** @description A specific time range [min,max] to aggregate over. If not provided, the time range will be used. */
+                        specificTimeRange?: number[];
                         /** @enum {unknown} */
                         aggregationType?: "aggregatePropertiesValues";
                         /** @enum {string} */
                         func: "average" | "sum" | "min" | "max" | "median" | "last";
                         /** @description A list of properties of type `number` on which the aggregation will be calculated. */
                         properties: string[];
-                    } | {
+                    } & (unknown & unknown)) | ({
                         /** @description The blueprint whose entities you wish to aggregate. */
                         blueprint?: string;
                         timeRange?: {
                             /** @enum {string} */
-                            preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                            preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years" | "specific";
                             timeZone?: string;
                         };
                         /** @enum {string} */
-                        timeInterval?: "hour" | "day" | "isoWeek" | "month";
-                        /** @description A [search query](https://docs.getport.io/search-and-query) used to filter the entities before the aggregation is calculated. */
+                        timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
+                        /** @description A [search query](https://docs.getport.io/search-and-query/overview) used to filter the entities before the aggregation is calculated. */
                         query?: components["schemas"]["def-1"];
                         /** @description A property of type `datetime` by which the aggregation will be calculated. */
                         measureTimeBy?: string;
+                        /** @description A specific time range [min,max] to aggregate over. If not provided, the time range will be used. */
+                        specificTimeRange?: number[];
                         /** @enum {unknown} */
                         aggregationType?: "countEntities";
                         /** @enum {string} */
                         func: "count" | "average";
                         /** @description A blueprint's property by which you want to break down the data. */
                         breakdownProperty?: string;
-                    };
+                    } & (unknown & unknown));
                 };
             };
             responses: {
@@ -2478,12 +2692,12 @@ export interface paths {
                         /** @description An array of property names to fetch historical records for. */
                         propertyNames: string[];
                         /** @enum {string} */
-                        timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                        timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                         timeRange?: {
                             /** @enum {string} */
-                            preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                            preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                             /** @enum {string} */
-                            timeZone: "Africa/Abidjan" | "Africa/Accra" | "Africa/Addis_Ababa" | "Africa/Algiers" | "Africa/Asmera" | "Africa/Bamako" | "Africa/Bangui" | "Africa/Banjul" | "Africa/Bissau" | "Africa/Blantyre" | "Africa/Brazzaville" | "Africa/Bujumbura" | "Africa/Cairo" | "Africa/Casablanca" | "Africa/Ceuta" | "Africa/Conakry" | "Africa/Dakar" | "Africa/Dar_es_Salaam" | "Africa/Djibouti" | "Africa/Douala" | "Africa/El_Aaiun" | "Africa/Freetown" | "Africa/Gaborone" | "Africa/Harare" | "Africa/Johannesburg" | "Africa/Juba" | "Africa/Kampala" | "Africa/Khartoum" | "Africa/Kigali" | "Africa/Kinshasa" | "Africa/Lagos" | "Africa/Libreville" | "Africa/Lome" | "Africa/Luanda" | "Africa/Lubumbashi" | "Africa/Lusaka" | "Africa/Malabo" | "Africa/Maputo" | "Africa/Maseru" | "Africa/Mbabane" | "Africa/Mogadishu" | "Africa/Monrovia" | "Africa/Nairobi" | "Africa/Ndjamena" | "Africa/Niamey" | "Africa/Nouakchott" | "Africa/Ouagadougou" | "Africa/Porto-Novo" | "Africa/Sao_Tome" | "Africa/Tripoli" | "Africa/Tunis" | "Africa/Windhoek" | "America/Adak" | "America/Anchorage" | "America/Anguilla" | "America/Antigua" | "America/Araguaina" | "America/Argentina/La_Rioja" | "America/Argentina/Rio_Gallegos" | "America/Argentina/Salta" | "America/Argentina/San_Juan" | "America/Argentina/San_Luis" | "America/Argentina/Tucuman" | "America/Argentina/Ushuaia" | "America/Aruba" | "America/Asuncion" | "America/Bahia" | "America/Bahia_Banderas" | "America/Barbados" | "America/Belem" | "America/Belize" | "America/Blanc-Sablon" | "America/Boa_Vista" | "America/Bogota" | "America/Boise" | "America/Buenos_Aires" | "America/Cambridge_Bay" | "America/Campo_Grande" | "America/Cancun" | "America/Caracas" | "America/Catamarca" | "America/Cayenne" | "America/Cayman" | "America/Chicago" | "America/Chihuahua" | "America/Ciudad_Juarez" | "America/Coral_Harbour" | "America/Cordoba" | "America/Costa_Rica" | "America/Creston" | "America/Cuiaba" | "America/Curacao" | "America/Danmarkshavn" | "America/Dawson" | "America/Dawson_Creek" | "America/Denver" | "America/Detroit" | "America/Dominica" | "America/Edmonton" | "America/Eirunepe" | "America/El_Salvador" | "America/Fort_Nelson" | "America/Fortaleza" | "America/Glace_Bay" | "America/Godthab" | "America/Goose_Bay" | "America/Grand_Turk" | "America/Grenada" | "America/Guadeloupe" | "America/Guatemala" | "America/Guayaquil" | "America/Guyana" | "America/Halifax" | "America/Havana" | "America/Hermosillo" | "America/Indiana/Knox" | "America/Indiana/Marengo" | "America/Indiana/Petersburg" | "America/Indiana/Tell_City" | "America/Indiana/Vevay" | "America/Indiana/Vincennes" | "America/Indiana/Winamac" | "America/Indianapolis" | "America/Inuvik" | "America/Iqaluit" | "America/Jamaica" | "America/Jujuy" | "America/Juneau" | "America/Kentucky/Monticello" | "America/Kralendijk" | "America/La_Paz" | "America/Lima" | "America/Los_Angeles" | "America/Louisville" | "America/Lower_Princes" | "America/Maceio" | "America/Managua" | "America/Manaus" | "America/Marigot" | "America/Martinique" | "America/Matamoros" | "America/Mazatlan" | "America/Mendoza" | "America/Menominee" | "America/Merida" | "America/Metlakatla" | "America/Mexico_City" | "America/Miquelon" | "America/Moncton" | "America/Monterrey" | "America/Montevideo" | "America/Montserrat" | "America/Nassau" | "America/New_York" | "America/Nome" | "America/Noronha" | "America/North_Dakota/Beulah" | "America/North_Dakota/Center" | "America/North_Dakota/New_Salem" | "America/Ojinaga" | "America/Panama" | "America/Paramaribo" | "America/Phoenix" | "America/Port-au-Prince" | "America/Port_of_Spain" | "America/Porto_Velho" | "America/Puerto_Rico" | "America/Punta_Arenas" | "America/Rankin_Inlet" | "America/Recife" | "America/Regina" | "America/Resolute" | "America/Rio_Branco" | "America/Santarem" | "America/Santiago" | "America/Santo_Domingo" | "America/Sao_Paulo" | "America/Scoresbysund" | "America/Sitka" | "America/St_Barthelemy" | "America/St_Johns" | "America/St_Kitts" | "America/St_Lucia" | "America/St_Thomas" | "America/St_Vincent" | "America/Swift_Current" | "America/Tegucigalpa" | "America/Thule" | "America/Tijuana" | "America/Toronto" | "America/Tortola" | "America/Vancouver" | "America/Whitehorse" | "America/Winnipeg" | "America/Yakutat" | "Antarctica/Casey" | "Antarctica/Davis" | "Antarctica/DumontDUrville" | "Antarctica/Macquarie" | "Antarctica/Mawson" | "Antarctica/McMurdo" | "Antarctica/Palmer" | "Antarctica/Rothera" | "Antarctica/Syowa" | "Antarctica/Troll" | "Antarctica/Vostok" | "Arctic/Longyearbyen" | "Asia/Aden" | "Asia/Almaty" | "Asia/Amman" | "Asia/Anadyr" | "Asia/Aqtau" | "Asia/Aqtobe" | "Asia/Ashgabat" | "Asia/Atyrau" | "Asia/Baghdad" | "Asia/Bahrain" | "Asia/Baku" | "Asia/Bangkok" | "Asia/Barnaul" | "Asia/Beirut" | "Asia/Bishkek" | "Asia/Brunei" | "Asia/Calcutta" | "Asia/Chita" | "Asia/Colombo" | "Asia/Damascus" | "Asia/Dhaka" | "Asia/Dili" | "Asia/Dubai" | "Asia/Dushanbe" | "Asia/Famagusta" | "Asia/Gaza" | "Asia/Hebron" | "Asia/Hong_Kong" | "Asia/Hovd" | "Asia/Irkutsk" | "Asia/Jakarta" | "Asia/Jayapura" | "Asia/Jerusalem" | "Asia/Kabul" | "Asia/Kamchatka" | "Asia/Karachi" | "Asia/Katmandu" | "Asia/Khandyga" | "Asia/Krasnoyarsk" | "Asia/Kuala_Lumpur" | "Asia/Kuching" | "Asia/Kuwait" | "Asia/Macau" | "Asia/Magadan" | "Asia/Makassar" | "Asia/Manila" | "Asia/Muscat" | "Asia/Nicosia" | "Asia/Novokuznetsk" | "Asia/Novosibirsk" | "Asia/Omsk" | "Asia/Oral" | "Asia/Phnom_Penh" | "Asia/Pontianak" | "Asia/Pyongyang" | "Asia/Qatar" | "Asia/Qostanay" | "Asia/Qyzylorda" | "Asia/Rangoon" | "Asia/Riyadh" | "Asia/Saigon" | "Asia/Sakhalin" | "Asia/Samarkand" | "Asia/Seoul" | "Asia/Shanghai" | "Asia/Singapore" | "Asia/Srednekolymsk" | "Asia/Taipei" | "Asia/Tashkent" | "Asia/Tbilisi" | "Asia/Tehran" | "Asia/Thimphu" | "Asia/Tokyo" | "Asia/Tomsk" | "Asia/Ulaanbaatar" | "Asia/Urumqi" | "Asia/Ust-Nera" | "Asia/Vientiane" | "Asia/Vladivostok" | "Asia/Yakutsk" | "Asia/Yekaterinburg" | "Asia/Yerevan" | "Atlantic/Azores" | "Atlantic/Bermuda" | "Atlantic/Canary" | "Atlantic/Cape_Verde" | "Atlantic/Faeroe" | "Atlantic/Madeira" | "Atlantic/Reykjavik" | "Atlantic/South_Georgia" | "Atlantic/St_Helena" | "Atlantic/Stanley" | "Australia/Adelaide" | "Australia/Brisbane" | "Australia/Broken_Hill" | "Australia/Darwin" | "Australia/Eucla" | "Australia/Hobart" | "Australia/Lindeman" | "Australia/Lord_Howe" | "Australia/Melbourne" | "Australia/Perth" | "Australia/Sydney" | "Europe/Amsterdam" | "Europe/Andorra" | "Europe/Astrakhan" | "Europe/Athens" | "Europe/Belgrade" | "Europe/Berlin" | "Europe/Bratislava" | "Europe/Brussels" | "Europe/Bucharest" | "Europe/Budapest" | "Europe/Busingen" | "Europe/Chisinau" | "Europe/Copenhagen" | "Europe/Dublin" | "Europe/Gibraltar" | "Europe/Guernsey" | "Europe/Helsinki" | "Europe/Isle_of_Man" | "Europe/Istanbul" | "Europe/Jersey" | "Europe/Kaliningrad" | "Europe/Kiev" | "Europe/Kirov" | "Europe/Lisbon" | "Europe/Ljubljana" | "Europe/London" | "Europe/Luxembourg" | "Europe/Madrid" | "Europe/Malta" | "Europe/Mariehamn" | "Europe/Minsk" | "Europe/Monaco" | "Europe/Moscow" | "Europe/Oslo" | "Europe/Paris" | "Europe/Podgorica" | "Europe/Prague" | "Europe/Riga" | "Europe/Rome" | "Europe/Samara" | "Europe/San_Marino" | "Europe/Sarajevo" | "Europe/Saratov" | "Europe/Simferopol" | "Europe/Skopje" | "Europe/Sofia" | "Europe/Stockholm" | "Europe/Tallinn" | "Europe/Tirane" | "Europe/Ulyanovsk" | "Europe/Vaduz" | "Europe/Vatican" | "Europe/Vienna" | "Europe/Vilnius" | "Europe/Volgograd" | "Europe/Warsaw" | "Europe/Zagreb" | "Europe/Zurich" | "Indian/Antananarivo" | "Indian/Chagos" | "Indian/Christmas" | "Indian/Cocos" | "Indian/Comoro" | "Indian/Kerguelen" | "Indian/Mahe" | "Indian/Maldives" | "Indian/Mauritius" | "Indian/Mayotte" | "Indian/Reunion" | "Pacific/Apia" | "Pacific/Auckland" | "Pacific/Bougainville" | "Pacific/Chatham" | "Pacific/Easter" | "Pacific/Efate" | "Pacific/Enderbury" | "Pacific/Fakaofo" | "Pacific/Fiji" | "Pacific/Funafuti" | "Pacific/Galapagos" | "Pacific/Gambier" | "Pacific/Guadalcanal" | "Pacific/Guam" | "Pacific/Honolulu" | "Pacific/Kiritimati" | "Pacific/Kosrae" | "Pacific/Kwajalein" | "Pacific/Majuro" | "Pacific/Marquesas" | "Pacific/Midway" | "Pacific/Nauru" | "Pacific/Niue" | "Pacific/Norfolk" | "Pacific/Noumea" | "Pacific/Pago_Pago" | "Pacific/Palau" | "Pacific/Pitcairn" | "Pacific/Ponape" | "Pacific/Port_Moresby" | "Pacific/Rarotonga" | "Pacific/Saipan" | "Pacific/Tahiti" | "Pacific/Tarawa" | "Pacific/Tongatapu" | "Pacific/Truk" | "Pacific/Wake" | "Pacific/Wallis";
+                            timeZone: "Africa/Abidjan" | "Africa/Accra" | "Africa/Addis_Ababa" | "Africa/Algiers" | "Africa/Asmera" | "Africa/Bamako" | "Africa/Bangui" | "Africa/Banjul" | "Africa/Bissau" | "Africa/Blantyre" | "Africa/Brazzaville" | "Africa/Bujumbura" | "Africa/Cairo" | "Africa/Casablanca" | "Africa/Ceuta" | "Africa/Conakry" | "Africa/Dakar" | "Africa/Dar_es_Salaam" | "Africa/Djibouti" | "Africa/Douala" | "Africa/El_Aaiun" | "Africa/Freetown" | "Africa/Gaborone" | "Africa/Harare" | "Africa/Johannesburg" | "Africa/Juba" | "Africa/Kampala" | "Africa/Khartoum" | "Africa/Kigali" | "Africa/Kinshasa" | "Africa/Lagos" | "Africa/Libreville" | "Africa/Lome" | "Africa/Luanda" | "Africa/Lubumbashi" | "Africa/Lusaka" | "Africa/Malabo" | "Africa/Maputo" | "Africa/Maseru" | "Africa/Mbabane" | "Africa/Mogadishu" | "Africa/Monrovia" | "Africa/Nairobi" | "Africa/Ndjamena" | "Africa/Niamey" | "Africa/Nouakchott" | "Africa/Ouagadougou" | "Africa/Porto-Novo" | "Africa/Sao_Tome" | "Africa/Tripoli" | "Africa/Tunis" | "Africa/Windhoek" | "America/Adak" | "America/Anchorage" | "America/Anguilla" | "America/Antigua" | "America/Araguaina" | "America/Argentina/La_Rioja" | "America/Argentina/Rio_Gallegos" | "America/Argentina/Salta" | "America/Argentina/San_Juan" | "America/Argentina/San_Luis" | "America/Argentina/Tucuman" | "America/Argentina/Ushuaia" | "America/Aruba" | "America/Asuncion" | "America/Bahia" | "America/Bahia_Banderas" | "America/Barbados" | "America/Belem" | "America/Belize" | "America/Blanc-Sablon" | "America/Boa_Vista" | "America/Bogota" | "America/Boise" | "America/Buenos_Aires" | "America/Cambridge_Bay" | "America/Campo_Grande" | "America/Cancun" | "America/Caracas" | "America/Catamarca" | "America/Cayenne" | "America/Cayman" | "America/Chicago" | "America/Chihuahua" | "America/Ciudad_Juarez" | "America/Coral_Harbour" | "America/Cordoba" | "America/Costa_Rica" | "America/Coyhaique" | "America/Creston" | "America/Cuiaba" | "America/Curacao" | "America/Danmarkshavn" | "America/Dawson" | "America/Dawson_Creek" | "America/Denver" | "America/Detroit" | "America/Dominica" | "America/Edmonton" | "America/Eirunepe" | "America/El_Salvador" | "America/Fort_Nelson" | "America/Fortaleza" | "America/Glace_Bay" | "America/Godthab" | "America/Goose_Bay" | "America/Grand_Turk" | "America/Grenada" | "America/Guadeloupe" | "America/Guatemala" | "America/Guayaquil" | "America/Guyana" | "America/Halifax" | "America/Havana" | "America/Hermosillo" | "America/Indiana/Knox" | "America/Indiana/Marengo" | "America/Indiana/Petersburg" | "America/Indiana/Tell_City" | "America/Indiana/Vevay" | "America/Indiana/Vincennes" | "America/Indiana/Winamac" | "America/Indianapolis" | "America/Inuvik" | "America/Iqaluit" | "America/Jamaica" | "America/Jujuy" | "America/Juneau" | "America/Kentucky/Monticello" | "America/Kralendijk" | "America/La_Paz" | "America/Lima" | "America/Los_Angeles" | "America/Louisville" | "America/Lower_Princes" | "America/Maceio" | "America/Managua" | "America/Manaus" | "America/Marigot" | "America/Martinique" | "America/Matamoros" | "America/Mazatlan" | "America/Mendoza" | "America/Menominee" | "America/Merida" | "America/Metlakatla" | "America/Mexico_City" | "America/Miquelon" | "America/Moncton" | "America/Monterrey" | "America/Montevideo" | "America/Montserrat" | "America/Nassau" | "America/New_York" | "America/Nome" | "America/Noronha" | "America/North_Dakota/Beulah" | "America/North_Dakota/Center" | "America/North_Dakota/New_Salem" | "America/Ojinaga" | "America/Panama" | "America/Paramaribo" | "America/Phoenix" | "America/Port-au-Prince" | "America/Port_of_Spain" | "America/Porto_Velho" | "America/Puerto_Rico" | "America/Punta_Arenas" | "America/Rankin_Inlet" | "America/Recife" | "America/Regina" | "America/Resolute" | "America/Rio_Branco" | "America/Santarem" | "America/Santiago" | "America/Santo_Domingo" | "America/Sao_Paulo" | "America/Scoresbysund" | "America/Sitka" | "America/St_Barthelemy" | "America/St_Johns" | "America/St_Kitts" | "America/St_Lucia" | "America/St_Thomas" | "America/St_Vincent" | "America/Swift_Current" | "America/Tegucigalpa" | "America/Thule" | "America/Tijuana" | "America/Toronto" | "America/Tortola" | "America/Vancouver" | "America/Whitehorse" | "America/Winnipeg" | "America/Yakutat" | "Antarctica/Casey" | "Antarctica/Davis" | "Antarctica/DumontDUrville" | "Antarctica/Macquarie" | "Antarctica/Mawson" | "Antarctica/McMurdo" | "Antarctica/Palmer" | "Antarctica/Rothera" | "Antarctica/Syowa" | "Antarctica/Troll" | "Antarctica/Vostok" | "Arctic/Longyearbyen" | "Asia/Aden" | "Asia/Almaty" | "Asia/Amman" | "Asia/Anadyr" | "Asia/Aqtau" | "Asia/Aqtobe" | "Asia/Ashgabat" | "Asia/Atyrau" | "Asia/Baghdad" | "Asia/Bahrain" | "Asia/Baku" | "Asia/Bangkok" | "Asia/Barnaul" | "Asia/Beirut" | "Asia/Bishkek" | "Asia/Brunei" | "Asia/Calcutta" | "Asia/Chita" | "Asia/Colombo" | "Asia/Damascus" | "Asia/Dhaka" | "Asia/Dili" | "Asia/Dubai" | "Asia/Dushanbe" | "Asia/Famagusta" | "Asia/Gaza" | "Asia/Hebron" | "Asia/Hong_Kong" | "Asia/Hovd" | "Asia/Irkutsk" | "Asia/Jakarta" | "Asia/Jayapura" | "Asia/Jerusalem" | "Asia/Kabul" | "Asia/Kamchatka" | "Asia/Karachi" | "Asia/Katmandu" | "Asia/Khandyga" | "Asia/Krasnoyarsk" | "Asia/Kuala_Lumpur" | "Asia/Kuching" | "Asia/Kuwait" | "Asia/Macau" | "Asia/Magadan" | "Asia/Makassar" | "Asia/Manila" | "Asia/Muscat" | "Asia/Nicosia" | "Asia/Novokuznetsk" | "Asia/Novosibirsk" | "Asia/Omsk" | "Asia/Oral" | "Asia/Phnom_Penh" | "Asia/Pontianak" | "Asia/Pyongyang" | "Asia/Qatar" | "Asia/Qostanay" | "Asia/Qyzylorda" | "Asia/Rangoon" | "Asia/Riyadh" | "Asia/Saigon" | "Asia/Sakhalin" | "Asia/Samarkand" | "Asia/Seoul" | "Asia/Shanghai" | "Asia/Singapore" | "Asia/Srednekolymsk" | "Asia/Taipei" | "Asia/Tashkent" | "Asia/Tbilisi" | "Asia/Tehran" | "Asia/Thimphu" | "Asia/Tokyo" | "Asia/Tomsk" | "Asia/Ulaanbaatar" | "Asia/Urumqi" | "Asia/Ust-Nera" | "Asia/Vientiane" | "Asia/Vladivostok" | "Asia/Yakutsk" | "Asia/Yekaterinburg" | "Asia/Yerevan" | "Atlantic/Azores" | "Atlantic/Bermuda" | "Atlantic/Canary" | "Atlantic/Cape_Verde" | "Atlantic/Faeroe" | "Atlantic/Madeira" | "Atlantic/Reykjavik" | "Atlantic/South_Georgia" | "Atlantic/St_Helena" | "Atlantic/Stanley" | "Australia/Adelaide" | "Australia/Brisbane" | "Australia/Broken_Hill" | "Australia/Darwin" | "Australia/Eucla" | "Australia/Hobart" | "Australia/Lindeman" | "Australia/Lord_Howe" | "Australia/Melbourne" | "Australia/Perth" | "Australia/Sydney" | "Europe/Amsterdam" | "Europe/Andorra" | "Europe/Astrakhan" | "Europe/Athens" | "Europe/Belgrade" | "Europe/Berlin" | "Europe/Bratislava" | "Europe/Brussels" | "Europe/Bucharest" | "Europe/Budapest" | "Europe/Busingen" | "Europe/Chisinau" | "Europe/Copenhagen" | "Europe/Dublin" | "Europe/Gibraltar" | "Europe/Guernsey" | "Europe/Helsinki" | "Europe/Isle_of_Man" | "Europe/Istanbul" | "Europe/Jersey" | "Europe/Kaliningrad" | "Europe/Kiev" | "Europe/Kirov" | "Europe/Lisbon" | "Europe/Ljubljana" | "Europe/London" | "Europe/Luxembourg" | "Europe/Madrid" | "Europe/Malta" | "Europe/Mariehamn" | "Europe/Minsk" | "Europe/Monaco" | "Europe/Moscow" | "Europe/Oslo" | "Europe/Paris" | "Europe/Podgorica" | "Europe/Prague" | "Europe/Riga" | "Europe/Rome" | "Europe/Samara" | "Europe/San_Marino" | "Europe/Sarajevo" | "Europe/Saratov" | "Europe/Simferopol" | "Europe/Skopje" | "Europe/Sofia" | "Europe/Stockholm" | "Europe/Tallinn" | "Europe/Tirane" | "Europe/Ulyanovsk" | "Europe/Vaduz" | "Europe/Vatican" | "Europe/Vienna" | "Europe/Vilnius" | "Europe/Volgograd" | "Europe/Warsaw" | "Europe/Zagreb" | "Europe/Zurich" | "Indian/Antananarivo" | "Indian/Chagos" | "Indian/Christmas" | "Indian/Cocos" | "Indian/Comoro" | "Indian/Kerguelen" | "Indian/Mahe" | "Indian/Maldives" | "Indian/Mauritius" | "Indian/Mayotte" | "Indian/Reunion" | "Pacific/Apia" | "Pacific/Auckland" | "Pacific/Bougainville" | "Pacific/Chatham" | "Pacific/Easter" | "Pacific/Efate" | "Pacific/Enderbury" | "Pacific/Fakaofo" | "Pacific/Fiji" | "Pacific/Funafuti" | "Pacific/Galapagos" | "Pacific/Gambier" | "Pacific/Guadalcanal" | "Pacific/Guam" | "Pacific/Honolulu" | "Pacific/Kiritimati" | "Pacific/Kosrae" | "Pacific/Kwajalein" | "Pacific/Majuro" | "Pacific/Marquesas" | "Pacific/Midway" | "Pacific/Nauru" | "Pacific/Niue" | "Pacific/Norfolk" | "Pacific/Noumea" | "Pacific/Pago_Pago" | "Pacific/Palau" | "Pacific/Pitcairn" | "Pacific/Ponape" | "Pacific/Port_Moresby" | "Pacific/Rarotonga" | "Pacific/Saipan" | "Pacific/Tahiti" | "Pacific/Tarawa" | "Pacific/Tongatapu" | "Pacific/Truk" | "Pacific/Wake" | "Pacific/Wallis";
                         };
                     };
                 };
@@ -2641,7 +2855,12 @@ export interface paths {
                                              * @description The type's [format](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/#supported-properties).
                                              * @enum {unknown}
                                              */
-                                            format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "blueprints" | "team" | "timer" | "proto";
+                                            format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "blueprints" | "team" | "timer" | "proto" | "labeled-url";
+                                            /**
+                                             * @description The display format for date-time properties. Only applicable when format is 'date-time'. Defaults to 'relative'.
+                                             * @enum {unknown}
+                                             */
+                                            dateFormat?: "relative" | "12-hour" | "24-hour" | "iso";
                                             /**
                                              * @description The [spec](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/#supported-properties) of the property.
                                              * @enum {unknown}
@@ -2689,7 +2908,12 @@ export interface paths {
                                          * @description The format of the property.
                                          * @enum {unknown}
                                          */
-                                        format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "proto";
+                                        format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "proto" | "labeled-url";
+                                        /**
+                                         * @description The display format for date-time calculation properties. Only applicable when format is 'date-time'. Defaults to 'relative'.
+                                         * @enum {unknown}
+                                         */
+                                        dateFormat?: "relative" | "12-hour" | "24-hour" | "iso";
                                         /**
                                          * @description The spec of the property.
                                          * @enum {unknown}
@@ -2725,7 +2949,7 @@ export interface paths {
                                              * @description The format of the item.
                                              * @enum {unknown}
                                              */
-                                            format?: "date-time" | "url" | "email" | "idn-format" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "timer" | "proto";
+                                            format?: "date-time" | "url" | "email" | "idn-format" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "timer" | "proto" | "labeled-url";
                                         };
                                     };
                                 };
@@ -2838,6 +3062,8 @@ export interface paths {
                                         type?: string;
                                     };
                                 };
+                                /** @description Overrides the org-level includeBlueprintsInGlobalSearchByDefault setting. When set, controls whether entities of this blueprint appear in global search results. Set to null to clear the override. */
+                                includeInGlobalSearch?: boolean | null;
                                 /** @description The destination of the blueprint's changelog. */
                                 changelogDestination?: {
                                     /** @enum {string} */
@@ -2952,7 +3178,12 @@ export interface paths {
                                      * @description The type's [format](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/#supported-properties).
                                      * @enum {unknown}
                                      */
-                                    format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "blueprints" | "team" | "timer" | "proto";
+                                    format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "blueprints" | "team" | "timer" | "proto" | "labeled-url";
+                                    /**
+                                     * @description The display format for date-time properties. Only applicable when format is 'date-time'. Defaults to 'relative'.
+                                     * @enum {unknown}
+                                     */
+                                    dateFormat?: "relative" | "12-hour" | "24-hour" | "iso";
                                     /**
                                      * @description The [spec](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/#supported-properties) of the property.
                                      * @enum {unknown}
@@ -3000,7 +3231,12 @@ export interface paths {
                                  * @description The format of the property.
                                  * @enum {unknown}
                                  */
-                                format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "proto";
+                                format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "proto" | "labeled-url";
+                                /**
+                                 * @description The display format for date-time calculation properties. Only applicable when format is 'date-time'. Defaults to 'relative'.
+                                 * @enum {unknown}
+                                 */
+                                dateFormat?: "relative" | "12-hour" | "24-hour" | "iso";
                                 /**
                                  * @description The spec of the property.
                                  * @enum {unknown}
@@ -3036,7 +3272,7 @@ export interface paths {
                                      * @description The format of the item.
                                      * @enum {unknown}
                                      */
-                                    format?: "date-time" | "url" | "email" | "idn-format" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "timer" | "proto";
+                                    format?: "date-time" | "url" | "email" | "idn-format" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "timer" | "proto" | "labeled-url";
                                 };
                             };
                         };
@@ -3149,6 +3385,8 @@ export interface paths {
                                 type?: string;
                             };
                         };
+                        /** @description Overrides the org-level includeBlueprintsInGlobalSearchByDefault setting. When set, controls whether entities of this blueprint appear in global search results. Set to null to clear the override. */
+                        includeInGlobalSearch?: boolean | null;
                         /** @description The destination of the blueprint's changelog. */
                         changelogDestination?: {
                             /** @enum {string} */
@@ -3221,7 +3459,12 @@ export interface paths {
                                              * @description The type's [format](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/#supported-properties).
                                              * @enum {unknown}
                                              */
-                                            format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "blueprints" | "team" | "timer" | "proto";
+                                            format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "blueprints" | "team" | "timer" | "proto" | "labeled-url";
+                                            /**
+                                             * @description The display format for date-time properties. Only applicable when format is 'date-time'. Defaults to 'relative'.
+                                             * @enum {unknown}
+                                             */
+                                            dateFormat?: "relative" | "12-hour" | "24-hour" | "iso";
                                             /**
                                              * @description The [spec](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/#supported-properties) of the property.
                                              * @enum {unknown}
@@ -3269,7 +3512,12 @@ export interface paths {
                                          * @description The format of the property.
                                          * @enum {unknown}
                                          */
-                                        format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "proto";
+                                        format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "proto" | "labeled-url";
+                                        /**
+                                         * @description The display format for date-time calculation properties. Only applicable when format is 'date-time'. Defaults to 'relative'.
+                                         * @enum {unknown}
+                                         */
+                                        dateFormat?: "relative" | "12-hour" | "24-hour" | "iso";
                                         /**
                                          * @description The spec of the property.
                                          * @enum {unknown}
@@ -3305,7 +3553,7 @@ export interface paths {
                                              * @description The format of the item.
                                              * @enum {unknown}
                                              */
-                                            format?: "date-time" | "url" | "email" | "idn-format" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "timer" | "proto";
+                                            format?: "date-time" | "url" | "email" | "idn-format" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "timer" | "proto" | "labeled-url";
                                         };
                                     };
                                 };
@@ -3418,6 +3666,8 @@ export interface paths {
                                         type?: string;
                                     };
                                 };
+                                /** @description Overrides the org-level includeBlueprintsInGlobalSearchByDefault setting. When set, controls whether entities of this blueprint appear in global search results. Set to null to clear the override. */
+                                includeInGlobalSearch?: boolean | null;
                                 /** @description The destination of the blueprint's changelog. */
                                 changelogDestination?: {
                                     /** @enum {string} */
@@ -3581,7 +3831,12 @@ export interface paths {
                                              * @description The type's [format](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/#supported-properties).
                                              * @enum {unknown}
                                              */
-                                            format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "blueprints" | "team" | "timer" | "proto";
+                                            format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "blueprints" | "team" | "timer" | "proto" | "labeled-url";
+                                            /**
+                                             * @description The display format for date-time properties. Only applicable when format is 'date-time'. Defaults to 'relative'.
+                                             * @enum {unknown}
+                                             */
+                                            dateFormat?: "relative" | "12-hour" | "24-hour" | "iso";
                                             /**
                                              * @description The [spec](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/#supported-properties) of the property.
                                              * @enum {unknown}
@@ -3629,7 +3884,12 @@ export interface paths {
                                          * @description The format of the property.
                                          * @enum {unknown}
                                          */
-                                        format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "proto";
+                                        format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "proto" | "labeled-url";
+                                        /**
+                                         * @description The display format for date-time calculation properties. Only applicable when format is 'date-time'. Defaults to 'relative'.
+                                         * @enum {unknown}
+                                         */
+                                        dateFormat?: "relative" | "12-hour" | "24-hour" | "iso";
                                         /**
                                          * @description The spec of the property.
                                          * @enum {unknown}
@@ -3665,7 +3925,7 @@ export interface paths {
                                              * @description The format of the item.
                                              * @enum {unknown}
                                              */
-                                            format?: "date-time" | "url" | "email" | "idn-format" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "timer" | "proto";
+                                            format?: "date-time" | "url" | "email" | "idn-format" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "timer" | "proto" | "labeled-url";
                                         };
                                     };
                                 };
@@ -3778,6 +4038,8 @@ export interface paths {
                                         type?: string;
                                     };
                                 };
+                                /** @description Overrides the org-level includeBlueprintsInGlobalSearchByDefault setting. When set, controls whether entities of this blueprint appear in global search results. Set to null to clear the override. */
+                                includeInGlobalSearch?: boolean | null;
                                 /** @description The destination of the blueprint's changelog. */
                                 changelogDestination?: {
                                     /** @enum {string} */
@@ -3891,7 +4153,12 @@ export interface paths {
                                      * @description The type's [format](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/#supported-properties).
                                      * @enum {unknown}
                                      */
-                                    format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "blueprints" | "team" | "timer" | "proto";
+                                    format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "blueprints" | "team" | "timer" | "proto" | "labeled-url";
+                                    /**
+                                     * @description The display format for date-time properties. Only applicable when format is 'date-time'. Defaults to 'relative'.
+                                     * @enum {unknown}
+                                     */
+                                    dateFormat?: "relative" | "12-hour" | "24-hour" | "iso";
                                     /**
                                      * @description The [spec](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/#supported-properties) of the property.
                                      * @enum {unknown}
@@ -3939,7 +4206,12 @@ export interface paths {
                                  * @description The format of the property.
                                  * @enum {unknown}
                                  */
-                                format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "proto";
+                                format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "proto" | "labeled-url";
+                                /**
+                                 * @description The display format for date-time calculation properties. Only applicable when format is 'date-time'. Defaults to 'relative'.
+                                 * @enum {unknown}
+                                 */
+                                dateFormat?: "relative" | "12-hour" | "24-hour" | "iso";
                                 /**
                                  * @description The spec of the property.
                                  * @enum {unknown}
@@ -3975,7 +4247,7 @@ export interface paths {
                                      * @description The format of the item.
                                      * @enum {unknown}
                                      */
-                                    format?: "date-time" | "url" | "email" | "idn-format" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "timer" | "proto";
+                                    format?: "date-time" | "url" | "email" | "idn-format" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "timer" | "proto" | "labeled-url";
                                 };
                             };
                         };
@@ -4088,6 +4360,8 @@ export interface paths {
                                 type?: string;
                             };
                         };
+                        /** @description Overrides the org-level includeBlueprintsInGlobalSearchByDefault setting. When set, controls whether entities of this blueprint appear in global search results. Set to null to clear the override. */
+                        includeInGlobalSearch?: boolean | null;
                         /** @description The destination of the blueprint's changelog. */
                         changelogDestination?: {
                             /** @enum {string} */
@@ -4160,7 +4434,12 @@ export interface paths {
                                              * @description The type's [format](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/#supported-properties).
                                              * @enum {unknown}
                                              */
-                                            format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "blueprints" | "team" | "timer" | "proto";
+                                            format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "blueprints" | "team" | "timer" | "proto" | "labeled-url";
+                                            /**
+                                             * @description The display format for date-time properties. Only applicable when format is 'date-time'. Defaults to 'relative'.
+                                             * @enum {unknown}
+                                             */
+                                            dateFormat?: "relative" | "12-hour" | "24-hour" | "iso";
                                             /**
                                              * @description The [spec](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/#supported-properties) of the property.
                                              * @enum {unknown}
@@ -4208,7 +4487,12 @@ export interface paths {
                                          * @description The format of the property.
                                          * @enum {unknown}
                                          */
-                                        format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "proto";
+                                        format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "proto" | "labeled-url";
+                                        /**
+                                         * @description The display format for date-time calculation properties. Only applicable when format is 'date-time'. Defaults to 'relative'.
+                                         * @enum {unknown}
+                                         */
+                                        dateFormat?: "relative" | "12-hour" | "24-hour" | "iso";
                                         /**
                                          * @description The spec of the property.
                                          * @enum {unknown}
@@ -4244,7 +4528,7 @@ export interface paths {
                                              * @description The format of the item.
                                              * @enum {unknown}
                                              */
-                                            format?: "date-time" | "url" | "email" | "idn-format" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "timer" | "proto";
+                                            format?: "date-time" | "url" | "email" | "idn-format" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "timer" | "proto" | "labeled-url";
                                         };
                                     };
                                 };
@@ -4357,6 +4641,8 @@ export interface paths {
                                         type?: string;
                                     };
                                 };
+                                /** @description Overrides the org-level includeBlueprintsInGlobalSearchByDefault setting. When set, controls whether entities of this blueprint appear in global search results. Set to null to clear the override. */
+                                includeInGlobalSearch?: boolean | null;
                                 /** @description The destination of the blueprint's changelog. */
                                 changelogDestination?: {
                                     /** @enum {string} */
@@ -4588,7 +4874,12 @@ export interface paths {
                                      * @description The type's [format](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/#supported-properties).
                                      * @enum {unknown}
                                      */
-                                    format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "blueprints" | "team" | "timer" | "proto";
+                                    format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "blueprints" | "team" | "timer" | "proto" | "labeled-url";
+                                    /**
+                                     * @description The display format for date-time properties. Only applicable when format is 'date-time'. Defaults to 'relative'.
+                                     * @enum {unknown}
+                                     */
+                                    dateFormat?: "relative" | "12-hour" | "24-hour" | "iso";
                                     /**
                                      * @description The [spec](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/#supported-properties) of the property.
                                      * @enum {unknown}
@@ -4636,7 +4927,12 @@ export interface paths {
                                  * @description The format of the property.
                                  * @enum {unknown}
                                  */
-                                format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "proto";
+                                format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "proto" | "labeled-url";
+                                /**
+                                 * @description The display format for date-time calculation properties. Only applicable when format is 'date-time'. Defaults to 'relative'.
+                                 * @enum {unknown}
+                                 */
+                                dateFormat?: "relative" | "12-hour" | "24-hour" | "iso";
                                 /**
                                  * @description The spec of the property.
                                  * @enum {unknown}
@@ -4672,7 +4968,7 @@ export interface paths {
                                      * @description The format of the item.
                                      * @enum {unknown}
                                      */
-                                    format?: "date-time" | "url" | "email" | "idn-format" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "timer" | "proto";
+                                    format?: "date-time" | "url" | "email" | "idn-format" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "timer" | "proto" | "labeled-url";
                                 };
                             };
                         };
@@ -4785,6 +5081,8 @@ export interface paths {
                                 type?: string;
                             };
                         };
+                        /** @description Overrides the org-level includeBlueprintsInGlobalSearchByDefault setting. When set, controls whether entities of this blueprint appear in global search results. Set to null to clear the override. */
+                        includeInGlobalSearch?: boolean | null;
                         /** @description The destination of the blueprint's changelog. */
                         changelogDestination?: {
                             /** @enum {string} */
@@ -4857,7 +5155,12 @@ export interface paths {
                                              * @description The type's [format](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/#supported-properties).
                                              * @enum {unknown}
                                              */
-                                            format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "blueprints" | "team" | "timer" | "proto";
+                                            format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "blueprints" | "team" | "timer" | "proto" | "labeled-url";
+                                            /**
+                                             * @description The display format for date-time properties. Only applicable when format is 'date-time'. Defaults to 'relative'.
+                                             * @enum {unknown}
+                                             */
+                                            dateFormat?: "relative" | "12-hour" | "24-hour" | "iso";
                                             /**
                                              * @description The [spec](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/#supported-properties) of the property.
                                              * @enum {unknown}
@@ -4905,7 +5208,12 @@ export interface paths {
                                          * @description The format of the property.
                                          * @enum {unknown}
                                          */
-                                        format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "proto";
+                                        format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "proto" | "labeled-url";
+                                        /**
+                                         * @description The display format for date-time calculation properties. Only applicable when format is 'date-time'. Defaults to 'relative'.
+                                         * @enum {unknown}
+                                         */
+                                        dateFormat?: "relative" | "12-hour" | "24-hour" | "iso";
                                         /**
                                          * @description The spec of the property.
                                          * @enum {unknown}
@@ -4941,7 +5249,7 @@ export interface paths {
                                              * @description The format of the item.
                                              * @enum {unknown}
                                              */
-                                            format?: "date-time" | "url" | "email" | "idn-format" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "timer" | "proto";
+                                            format?: "date-time" | "url" | "email" | "idn-format" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "timer" | "proto" | "labeled-url";
                                         };
                                     };
                                 };
@@ -5054,6 +5362,8 @@ export interface paths {
                                         type?: string;
                                     };
                                 };
+                                /** @description Overrides the org-level includeBlueprintsInGlobalSearchByDefault setting. When set, controls whether entities of this blueprint appear in global search results. Set to null to clear the override. */
+                                includeInGlobalSearch?: boolean | null;
                                 /** @description The destination of the blueprint's changelog. */
                                 changelogDestination?: {
                                     /** @enum {string} */
@@ -5228,7 +5538,12 @@ export interface paths {
                                              * @description The type's [format](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/#supported-properties).
                                              * @enum {unknown}
                                              */
-                                            format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "blueprints" | "team" | "timer" | "proto";
+                                            format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "blueprints" | "team" | "timer" | "proto" | "labeled-url";
+                                            /**
+                                             * @description The display format for date-time properties. Only applicable when format is 'date-time'. Defaults to 'relative'.
+                                             * @enum {unknown}
+                                             */
+                                            dateFormat?: "relative" | "12-hour" | "24-hour" | "iso";
                                             /**
                                              * @description The [spec](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/#supported-properties) of the property.
                                              * @enum {unknown}
@@ -5276,7 +5591,12 @@ export interface paths {
                                          * @description The format of the property.
                                          * @enum {unknown}
                                          */
-                                        format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "proto";
+                                        format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "proto" | "labeled-url";
+                                        /**
+                                         * @description The display format for date-time calculation properties. Only applicable when format is 'date-time'. Defaults to 'relative'.
+                                         * @enum {unknown}
+                                         */
+                                        dateFormat?: "relative" | "12-hour" | "24-hour" | "iso";
                                         /**
                                          * @description The spec of the property.
                                          * @enum {unknown}
@@ -5312,7 +5632,7 @@ export interface paths {
                                              * @description The format of the item.
                                              * @enum {unknown}
                                              */
-                                            format?: "date-time" | "url" | "email" | "idn-format" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "timer" | "proto";
+                                            format?: "date-time" | "url" | "email" | "idn-format" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "timer" | "proto" | "labeled-url";
                                         };
                                     };
                                 };
@@ -5425,6 +5745,8 @@ export interface paths {
                                         type?: string;
                                     };
                                 };
+                                /** @description Overrides the org-level includeBlueprintsInGlobalSearchByDefault setting. When set, controls whether entities of this blueprint appear in global search results. Set to null to clear the override. */
+                                includeInGlobalSearch?: boolean | null;
                                 /** @description The destination of the blueprint's changelog. */
                                 changelogDestination?: {
                                     /** @enum {string} */
@@ -5599,7 +5921,12 @@ export interface paths {
                                              * @description The type's [format](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/#supported-properties).
                                              * @enum {unknown}
                                              */
-                                            format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "blueprints" | "team" | "timer" | "proto";
+                                            format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "blueprints" | "team" | "timer" | "proto" | "labeled-url";
+                                            /**
+                                             * @description The display format for date-time properties. Only applicable when format is 'date-time'. Defaults to 'relative'.
+                                             * @enum {unknown}
+                                             */
+                                            dateFormat?: "relative" | "12-hour" | "24-hour" | "iso";
                                             /**
                                              * @description The [spec](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/#supported-properties) of the property.
                                              * @enum {unknown}
@@ -5647,7 +5974,12 @@ export interface paths {
                                          * @description The format of the property.
                                          * @enum {unknown}
                                          */
-                                        format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "proto";
+                                        format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "proto" | "labeled-url";
+                                        /**
+                                         * @description The display format for date-time calculation properties. Only applicable when format is 'date-time'. Defaults to 'relative'.
+                                         * @enum {unknown}
+                                         */
+                                        dateFormat?: "relative" | "12-hour" | "24-hour" | "iso";
                                         /**
                                          * @description The spec of the property.
                                          * @enum {unknown}
@@ -5683,7 +6015,7 @@ export interface paths {
                                              * @description The format of the item.
                                              * @enum {unknown}
                                              */
-                                            format?: "date-time" | "url" | "email" | "idn-format" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "timer" | "proto";
+                                            format?: "date-time" | "url" | "email" | "idn-format" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "timer" | "proto" | "labeled-url";
                                         };
                                     };
                                 };
@@ -5796,6 +6128,8 @@ export interface paths {
                                         type?: string;
                                     };
                                 };
+                                /** @description Overrides the org-level includeBlueprintsInGlobalSearchByDefault setting. When set, controls whether entities of this blueprint appear in global search results. Set to null to clear the override. */
+                                includeInGlobalSearch?: boolean | null;
                                 /** @description The destination of the blueprint's changelog. */
                                 changelogDestination?: {
                                     /** @enum {string} */
@@ -5970,7 +6304,12 @@ export interface paths {
                                              * @description The type's [format](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/#supported-properties).
                                              * @enum {unknown}
                                              */
-                                            format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "blueprints" | "team" | "timer" | "proto";
+                                            format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "blueprints" | "team" | "timer" | "proto" | "labeled-url";
+                                            /**
+                                             * @description The display format for date-time properties. Only applicable when format is 'date-time'. Defaults to 'relative'.
+                                             * @enum {unknown}
+                                             */
+                                            dateFormat?: "relative" | "12-hour" | "24-hour" | "iso";
                                             /**
                                              * @description The [spec](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/#supported-properties) of the property.
                                              * @enum {unknown}
@@ -6018,7 +6357,12 @@ export interface paths {
                                          * @description The format of the property.
                                          * @enum {unknown}
                                          */
-                                        format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "proto";
+                                        format?: "date-time" | "url" | "email" | "idn-email" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "proto" | "labeled-url";
+                                        /**
+                                         * @description The display format for date-time calculation properties. Only applicable when format is 'date-time'. Defaults to 'relative'.
+                                         * @enum {unknown}
+                                         */
+                                        dateFormat?: "relative" | "12-hour" | "24-hour" | "iso";
                                         /**
                                          * @description The spec of the property.
                                          * @enum {unknown}
@@ -6054,7 +6398,7 @@ export interface paths {
                                              * @description The format of the item.
                                              * @enum {unknown}
                                              */
-                                            format?: "date-time" | "url" | "email" | "idn-format" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "timer" | "proto";
+                                            format?: "date-time" | "url" | "email" | "idn-format" | "ipv4" | "ipv6" | "markdown" | "yaml" | "user" | "team" | "timer" | "proto" | "labeled-url";
                                         };
                                     };
                                 };
@@ -6167,6 +6511,8 @@ export interface paths {
                                         type?: string;
                                     };
                                 };
+                                /** @description Overrides the org-level includeBlueprintsInGlobalSearchByDefault setting. When set, controls whether entities of this blueprint appear in global search results. Set to null to clear the override. */
+                                includeInGlobalSearch?: boolean | null;
                                 /** @description The destination of the blueprint's changelog. */
                                 changelogDestination?: {
                                     /** @enum {string} */
@@ -6366,7 +6712,7 @@ export interface paths {
                                          * @description The format of the input.
                                          * @enum {unknown}
                                          */
-                                        format?: "date-time" | "url" | "email" | "ipv4" | "ipv6" | "yaml" | "entity" | "user" | "team" | "proto" | "markdown" | "multi-line";
+                                        format?: "date-time" | "url" | "email" | "ipv4" | "ipv6" | "yaml" | "entity" | "user" | "team" | "proto" | "markdown" | "multi-line" | "labeled-url";
                                         /**
                                          * Blueprint
                                          * @description When using the `entity` format, this is the identifier of the blueprint whose entities will be selectable via this input.
@@ -6434,7 +6780,7 @@ export interface paths {
                                          * @description The format of the input.
                                          * @enum {unknown}
                                          */
-                                        format?: "date-time" | "url" | "email" | "ipv4" | "ipv6" | "yaml" | "entity" | "user" | "team" | "proto" | "markdown" | "multi-line";
+                                        format?: "date-time" | "url" | "email" | "ipv4" | "ipv6" | "yaml" | "entity" | "user" | "team" | "proto" | "markdown" | "multi-line" | "labeled-url";
                                         /**
                                          * Blueprint
                                          * @description When using the `entity` format, this is the identifier of the blueprint whose entities will be selectable via this input.
@@ -6503,7 +6849,7 @@ export interface paths {
                                          * @description The format of the input.
                                          * @enum {unknown}
                                          */
-                                        format?: "date-time" | "url" | "email" | "ipv4" | "ipv6" | "yaml" | "entity" | "user" | "team" | "proto" | "markdown" | "multi-line";
+                                        format?: "date-time" | "url" | "email" | "ipv4" | "ipv6" | "yaml" | "entity" | "user" | "team" | "proto" | "markdown" | "multi-line" | "labeled-url";
                                         /**
                                          * Blueprint
                                          * @description When using the `entity` format, this is the identifier of the blueprint whose entities will be selectable via this input.
@@ -6590,7 +6936,7 @@ export interface paths {
                                         to: string;
                                     } | {
                                         /** @enum {string} */
-                                        preset: "today" | "tomorrow" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                        preset: "today" | "tomorrow" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years" | "nextDay" | "nextWeek" | "next2Weeks" | "nextMonth" | "next3Months" | "next6Months" | "next12Months";
                                     } | {
                                         property: string;
                                         /** @enum {string} */
@@ -6699,7 +7045,7 @@ export interface paths {
                                          * @description The format of the input.
                                          * @enum {unknown}
                                          */
-                                        format?: "date-time" | "url" | "email" | "ipv4" | "ipv6" | "yaml" | "entity" | "user" | "team" | "proto" | "markdown" | "multi-line";
+                                        format?: "date-time" | "url" | "email" | "ipv4" | "ipv6" | "yaml" | "entity" | "user" | "team" | "proto" | "markdown" | "multi-line" | "labeled-url";
                                         /**
                                          * Blueprint
                                          * @description When using the `entity` format, this is the identifier of the blueprint whose entities will be selectable via this input.
@@ -6767,7 +7113,7 @@ export interface paths {
                                          * @description The format of the input.
                                          * @enum {unknown}
                                          */
-                                        format?: "date-time" | "url" | "email" | "ipv4" | "ipv6" | "yaml" | "entity" | "user" | "team" | "proto" | "markdown" | "multi-line";
+                                        format?: "date-time" | "url" | "email" | "ipv4" | "ipv6" | "yaml" | "entity" | "user" | "team" | "proto" | "markdown" | "multi-line" | "labeled-url";
                                         /**
                                          * Blueprint
                                          * @description When using the `entity` format, this is the identifier of the blueprint whose entities will be selectable via this input.
@@ -6836,7 +7182,7 @@ export interface paths {
                                          * @description The format of the input.
                                          * @enum {unknown}
                                          */
-                                        format?: "date-time" | "url" | "email" | "ipv4" | "ipv6" | "yaml" | "entity" | "user" | "team" | "proto" | "markdown" | "multi-line";
+                                        format?: "date-time" | "url" | "email" | "ipv4" | "ipv6" | "yaml" | "entity" | "user" | "team" | "proto" | "markdown" | "multi-line" | "labeled-url";
                                         /**
                                          * Blueprint
                                          * @description When using the `entity` format, this is the identifier of the blueprint whose entities will be selectable via this input.
@@ -6952,7 +7298,7 @@ export interface paths {
                             condition?: {
                                 /** @enum {string} */
                                 type: "JQ";
-                                /** @description An array of [jq expressions](https://docs.port.io/search-and-query/#jq-expressions) used to filter entities.<br/>Read more [here](https://docs.port.io/actions-and-automations/define-automations/setup-trigger#conditions). */
+                                /** @description An array of [jq expressions](https://docs.port.io/search-and-query/structure-and-syntax) used to filter entities.<br/>Read more [here](https://docs.port.io/actions-and-automations/define-automations/setup-trigger#conditions). */
                                 expressions: string[];
                                 /** @enum {string} */
                                 combinator?: "and" | "or";
@@ -7223,7 +7569,7 @@ export interface paths {
                                          * @description The format of the input.
                                          * @enum {unknown}
                                          */
-                                        format?: "date-time" | "url" | "email" | "ipv4" | "ipv6" | "yaml" | "entity" | "user" | "team" | "proto" | "markdown" | "multi-line";
+                                        format?: "date-time" | "url" | "email" | "ipv4" | "ipv6" | "yaml" | "entity" | "user" | "team" | "proto" | "markdown" | "multi-line" | "labeled-url";
                                         /**
                                          * Blueprint
                                          * @description When using the `entity` format, this is the identifier of the blueprint whose entities will be selectable via this input.
@@ -7291,7 +7637,7 @@ export interface paths {
                                          * @description The format of the input.
                                          * @enum {unknown}
                                          */
-                                        format?: "date-time" | "url" | "email" | "ipv4" | "ipv6" | "yaml" | "entity" | "user" | "team" | "proto" | "markdown" | "multi-line";
+                                        format?: "date-time" | "url" | "email" | "ipv4" | "ipv6" | "yaml" | "entity" | "user" | "team" | "proto" | "markdown" | "multi-line" | "labeled-url";
                                         /**
                                          * Blueprint
                                          * @description When using the `entity` format, this is the identifier of the blueprint whose entities will be selectable via this input.
@@ -7360,7 +7706,7 @@ export interface paths {
                                          * @description The format of the input.
                                          * @enum {unknown}
                                          */
-                                        format?: "date-time" | "url" | "email" | "ipv4" | "ipv6" | "yaml" | "entity" | "user" | "team" | "proto" | "markdown" | "multi-line";
+                                        format?: "date-time" | "url" | "email" | "ipv4" | "ipv6" | "yaml" | "entity" | "user" | "team" | "proto" | "markdown" | "multi-line" | "labeled-url";
                                         /**
                                          * Blueprint
                                          * @description When using the `entity` format, this is the identifier of the blueprint whose entities will be selectable via this input.
@@ -7447,7 +7793,7 @@ export interface paths {
                                         to: string;
                                     } | {
                                         /** @enum {string} */
-                                        preset: "today" | "tomorrow" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                        preset: "today" | "tomorrow" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years" | "nextDay" | "nextWeek" | "next2Weeks" | "nextMonth" | "next3Months" | "next6Months" | "next12Months";
                                     } | {
                                         property: string;
                                         /** @enum {string} */
@@ -7556,7 +7902,7 @@ export interface paths {
                                          * @description The format of the input.
                                          * @enum {unknown}
                                          */
-                                        format?: "date-time" | "url" | "email" | "ipv4" | "ipv6" | "yaml" | "entity" | "user" | "team" | "proto" | "markdown" | "multi-line";
+                                        format?: "date-time" | "url" | "email" | "ipv4" | "ipv6" | "yaml" | "entity" | "user" | "team" | "proto" | "markdown" | "multi-line" | "labeled-url";
                                         /**
                                          * Blueprint
                                          * @description When using the `entity` format, this is the identifier of the blueprint whose entities will be selectable via this input.
@@ -7624,7 +7970,7 @@ export interface paths {
                                          * @description The format of the input.
                                          * @enum {unknown}
                                          */
-                                        format?: "date-time" | "url" | "email" | "ipv4" | "ipv6" | "yaml" | "entity" | "user" | "team" | "proto" | "markdown" | "multi-line";
+                                        format?: "date-time" | "url" | "email" | "ipv4" | "ipv6" | "yaml" | "entity" | "user" | "team" | "proto" | "markdown" | "multi-line" | "labeled-url";
                                         /**
                                          * Blueprint
                                          * @description When using the `entity` format, this is the identifier of the blueprint whose entities will be selectable via this input.
@@ -7693,7 +8039,7 @@ export interface paths {
                                          * @description The format of the input.
                                          * @enum {unknown}
                                          */
-                                        format?: "date-time" | "url" | "email" | "ipv4" | "ipv6" | "yaml" | "entity" | "user" | "team" | "proto" | "markdown" | "multi-line";
+                                        format?: "date-time" | "url" | "email" | "ipv4" | "ipv6" | "yaml" | "entity" | "user" | "team" | "proto" | "markdown" | "multi-line" | "labeled-url";
                                         /**
                                          * Blueprint
                                          * @description When using the `entity` format, this is the identifier of the blueprint whose entities will be selectable via this input.
@@ -7809,7 +8155,7 @@ export interface paths {
                             condition?: {
                                 /** @enum {string} */
                                 type: "JQ";
-                                /** @description An array of [jq expressions](https://docs.port.io/search-and-query/#jq-expressions) used to filter entities.<br/>Read more [here](https://docs.port.io/actions-and-automations/define-automations/setup-trigger#conditions). */
+                                /** @description An array of [jq expressions](https://docs.port.io/search-and-query/structure-and-syntax) used to filter entities.<br/>Read more [here](https://docs.port.io/actions-and-automations/define-automations/setup-trigger#conditions). */
                                 expressions: string[];
                                 /** @enum {string} */
                                 combinator?: "and" | "or";
@@ -8066,7 +8412,10 @@ export interface paths {
             parameters: {
                 query?: never;
                 header?: never;
-                path?: never;
+                path: {
+                    type: Record<string, never>;
+                    nullable: unknown;
+                };
                 cookie?: never;
             };
             requestBody?: never;
@@ -8110,12 +8459,15 @@ export interface paths {
             parameters: {
                 query?: never;
                 header?: never;
-                path?: never;
+                path: {
+                    type: Record<string, never>;
+                    nullable: unknown;
+                };
                 cookie?: never;
             };
             requestBody?: {
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": Record<string, never> | null;
                 };
             };
             responses: {
@@ -8186,12 +8538,15 @@ export interface paths {
             parameters: {
                 query?: never;
                 header?: never;
-                path?: never;
+                path: {
+                    type: Record<string, never>;
+                    nullable: unknown;
+                };
                 cookie?: never;
             };
             requestBody?: {
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": Record<string, never> | null;
                 };
             };
             responses: {
@@ -8275,7 +8630,10 @@ export interface paths {
             parameters: {
                 query?: never;
                 header?: never;
-                path?: never;
+                path: {
+                    type: Record<string, never>;
+                    nullable: unknown;
+                };
                 cookie?: never;
             };
             requestBody?: never;
@@ -8319,12 +8677,15 @@ export interface paths {
             parameters: {
                 query?: never;
                 header?: never;
-                path?: never;
+                path: {
+                    type: Record<string, never>;
+                    nullable: unknown;
+                };
                 cookie?: never;
             };
             requestBody?: {
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": Record<string, never> | null;
                 };
             };
             responses: {
@@ -8396,7 +8757,10 @@ export interface paths {
             parameters: {
                 query?: never;
                 header?: never;
-                path?: never;
+                path: {
+                    type: Record<string, never>;
+                    nullable: unknown;
+                };
                 cookie?: never;
             };
             requestBody?: never;
@@ -8546,6 +8910,7 @@ export interface paths {
                                 approval?: {
                                     description?: string;
                                     userId?: string | null;
+                                    impersonatedUserId?: string | null;
                                     state?: string;
                                 } | null;
                                 payload?: {
@@ -8571,6 +8936,7 @@ export interface paths {
                                 installationId?: string;
                                 createdBy?: string;
                                 impersonatedBy?: string;
+                                impersonatedUserId?: string;
                                 updatedBy?: string;
                                 /** Format: date-time */
                                 createdAt?: string;
@@ -8653,7 +9019,7 @@ export interface paths {
         };
         /**
          * Get an action run's details
-         * @description This route allows you to fetch the details of an action run.<br/><br/>To learn more about action runs, check out the [documentation](https://docs.port.io/create-self-service-experiences/reflect-action-progress/).<br/><br/>:::info Version parameter<br/>Set the `version` parameter to `v2` for the latest version of the API.:::
+         * @description This route allows you to fetch the details of an action run.<br/><br/>To learn more about action runs, check out the [documentation](https://docs.port.io/create-self-service-experiences/reflect-action-progress/).<br/><br/>:::info Version parameter<br/>Set the `version` parameter to `v2` for the latest version of the API.<br/>:::
          */
         get: {
             parameters: {
@@ -8715,6 +9081,7 @@ export interface paths {
                                 approval?: {
                                     description?: string;
                                     userId?: string | null;
+                                    impersonatedUserId?: string | null;
                                     state?: string;
                                 } | null;
                                 payload?: {
@@ -8740,6 +9107,7 @@ export interface paths {
                                 installationId?: string;
                                 createdBy?: string;
                                 impersonatedBy?: string;
+                                impersonatedUserId?: string;
                                 updatedBy?: string;
                                 /** Format: date-time */
                                 createdAt?: string;
@@ -8865,6 +9233,7 @@ export interface paths {
                                 approval?: {
                                     description?: string;
                                     userId?: string | null;
+                                    impersonatedUserId?: string | null;
                                     state?: string;
                                 } | null;
                                 payload?: {
@@ -8890,6 +9259,7 @@ export interface paths {
                                 installationId?: string;
                                 createdBy?: string;
                                 impersonatedBy?: string;
+                                impersonatedUserId?: string;
                                 updatedBy?: string;
                                 /** Format: date-time */
                                 createdAt?: string;
@@ -8974,7 +9344,7 @@ export interface paths {
         head?: never;
         /**
          * Approve an action run
-         * @description This route allows you to approve or decline a request to execute an action that requires approval.<br/><br/>To learn more about manual approval for actions, check out the [documentation](https://docs.port.io/create-self-service-experiences/set-self-service-actions-rbac/#configure-manual-approval-for-actions).
+         * @description This route allows you to approve or decline a request to execute an action that requires approval.<br/><br/>To learn more about manual approval for actions, check out the [documentation](https://docs.port.io/create-self-service-experiences/set-self-service-actions-rbac/#configure-manual-approval-for-actions).<br/><br/>:::info Version parameter value<br/>Set the `version` parameter to `v2` for the latest version of the API.<br/>:::
          */
         patch: {
             parameters: {
@@ -9045,6 +9415,7 @@ export interface paths {
                                 approval?: {
                                     description?: string;
                                     userId?: string | null;
+                                    impersonatedUserId?: string | null;
                                     state?: string;
                                 } | null;
                                 payload?: {
@@ -9070,6 +9441,7 @@ export interface paths {
                                 installationId?: string;
                                 createdBy?: string;
                                 impersonatedBy?: string;
+                                impersonatedUserId?: string;
                                 updatedBy?: string;
                                 /** Format: date-time */
                                 createdAt?: string;
@@ -9148,7 +9520,7 @@ export interface paths {
         };
         /**
          * Get all action runs
-         * @description This route allows you to fetch all action runs in your Port account. The route will perform a logical `AND` between all query parameters below, and return all action runs that match the criteria.<br/><br/>To learn more about action runs, check out the [documentation](https://docs.port.io/create-self-service-experiences/reflect-action-progress/).<br/><br/>:::info Version parameter<br/>Set the `version` parameter to `v2` for the latest version of the API.:::
+         * @description This route allows you to fetch all action runs in your Port account. The route will perform a logical `AND` between all query parameters below, and return all action runs that match the criteria.<br/><br/>To learn more about action runs, check out the [documentation](https://docs.port.io/create-self-service-experiences/reflect-action-progress/).<br/><br/>:::info Version parameter<br/>Set the `version` parameter to `v2` for the latest version of the API.<br/>:::
          */
         get: {
             parameters: {
@@ -9225,6 +9597,7 @@ export interface paths {
                                 approval?: {
                                     description?: string;
                                     userId?: string | null;
+                                    impersonatedUserId?: string | null;
                                     state?: string;
                                 } | null;
                                 payload?: {
@@ -9250,6 +9623,7 @@ export interface paths {
                                 installationId?: string;
                                 createdBy?: string;
                                 impersonatedBy?: string;
+                                impersonatedUserId?: string;
                                 updatedBy?: string;
                                 /** Format: date-time */
                                 createdAt?: string;
@@ -9870,7 +10244,7 @@ export interface paths {
                                 /** @description Fetch all audit logs related to the specified integration. */
                                 InstallationId?: string;
                                 /** @description Fetch all audit logs related to the specified resource type/s.<br/>**Possible values**: [`blueprint`, `entity`, `run`, `webhook`, `scorecard`, `action`, `integration`] */
-                                resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration");
+                                resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "action_permissions" | "integration" | "secret")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "action_permissions" | "integration" | "secret");
                                 /** @description The fields you want to include in the response. If used, only the specified fields will be included in the response. */
                                 includes?: ("action" | "context" | "diff" | "identifier" | "resourceType" | "status" | "trigger" | "additionalData" | "message")[];
                                 /**
@@ -10036,6 +10410,34 @@ export interface paths {
                             createdAt?: string;
                             createdBy?: string;
                             /** @enum {unknown} */
+                            type: "workflow-runs-history-table";
+                            query?: Record<string, never>;
+                            tableConfig?: {
+                                filterSettings?: {
+                                    filterBy: components["schemas"]["def-1"];
+                                };
+                                groupSettings?: {
+                                    groupBy: string[];
+                                };
+                                sortSettings?: {
+                                    sortBy?: {
+                                        property: string;
+                                        /** @enum {unknown} */
+                                        order: "asc" | "desc";
+                                    }[];
+                                };
+                                propertiesSettings?: {
+                                    hidden?: string[];
+                                    order?: string[];
+                                };
+                            };
+                        } | {
+                            id?: string;
+                            updatedAt?: string;
+                            updatedBy?: string;
+                            createdAt?: string;
+                            createdBy?: string;
+                            /** @enum {unknown} */
                             type: "run-info";
                             title?: string;
                             runId: string;
@@ -10075,6 +10477,32 @@ export interface paths {
                             description?: string;
                             dataset: components["schemas"]["def-1"];
                             emptyStateText?: string;
+                            segmentTableViewConfig?: {
+                                [key: string]: {
+                                    filterSettings?: {
+                                        filterBy: components["schemas"]["def-1"];
+                                    };
+                                    groupSettings?: {
+                                        groupBy: string[];
+                                    };
+                                    sortSettings?: {
+                                        sortBy?: {
+                                            property: string;
+                                            /** @enum {unknown} */
+                                            order: "asc" | "desc";
+                                        }[];
+                                    };
+                                    propertiesSettings?: {
+                                        hidden?: string[];
+                                        shown?: string[];
+                                        order?: string[];
+                                    };
+                                    tabIndex?: number;
+                                    hidden?: boolean;
+                                    title?: string;
+                                    description?: string;
+                                };
+                            };
                         } | {
                             id?: string;
                             updatedAt?: string;
@@ -10090,6 +10518,32 @@ export interface paths {
                             description?: string;
                             dataset: components["schemas"]["def-1"];
                             emptyStateText?: string;
+                            segmentTableViewConfig?: {
+                                [key: string]: {
+                                    filterSettings?: {
+                                        filterBy: components["schemas"]["def-1"];
+                                    };
+                                    groupSettings?: {
+                                        groupBy: string[];
+                                    };
+                                    sortSettings?: {
+                                        sortBy?: {
+                                            property: string;
+                                            /** @enum {unknown} */
+                                            order: "asc" | "desc";
+                                        }[];
+                                    };
+                                    propertiesSettings?: {
+                                        hidden?: string[];
+                                        shown?: string[];
+                                        order?: string[];
+                                    };
+                                    tabIndex?: number;
+                                    hidden?: boolean;
+                                    title?: string;
+                                    description?: string;
+                                };
+                            };
                         } | ({
                             id?: string;
                             updatedAt?: string;
@@ -10106,10 +10560,10 @@ export interface paths {
                             xAxisTitle?: string;
                             yAxisTitle?: string;
                             /** @enum {string} */
-                            timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                            timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                             timeRange?: {
                                 /** @enum {string} */
-                                preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                             };
                             description?: string;
                             emptyStateText?: string;
@@ -10131,10 +10585,10 @@ export interface paths {
                             xAxisTitle?: string;
                             yAxisTitle?: string;
                             /** @enum {string} */
-                            timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                            timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                             timeRange?: {
                                 /** @enum {string} */
-                                preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                             };
                             description?: string;
                             emptyStateText?: string;
@@ -10159,10 +10613,10 @@ export interface paths {
                             xAxisTitle?: string;
                             yAxisTitle?: string;
                             /** @enum {string} */
-                            timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                            timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                             timeRange?: {
                                 /** @enum {string} */
-                                preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                             };
                             description?: string;
                             emptyStateText?: string;
@@ -10171,7 +10625,62 @@ export interface paths {
                             breakdownProperty?: string;
                             measureTimeBy: string;
                             dataset?: components["schemas"]["def-1"];
-                        }) | ({
+                        }) | {
+                            id?: string;
+                            updatedAt?: string;
+                            updatedBy?: string;
+                            createdAt?: string;
+                            createdBy?: string;
+                            icon?: string;
+                            /** @enum {unknown} */
+                            type: "multi-line-chart";
+                            title: string;
+                            xAxisTitle?: string;
+                            yAxisTitle?: string;
+                            /** @enum {string} */
+                            timeInterval: "hour" | "day" | "isoWeek" | "month" | "quarter";
+                            timeRange: {
+                                /** @enum {string} */
+                                preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
+                            };
+                            description?: string;
+                            emptyStateText?: string;
+                            lines: ({
+                                title: string;
+                                blueprint: string;
+                                /** @enum {unknown} */
+                                chartType: "propertiesValueHistory";
+                                entity: string;
+                                properties: string[];
+                            } | {
+                                title: string;
+                                blueprint: string;
+                                /** @enum {unknown} */
+                                chartType: "aggregatePropertiesValues";
+                                /** @enum {string} */
+                                func: "sum" | "average" | "min" | "max" | "median" | "last";
+                                properties: string[];
+                                measureTimeBy: string;
+                                dataset?: components["schemas"]["def-1"];
+                            } | {
+                                title: string;
+                                blueprint: string;
+                                /** @enum {unknown} */
+                                chartType: "countEntities";
+                                /** @enum {string} */
+                                func: "count" | "average";
+                                breakdownProperty?: string;
+                                measureTimeBy: string;
+                                dataset?: components["schemas"]["def-1"];
+                            })[];
+                            baselines?: {
+                                name?: string;
+                                value: number;
+                                color?: string;
+                            }[];
+                            /** @enum {string} */
+                            nullValueDisplayMode?: "zero" | "null";
+                        } | ({
                             id?: string;
                             updatedAt?: string;
                             updatedBy?: string;
@@ -10277,6 +10786,25 @@ export interface paths {
                             type: "my-entities";
                             title: string;
                             icon?: string;
+                        } | {
+                            id?: string;
+                            updatedAt?: string;
+                            updatedBy?: string;
+                            createdAt?: string;
+                            createdBy?: string;
+                            /** @enum {string} */
+                            type: "custom-widget";
+                            title: string;
+                            icon?: string;
+                            description?: string;
+                            pluginId: string;
+                            paramValues?: {
+                                [key: string]: {
+                                    /** @enum {string} */
+                                    type: "string" | "number" | "boolean" | "object" | "array" | "blueprint";
+                                    value: string | number | boolean | unknown[] | Record<string, never>;
+                                };
+                            };
                         } | components["schemas"]["def-3"] | components["schemas"]["def-4"] | {
                             id?: string;
                             updatedAt?: string;
@@ -10513,7 +11041,7 @@ export interface paths {
                                         /** @description Fetch all audit logs related to the specified integration. */
                                         InstallationId?: string;
                                         /** @description Fetch all audit logs related to the specified resource type/s.<br/>**Possible values**: [`blueprint`, `entity`, `run`, `webhook`, `scorecard`, `action`, `integration`] */
-                                        resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration");
+                                        resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "action_permissions" | "integration" | "secret")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "action_permissions" | "integration" | "secret");
                                         /** @description The fields you want to include in the response. If used, only the specified fields will be included in the response. */
                                         includes?: ("action" | "context" | "diff" | "identifier" | "resourceType" | "status" | "trigger" | "additionalData" | "message")[];
                                         /**
@@ -10679,6 +11207,34 @@ export interface paths {
                                     createdAt?: string;
                                     createdBy?: string;
                                     /** @enum {unknown} */
+                                    type: "workflow-runs-history-table";
+                                    query?: Record<string, never>;
+                                    tableConfig?: {
+                                        filterSettings?: {
+                                            filterBy: components["schemas"]["def-1"];
+                                        };
+                                        groupSettings?: {
+                                            groupBy: string[];
+                                        };
+                                        sortSettings?: {
+                                            sortBy?: {
+                                                property: string;
+                                                /** @enum {unknown} */
+                                                order: "asc" | "desc";
+                                            }[];
+                                        };
+                                        propertiesSettings?: {
+                                            hidden?: string[];
+                                            order?: string[];
+                                        };
+                                    };
+                                } | {
+                                    id?: string;
+                                    updatedAt?: string;
+                                    updatedBy?: string;
+                                    createdAt?: string;
+                                    createdBy?: string;
+                                    /** @enum {unknown} */
                                     type: "run-info";
                                     title?: string;
                                     runId: string;
@@ -10718,6 +11274,32 @@ export interface paths {
                                     description?: string;
                                     dataset: components["schemas"]["def-1"];
                                     emptyStateText?: string;
+                                    segmentTableViewConfig?: {
+                                        [key: string]: {
+                                            filterSettings?: {
+                                                filterBy: components["schemas"]["def-1"];
+                                            };
+                                            groupSettings?: {
+                                                groupBy: string[];
+                                            };
+                                            sortSettings?: {
+                                                sortBy?: {
+                                                    property: string;
+                                                    /** @enum {unknown} */
+                                                    order: "asc" | "desc";
+                                                }[];
+                                            };
+                                            propertiesSettings?: {
+                                                hidden?: string[];
+                                                shown?: string[];
+                                                order?: string[];
+                                            };
+                                            tabIndex?: number;
+                                            hidden?: boolean;
+                                            title?: string;
+                                            description?: string;
+                                        };
+                                    };
                                 } | {
                                     id?: string;
                                     updatedAt?: string;
@@ -10733,6 +11315,32 @@ export interface paths {
                                     description?: string;
                                     dataset: components["schemas"]["def-1"];
                                     emptyStateText?: string;
+                                    segmentTableViewConfig?: {
+                                        [key: string]: {
+                                            filterSettings?: {
+                                                filterBy: components["schemas"]["def-1"];
+                                            };
+                                            groupSettings?: {
+                                                groupBy: string[];
+                                            };
+                                            sortSettings?: {
+                                                sortBy?: {
+                                                    property: string;
+                                                    /** @enum {unknown} */
+                                                    order: "asc" | "desc";
+                                                }[];
+                                            };
+                                            propertiesSettings?: {
+                                                hidden?: string[];
+                                                shown?: string[];
+                                                order?: string[];
+                                            };
+                                            tabIndex?: number;
+                                            hidden?: boolean;
+                                            title?: string;
+                                            description?: string;
+                                        };
+                                    };
                                 } | ({
                                     id?: string;
                                     updatedAt?: string;
@@ -10749,10 +11357,10 @@ export interface paths {
                                     xAxisTitle?: string;
                                     yAxisTitle?: string;
                                     /** @enum {string} */
-                                    timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                                    timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                                     timeRange?: {
                                         /** @enum {string} */
-                                        preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                        preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                                     };
                                     description?: string;
                                     emptyStateText?: string;
@@ -10774,10 +11382,10 @@ export interface paths {
                                     xAxisTitle?: string;
                                     yAxisTitle?: string;
                                     /** @enum {string} */
-                                    timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                                    timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                                     timeRange?: {
                                         /** @enum {string} */
-                                        preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                        preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                                     };
                                     description?: string;
                                     emptyStateText?: string;
@@ -10802,10 +11410,10 @@ export interface paths {
                                     xAxisTitle?: string;
                                     yAxisTitle?: string;
                                     /** @enum {string} */
-                                    timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                                    timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                                     timeRange?: {
                                         /** @enum {string} */
-                                        preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                        preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                                     };
                                     description?: string;
                                     emptyStateText?: string;
@@ -10814,7 +11422,62 @@ export interface paths {
                                     breakdownProperty?: string;
                                     measureTimeBy: string;
                                     dataset?: components["schemas"]["def-1"];
-                                }) | ({
+                                }) | {
+                                    id?: string;
+                                    updatedAt?: string;
+                                    updatedBy?: string;
+                                    createdAt?: string;
+                                    createdBy?: string;
+                                    icon?: string;
+                                    /** @enum {unknown} */
+                                    type: "multi-line-chart";
+                                    title: string;
+                                    xAxisTitle?: string;
+                                    yAxisTitle?: string;
+                                    /** @enum {string} */
+                                    timeInterval: "hour" | "day" | "isoWeek" | "month" | "quarter";
+                                    timeRange: {
+                                        /** @enum {string} */
+                                        preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
+                                    };
+                                    description?: string;
+                                    emptyStateText?: string;
+                                    lines: ({
+                                        title: string;
+                                        blueprint: string;
+                                        /** @enum {unknown} */
+                                        chartType: "propertiesValueHistory";
+                                        entity: string;
+                                        properties: string[];
+                                    } | {
+                                        title: string;
+                                        blueprint: string;
+                                        /** @enum {unknown} */
+                                        chartType: "aggregatePropertiesValues";
+                                        /** @enum {string} */
+                                        func: "sum" | "average" | "min" | "max" | "median" | "last";
+                                        properties: string[];
+                                        measureTimeBy: string;
+                                        dataset?: components["schemas"]["def-1"];
+                                    } | {
+                                        title: string;
+                                        blueprint: string;
+                                        /** @enum {unknown} */
+                                        chartType: "countEntities";
+                                        /** @enum {string} */
+                                        func: "count" | "average";
+                                        breakdownProperty?: string;
+                                        measureTimeBy: string;
+                                        dataset?: components["schemas"]["def-1"];
+                                    })[];
+                                    baselines?: {
+                                        name?: string;
+                                        value: number;
+                                        color?: string;
+                                    }[];
+                                    /** @enum {string} */
+                                    nullValueDisplayMode?: "zero" | "null";
+                                } | ({
                                     id?: string;
                                     updatedAt?: string;
                                     updatedBy?: string;
@@ -10920,6 +11583,25 @@ export interface paths {
                                     type: "my-entities";
                                     title: string;
                                     icon?: string;
+                                } | {
+                                    id?: string;
+                                    updatedAt?: string;
+                                    updatedBy?: string;
+                                    createdAt?: string;
+                                    createdBy?: string;
+                                    /** @enum {string} */
+                                    type: "custom-widget";
+                                    title: string;
+                                    icon?: string;
+                                    description?: string;
+                                    pluginId: string;
+                                    paramValues?: {
+                                        [key: string]: {
+                                            /** @enum {string} */
+                                            type: "string" | "number" | "boolean" | "object" | "array" | "blueprint";
+                                            value: string | number | boolean | unknown[] | Record<string, never>;
+                                        };
+                                    };
                                 } | components["schemas"]["def-3"] | components["schemas"]["def-4"])[];
                             }[];
                         } | {
@@ -11157,7 +11839,7 @@ export interface paths {
                                     /** @description Fetch all audit logs related to the specified integration. */
                                     InstallationId?: string;
                                     /** @description Fetch all audit logs related to the specified resource type/s.<br/>**Possible values**: [`blueprint`, `entity`, `run`, `webhook`, `scorecard`, `action`, `integration`] */
-                                    resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration");
+                                    resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "action_permissions" | "integration" | "secret")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "action_permissions" | "integration" | "secret");
                                     /** @description The fields you want to include in the response. If used, only the specified fields will be included in the response. */
                                     includes?: ("action" | "context" | "diff" | "identifier" | "resourceType" | "status" | "trigger" | "additionalData" | "message")[];
                                     /**
@@ -11323,6 +12005,34 @@ export interface paths {
                                 createdAt?: string;
                                 createdBy?: string;
                                 /** @enum {unknown} */
+                                type: "workflow-runs-history-table";
+                                query?: Record<string, never>;
+                                tableConfig?: {
+                                    filterSettings?: {
+                                        filterBy: components["schemas"]["def-1"];
+                                    };
+                                    groupSettings?: {
+                                        groupBy: string[];
+                                    };
+                                    sortSettings?: {
+                                        sortBy?: {
+                                            property: string;
+                                            /** @enum {unknown} */
+                                            order: "asc" | "desc";
+                                        }[];
+                                    };
+                                    propertiesSettings?: {
+                                        hidden?: string[];
+                                        order?: string[];
+                                    };
+                                };
+                            } | {
+                                id?: string;
+                                updatedAt?: string;
+                                updatedBy?: string;
+                                createdAt?: string;
+                                createdBy?: string;
+                                /** @enum {unknown} */
                                 type: "run-info";
                                 title?: string;
                                 runId: string;
@@ -11362,6 +12072,32 @@ export interface paths {
                                 description?: string;
                                 dataset: components["schemas"]["def-1"];
                                 emptyStateText?: string;
+                                segmentTableViewConfig?: {
+                                    [key: string]: {
+                                        filterSettings?: {
+                                            filterBy: components["schemas"]["def-1"];
+                                        };
+                                        groupSettings?: {
+                                            groupBy: string[];
+                                        };
+                                        sortSettings?: {
+                                            sortBy?: {
+                                                property: string;
+                                                /** @enum {unknown} */
+                                                order: "asc" | "desc";
+                                            }[];
+                                        };
+                                        propertiesSettings?: {
+                                            hidden?: string[];
+                                            shown?: string[];
+                                            order?: string[];
+                                        };
+                                        tabIndex?: number;
+                                        hidden?: boolean;
+                                        title?: string;
+                                        description?: string;
+                                    };
+                                };
                             } | {
                                 id?: string;
                                 updatedAt?: string;
@@ -11377,6 +12113,32 @@ export interface paths {
                                 description?: string;
                                 dataset: components["schemas"]["def-1"];
                                 emptyStateText?: string;
+                                segmentTableViewConfig?: {
+                                    [key: string]: {
+                                        filterSettings?: {
+                                            filterBy: components["schemas"]["def-1"];
+                                        };
+                                        groupSettings?: {
+                                            groupBy: string[];
+                                        };
+                                        sortSettings?: {
+                                            sortBy?: {
+                                                property: string;
+                                                /** @enum {unknown} */
+                                                order: "asc" | "desc";
+                                            }[];
+                                        };
+                                        propertiesSettings?: {
+                                            hidden?: string[];
+                                            shown?: string[];
+                                            order?: string[];
+                                        };
+                                        tabIndex?: number;
+                                        hidden?: boolean;
+                                        title?: string;
+                                        description?: string;
+                                    };
+                                };
                             } | ({
                                 id?: string;
                                 updatedAt?: string;
@@ -11393,10 +12155,10 @@ export interface paths {
                                 xAxisTitle?: string;
                                 yAxisTitle?: string;
                                 /** @enum {string} */
-                                timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                                timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                                 timeRange?: {
                                     /** @enum {string} */
-                                    preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                    preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                                 };
                                 description?: string;
                                 emptyStateText?: string;
@@ -11418,10 +12180,10 @@ export interface paths {
                                 xAxisTitle?: string;
                                 yAxisTitle?: string;
                                 /** @enum {string} */
-                                timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                                timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                                 timeRange?: {
                                     /** @enum {string} */
-                                    preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                    preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                                 };
                                 description?: string;
                                 emptyStateText?: string;
@@ -11446,10 +12208,10 @@ export interface paths {
                                 xAxisTitle?: string;
                                 yAxisTitle?: string;
                                 /** @enum {string} */
-                                timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                                timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                                 timeRange?: {
                                     /** @enum {string} */
-                                    preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                    preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                                 };
                                 description?: string;
                                 emptyStateText?: string;
@@ -11458,7 +12220,62 @@ export interface paths {
                                 breakdownProperty?: string;
                                 measureTimeBy: string;
                                 dataset?: components["schemas"]["def-1"];
-                            }) | ({
+                            }) | {
+                                id?: string;
+                                updatedAt?: string;
+                                updatedBy?: string;
+                                createdAt?: string;
+                                createdBy?: string;
+                                icon?: string;
+                                /** @enum {unknown} */
+                                type: "multi-line-chart";
+                                title: string;
+                                xAxisTitle?: string;
+                                yAxisTitle?: string;
+                                /** @enum {string} */
+                                timeInterval: "hour" | "day" | "isoWeek" | "month" | "quarter";
+                                timeRange: {
+                                    /** @enum {string} */
+                                    preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
+                                };
+                                description?: string;
+                                emptyStateText?: string;
+                                lines: ({
+                                    title: string;
+                                    blueprint: string;
+                                    /** @enum {unknown} */
+                                    chartType: "propertiesValueHistory";
+                                    entity: string;
+                                    properties: string[];
+                                } | {
+                                    title: string;
+                                    blueprint: string;
+                                    /** @enum {unknown} */
+                                    chartType: "aggregatePropertiesValues";
+                                    /** @enum {string} */
+                                    func: "sum" | "average" | "min" | "max" | "median" | "last";
+                                    properties: string[];
+                                    measureTimeBy: string;
+                                    dataset?: components["schemas"]["def-1"];
+                                } | {
+                                    title: string;
+                                    blueprint: string;
+                                    /** @enum {unknown} */
+                                    chartType: "countEntities";
+                                    /** @enum {string} */
+                                    func: "count" | "average";
+                                    breakdownProperty?: string;
+                                    measureTimeBy: string;
+                                    dataset?: components["schemas"]["def-1"];
+                                })[];
+                                baselines?: {
+                                    name?: string;
+                                    value: number;
+                                    color?: string;
+                                }[];
+                                /** @enum {string} */
+                                nullValueDisplayMode?: "zero" | "null";
+                            } | ({
                                 id?: string;
                                 updatedAt?: string;
                                 updatedBy?: string;
@@ -11564,6 +12381,25 @@ export interface paths {
                                 type: "my-entities";
                                 title: string;
                                 icon?: string;
+                            } | {
+                                id?: string;
+                                updatedAt?: string;
+                                updatedBy?: string;
+                                createdAt?: string;
+                                createdBy?: string;
+                                /** @enum {string} */
+                                type: "custom-widget";
+                                title: string;
+                                icon?: string;
+                                description?: string;
+                                pluginId: string;
+                                paramValues?: {
+                                    [key: string]: {
+                                        /** @enum {string} */
+                                        type: "string" | "number" | "boolean" | "object" | "array" | "blueprint";
+                                        value: string | number | boolean | unknown[] | Record<string, never>;
+                                    };
+                                };
                             } | components["schemas"]["def-3"] | components["schemas"]["def-4"])[];
                         })[];
                         /** @enum {string} */
@@ -11611,7 +12447,7 @@ export interface paths {
                                         to: string;
                                     } | {
                                         /** @enum {string} */
-                                        preset: "today" | "tomorrow" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                        preset: "today" | "tomorrow" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years" | "nextDay" | "nextWeek" | "next2Weeks" | "nextMonth" | "next3Months" | "next6Months" | "next12Months";
                                     } | {
                                         property: string;
                                         /** @enum {string} */
@@ -12161,7 +12997,7 @@ export interface paths {
                                 /** @description Fetch all audit logs related to the specified integration. */
                                 InstallationId?: string;
                                 /** @description Fetch all audit logs related to the specified resource type/s.<br/>**Possible values**: [`blueprint`, `entity`, `run`, `webhook`, `scorecard`, `action`, `integration`] */
-                                resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration");
+                                resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "action_permissions" | "integration" | "secret")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "action_permissions" | "integration" | "secret");
                                 /** @description The fields you want to include in the response. If used, only the specified fields will be included in the response. */
                                 includes?: ("action" | "context" | "diff" | "identifier" | "resourceType" | "status" | "trigger" | "additionalData" | "message")[];
                                 /**
@@ -12327,6 +13163,34 @@ export interface paths {
                             createdAt?: string;
                             createdBy?: string;
                             /** @enum {unknown} */
+                            type: "workflow-runs-history-table";
+                            query?: Record<string, never>;
+                            tableConfig?: {
+                                filterSettings?: {
+                                    filterBy: components["schemas"]["def-1"];
+                                };
+                                groupSettings?: {
+                                    groupBy: string[];
+                                };
+                                sortSettings?: {
+                                    sortBy?: {
+                                        property: string;
+                                        /** @enum {unknown} */
+                                        order: "asc" | "desc";
+                                    }[];
+                                };
+                                propertiesSettings?: {
+                                    hidden?: string[];
+                                    order?: string[];
+                                };
+                            };
+                        } | {
+                            id?: string;
+                            updatedAt?: string;
+                            updatedBy?: string;
+                            createdAt?: string;
+                            createdBy?: string;
+                            /** @enum {unknown} */
                             type: "run-info";
                             title?: string;
                             runId: string;
@@ -12366,6 +13230,32 @@ export interface paths {
                             description?: string;
                             dataset: components["schemas"]["def-1"];
                             emptyStateText?: string;
+                            segmentTableViewConfig?: {
+                                [key: string]: {
+                                    filterSettings?: {
+                                        filterBy: components["schemas"]["def-1"];
+                                    };
+                                    groupSettings?: {
+                                        groupBy: string[];
+                                    };
+                                    sortSettings?: {
+                                        sortBy?: {
+                                            property: string;
+                                            /** @enum {unknown} */
+                                            order: "asc" | "desc";
+                                        }[];
+                                    };
+                                    propertiesSettings?: {
+                                        hidden?: string[];
+                                        shown?: string[];
+                                        order?: string[];
+                                    };
+                                    tabIndex?: number;
+                                    hidden?: boolean;
+                                    title?: string;
+                                    description?: string;
+                                };
+                            };
                         } | {
                             id?: string;
                             updatedAt?: string;
@@ -12381,6 +13271,32 @@ export interface paths {
                             description?: string;
                             dataset: components["schemas"]["def-1"];
                             emptyStateText?: string;
+                            segmentTableViewConfig?: {
+                                [key: string]: {
+                                    filterSettings?: {
+                                        filterBy: components["schemas"]["def-1"];
+                                    };
+                                    groupSettings?: {
+                                        groupBy: string[];
+                                    };
+                                    sortSettings?: {
+                                        sortBy?: {
+                                            property: string;
+                                            /** @enum {unknown} */
+                                            order: "asc" | "desc";
+                                        }[];
+                                    };
+                                    propertiesSettings?: {
+                                        hidden?: string[];
+                                        shown?: string[];
+                                        order?: string[];
+                                    };
+                                    tabIndex?: number;
+                                    hidden?: boolean;
+                                    title?: string;
+                                    description?: string;
+                                };
+                            };
                         } | ({
                             id?: string;
                             updatedAt?: string;
@@ -12397,10 +13313,10 @@ export interface paths {
                             xAxisTitle?: string;
                             yAxisTitle?: string;
                             /** @enum {string} */
-                            timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                            timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                             timeRange?: {
                                 /** @enum {string} */
-                                preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                             };
                             description?: string;
                             emptyStateText?: string;
@@ -12422,10 +13338,10 @@ export interface paths {
                             xAxisTitle?: string;
                             yAxisTitle?: string;
                             /** @enum {string} */
-                            timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                            timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                             timeRange?: {
                                 /** @enum {string} */
-                                preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                             };
                             description?: string;
                             emptyStateText?: string;
@@ -12450,10 +13366,10 @@ export interface paths {
                             xAxisTitle?: string;
                             yAxisTitle?: string;
                             /** @enum {string} */
-                            timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                            timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                             timeRange?: {
                                 /** @enum {string} */
-                                preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                             };
                             description?: string;
                             emptyStateText?: string;
@@ -12462,7 +13378,62 @@ export interface paths {
                             breakdownProperty?: string;
                             measureTimeBy: string;
                             dataset?: components["schemas"]["def-1"];
-                        }) | ({
+                        }) | {
+                            id?: string;
+                            updatedAt?: string;
+                            updatedBy?: string;
+                            createdAt?: string;
+                            createdBy?: string;
+                            icon?: string;
+                            /** @enum {unknown} */
+                            type: "multi-line-chart";
+                            title: string;
+                            xAxisTitle?: string;
+                            yAxisTitle?: string;
+                            /** @enum {string} */
+                            timeInterval: "hour" | "day" | "isoWeek" | "month" | "quarter";
+                            timeRange: {
+                                /** @enum {string} */
+                                preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
+                            };
+                            description?: string;
+                            emptyStateText?: string;
+                            lines: ({
+                                title: string;
+                                blueprint: string;
+                                /** @enum {unknown} */
+                                chartType: "propertiesValueHistory";
+                                entity: string;
+                                properties: string[];
+                            } | {
+                                title: string;
+                                blueprint: string;
+                                /** @enum {unknown} */
+                                chartType: "aggregatePropertiesValues";
+                                /** @enum {string} */
+                                func: "sum" | "average" | "min" | "max" | "median" | "last";
+                                properties: string[];
+                                measureTimeBy: string;
+                                dataset?: components["schemas"]["def-1"];
+                            } | {
+                                title: string;
+                                blueprint: string;
+                                /** @enum {unknown} */
+                                chartType: "countEntities";
+                                /** @enum {string} */
+                                func: "count" | "average";
+                                breakdownProperty?: string;
+                                measureTimeBy: string;
+                                dataset?: components["schemas"]["def-1"];
+                            })[];
+                            baselines?: {
+                                name?: string;
+                                value: number;
+                                color?: string;
+                            }[];
+                            /** @enum {string} */
+                            nullValueDisplayMode?: "zero" | "null";
+                        } | ({
                             id?: string;
                             updatedAt?: string;
                             updatedBy?: string;
@@ -12568,6 +13539,25 @@ export interface paths {
                             type: "my-entities";
                             title: string;
                             icon?: string;
+                        } | {
+                            id?: string;
+                            updatedAt?: string;
+                            updatedBy?: string;
+                            createdAt?: string;
+                            createdBy?: string;
+                            /** @enum {string} */
+                            type: "custom-widget";
+                            title: string;
+                            icon?: string;
+                            description?: string;
+                            pluginId: string;
+                            paramValues?: {
+                                [key: string]: {
+                                    /** @enum {string} */
+                                    type: "string" | "number" | "boolean" | "object" | "array" | "blueprint";
+                                    value: string | number | boolean | unknown[] | Record<string, never>;
+                                };
+                            };
                         } | components["schemas"]["def-3"] | components["schemas"]["def-4"] | {
                             id?: string;
                             updatedAt?: string;
@@ -12804,7 +13794,7 @@ export interface paths {
                                         /** @description Fetch all audit logs related to the specified integration. */
                                         InstallationId?: string;
                                         /** @description Fetch all audit logs related to the specified resource type/s.<br/>**Possible values**: [`blueprint`, `entity`, `run`, `webhook`, `scorecard`, `action`, `integration`] */
-                                        resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration");
+                                        resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "action_permissions" | "integration" | "secret")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "action_permissions" | "integration" | "secret");
                                         /** @description The fields you want to include in the response. If used, only the specified fields will be included in the response. */
                                         includes?: ("action" | "context" | "diff" | "identifier" | "resourceType" | "status" | "trigger" | "additionalData" | "message")[];
                                         /**
@@ -12970,6 +13960,34 @@ export interface paths {
                                     createdAt?: string;
                                     createdBy?: string;
                                     /** @enum {unknown} */
+                                    type: "workflow-runs-history-table";
+                                    query?: Record<string, never>;
+                                    tableConfig?: {
+                                        filterSettings?: {
+                                            filterBy: components["schemas"]["def-1"];
+                                        };
+                                        groupSettings?: {
+                                            groupBy: string[];
+                                        };
+                                        sortSettings?: {
+                                            sortBy?: {
+                                                property: string;
+                                                /** @enum {unknown} */
+                                                order: "asc" | "desc";
+                                            }[];
+                                        };
+                                        propertiesSettings?: {
+                                            hidden?: string[];
+                                            order?: string[];
+                                        };
+                                    };
+                                } | {
+                                    id?: string;
+                                    updatedAt?: string;
+                                    updatedBy?: string;
+                                    createdAt?: string;
+                                    createdBy?: string;
+                                    /** @enum {unknown} */
                                     type: "run-info";
                                     title?: string;
                                     runId: string;
@@ -13009,6 +14027,32 @@ export interface paths {
                                     description?: string;
                                     dataset: components["schemas"]["def-1"];
                                     emptyStateText?: string;
+                                    segmentTableViewConfig?: {
+                                        [key: string]: {
+                                            filterSettings?: {
+                                                filterBy: components["schemas"]["def-1"];
+                                            };
+                                            groupSettings?: {
+                                                groupBy: string[];
+                                            };
+                                            sortSettings?: {
+                                                sortBy?: {
+                                                    property: string;
+                                                    /** @enum {unknown} */
+                                                    order: "asc" | "desc";
+                                                }[];
+                                            };
+                                            propertiesSettings?: {
+                                                hidden?: string[];
+                                                shown?: string[];
+                                                order?: string[];
+                                            };
+                                            tabIndex?: number;
+                                            hidden?: boolean;
+                                            title?: string;
+                                            description?: string;
+                                        };
+                                    };
                                 } | {
                                     id?: string;
                                     updatedAt?: string;
@@ -13024,6 +14068,32 @@ export interface paths {
                                     description?: string;
                                     dataset: components["schemas"]["def-1"];
                                     emptyStateText?: string;
+                                    segmentTableViewConfig?: {
+                                        [key: string]: {
+                                            filterSettings?: {
+                                                filterBy: components["schemas"]["def-1"];
+                                            };
+                                            groupSettings?: {
+                                                groupBy: string[];
+                                            };
+                                            sortSettings?: {
+                                                sortBy?: {
+                                                    property: string;
+                                                    /** @enum {unknown} */
+                                                    order: "asc" | "desc";
+                                                }[];
+                                            };
+                                            propertiesSettings?: {
+                                                hidden?: string[];
+                                                shown?: string[];
+                                                order?: string[];
+                                            };
+                                            tabIndex?: number;
+                                            hidden?: boolean;
+                                            title?: string;
+                                            description?: string;
+                                        };
+                                    };
                                 } | ({
                                     id?: string;
                                     updatedAt?: string;
@@ -13040,10 +14110,10 @@ export interface paths {
                                     xAxisTitle?: string;
                                     yAxisTitle?: string;
                                     /** @enum {string} */
-                                    timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                                    timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                                     timeRange?: {
                                         /** @enum {string} */
-                                        preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                        preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                                     };
                                     description?: string;
                                     emptyStateText?: string;
@@ -13065,10 +14135,10 @@ export interface paths {
                                     xAxisTitle?: string;
                                     yAxisTitle?: string;
                                     /** @enum {string} */
-                                    timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                                    timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                                     timeRange?: {
                                         /** @enum {string} */
-                                        preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                        preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                                     };
                                     description?: string;
                                     emptyStateText?: string;
@@ -13093,10 +14163,10 @@ export interface paths {
                                     xAxisTitle?: string;
                                     yAxisTitle?: string;
                                     /** @enum {string} */
-                                    timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                                    timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                                     timeRange?: {
                                         /** @enum {string} */
-                                        preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                        preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                                     };
                                     description?: string;
                                     emptyStateText?: string;
@@ -13105,7 +14175,62 @@ export interface paths {
                                     breakdownProperty?: string;
                                     measureTimeBy: string;
                                     dataset?: components["schemas"]["def-1"];
-                                }) | ({
+                                }) | {
+                                    id?: string;
+                                    updatedAt?: string;
+                                    updatedBy?: string;
+                                    createdAt?: string;
+                                    createdBy?: string;
+                                    icon?: string;
+                                    /** @enum {unknown} */
+                                    type: "multi-line-chart";
+                                    title: string;
+                                    xAxisTitle?: string;
+                                    yAxisTitle?: string;
+                                    /** @enum {string} */
+                                    timeInterval: "hour" | "day" | "isoWeek" | "month" | "quarter";
+                                    timeRange: {
+                                        /** @enum {string} */
+                                        preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
+                                    };
+                                    description?: string;
+                                    emptyStateText?: string;
+                                    lines: ({
+                                        title: string;
+                                        blueprint: string;
+                                        /** @enum {unknown} */
+                                        chartType: "propertiesValueHistory";
+                                        entity: string;
+                                        properties: string[];
+                                    } | {
+                                        title: string;
+                                        blueprint: string;
+                                        /** @enum {unknown} */
+                                        chartType: "aggregatePropertiesValues";
+                                        /** @enum {string} */
+                                        func: "sum" | "average" | "min" | "max" | "median" | "last";
+                                        properties: string[];
+                                        measureTimeBy: string;
+                                        dataset?: components["schemas"]["def-1"];
+                                    } | {
+                                        title: string;
+                                        blueprint: string;
+                                        /** @enum {unknown} */
+                                        chartType: "countEntities";
+                                        /** @enum {string} */
+                                        func: "count" | "average";
+                                        breakdownProperty?: string;
+                                        measureTimeBy: string;
+                                        dataset?: components["schemas"]["def-1"];
+                                    })[];
+                                    baselines?: {
+                                        name?: string;
+                                        value: number;
+                                        color?: string;
+                                    }[];
+                                    /** @enum {string} */
+                                    nullValueDisplayMode?: "zero" | "null";
+                                } | ({
                                     id?: string;
                                     updatedAt?: string;
                                     updatedBy?: string;
@@ -13211,6 +14336,25 @@ export interface paths {
                                     type: "my-entities";
                                     title: string;
                                     icon?: string;
+                                } | {
+                                    id?: string;
+                                    updatedAt?: string;
+                                    updatedBy?: string;
+                                    createdAt?: string;
+                                    createdBy?: string;
+                                    /** @enum {string} */
+                                    type: "custom-widget";
+                                    title: string;
+                                    icon?: string;
+                                    description?: string;
+                                    pluginId: string;
+                                    paramValues?: {
+                                        [key: string]: {
+                                            /** @enum {string} */
+                                            type: "string" | "number" | "boolean" | "object" | "array" | "blueprint";
+                                            value: string | number | boolean | unknown[] | Record<string, never>;
+                                        };
+                                    };
                                 } | components["schemas"]["def-3"] | components["schemas"]["def-4"])[];
                             }[];
                         } | {
@@ -13448,7 +14592,7 @@ export interface paths {
                                     /** @description Fetch all audit logs related to the specified integration. */
                                     InstallationId?: string;
                                     /** @description Fetch all audit logs related to the specified resource type/s.<br/>**Possible values**: [`blueprint`, `entity`, `run`, `webhook`, `scorecard`, `action`, `integration`] */
-                                    resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration");
+                                    resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "action_permissions" | "integration" | "secret")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "action_permissions" | "integration" | "secret");
                                     /** @description The fields you want to include in the response. If used, only the specified fields will be included in the response. */
                                     includes?: ("action" | "context" | "diff" | "identifier" | "resourceType" | "status" | "trigger" | "additionalData" | "message")[];
                                     /**
@@ -13614,6 +14758,34 @@ export interface paths {
                                 createdAt?: string;
                                 createdBy?: string;
                                 /** @enum {unknown} */
+                                type: "workflow-runs-history-table";
+                                query?: Record<string, never>;
+                                tableConfig?: {
+                                    filterSettings?: {
+                                        filterBy: components["schemas"]["def-1"];
+                                    };
+                                    groupSettings?: {
+                                        groupBy: string[];
+                                    };
+                                    sortSettings?: {
+                                        sortBy?: {
+                                            property: string;
+                                            /** @enum {unknown} */
+                                            order: "asc" | "desc";
+                                        }[];
+                                    };
+                                    propertiesSettings?: {
+                                        hidden?: string[];
+                                        order?: string[];
+                                    };
+                                };
+                            } | {
+                                id?: string;
+                                updatedAt?: string;
+                                updatedBy?: string;
+                                createdAt?: string;
+                                createdBy?: string;
+                                /** @enum {unknown} */
                                 type: "run-info";
                                 title?: string;
                                 runId: string;
@@ -13653,6 +14825,32 @@ export interface paths {
                                 description?: string;
                                 dataset: components["schemas"]["def-1"];
                                 emptyStateText?: string;
+                                segmentTableViewConfig?: {
+                                    [key: string]: {
+                                        filterSettings?: {
+                                            filterBy: components["schemas"]["def-1"];
+                                        };
+                                        groupSettings?: {
+                                            groupBy: string[];
+                                        };
+                                        sortSettings?: {
+                                            sortBy?: {
+                                                property: string;
+                                                /** @enum {unknown} */
+                                                order: "asc" | "desc";
+                                            }[];
+                                        };
+                                        propertiesSettings?: {
+                                            hidden?: string[];
+                                            shown?: string[];
+                                            order?: string[];
+                                        };
+                                        tabIndex?: number;
+                                        hidden?: boolean;
+                                        title?: string;
+                                        description?: string;
+                                    };
+                                };
                             } | {
                                 id?: string;
                                 updatedAt?: string;
@@ -13668,6 +14866,32 @@ export interface paths {
                                 description?: string;
                                 dataset: components["schemas"]["def-1"];
                                 emptyStateText?: string;
+                                segmentTableViewConfig?: {
+                                    [key: string]: {
+                                        filterSettings?: {
+                                            filterBy: components["schemas"]["def-1"];
+                                        };
+                                        groupSettings?: {
+                                            groupBy: string[];
+                                        };
+                                        sortSettings?: {
+                                            sortBy?: {
+                                                property: string;
+                                                /** @enum {unknown} */
+                                                order: "asc" | "desc";
+                                            }[];
+                                        };
+                                        propertiesSettings?: {
+                                            hidden?: string[];
+                                            shown?: string[];
+                                            order?: string[];
+                                        };
+                                        tabIndex?: number;
+                                        hidden?: boolean;
+                                        title?: string;
+                                        description?: string;
+                                    };
+                                };
                             } | ({
                                 id?: string;
                                 updatedAt?: string;
@@ -13684,10 +14908,10 @@ export interface paths {
                                 xAxisTitle?: string;
                                 yAxisTitle?: string;
                                 /** @enum {string} */
-                                timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                                timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                                 timeRange?: {
                                     /** @enum {string} */
-                                    preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                    preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                                 };
                                 description?: string;
                                 emptyStateText?: string;
@@ -13709,10 +14933,10 @@ export interface paths {
                                 xAxisTitle?: string;
                                 yAxisTitle?: string;
                                 /** @enum {string} */
-                                timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                                timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                                 timeRange?: {
                                     /** @enum {string} */
-                                    preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                    preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                                 };
                                 description?: string;
                                 emptyStateText?: string;
@@ -13737,10 +14961,10 @@ export interface paths {
                                 xAxisTitle?: string;
                                 yAxisTitle?: string;
                                 /** @enum {string} */
-                                timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                                timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                                 timeRange?: {
                                     /** @enum {string} */
-                                    preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                    preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                                 };
                                 description?: string;
                                 emptyStateText?: string;
@@ -13749,7 +14973,62 @@ export interface paths {
                                 breakdownProperty?: string;
                                 measureTimeBy: string;
                                 dataset?: components["schemas"]["def-1"];
-                            }) | ({
+                            }) | {
+                                id?: string;
+                                updatedAt?: string;
+                                updatedBy?: string;
+                                createdAt?: string;
+                                createdBy?: string;
+                                icon?: string;
+                                /** @enum {unknown} */
+                                type: "multi-line-chart";
+                                title: string;
+                                xAxisTitle?: string;
+                                yAxisTitle?: string;
+                                /** @enum {string} */
+                                timeInterval: "hour" | "day" | "isoWeek" | "month" | "quarter";
+                                timeRange: {
+                                    /** @enum {string} */
+                                    preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
+                                };
+                                description?: string;
+                                emptyStateText?: string;
+                                lines: ({
+                                    title: string;
+                                    blueprint: string;
+                                    /** @enum {unknown} */
+                                    chartType: "propertiesValueHistory";
+                                    entity: string;
+                                    properties: string[];
+                                } | {
+                                    title: string;
+                                    blueprint: string;
+                                    /** @enum {unknown} */
+                                    chartType: "aggregatePropertiesValues";
+                                    /** @enum {string} */
+                                    func: "sum" | "average" | "min" | "max" | "median" | "last";
+                                    properties: string[];
+                                    measureTimeBy: string;
+                                    dataset?: components["schemas"]["def-1"];
+                                } | {
+                                    title: string;
+                                    blueprint: string;
+                                    /** @enum {unknown} */
+                                    chartType: "countEntities";
+                                    /** @enum {string} */
+                                    func: "count" | "average";
+                                    breakdownProperty?: string;
+                                    measureTimeBy: string;
+                                    dataset?: components["schemas"]["def-1"];
+                                })[];
+                                baselines?: {
+                                    name?: string;
+                                    value: number;
+                                    color?: string;
+                                }[];
+                                /** @enum {string} */
+                                nullValueDisplayMode?: "zero" | "null";
+                            } | ({
                                 id?: string;
                                 updatedAt?: string;
                                 updatedBy?: string;
@@ -13855,6 +15134,25 @@ export interface paths {
                                 type: "my-entities";
                                 title: string;
                                 icon?: string;
+                            } | {
+                                id?: string;
+                                updatedAt?: string;
+                                updatedBy?: string;
+                                createdAt?: string;
+                                createdBy?: string;
+                                /** @enum {string} */
+                                type: "custom-widget";
+                                title: string;
+                                icon?: string;
+                                description?: string;
+                                pluginId: string;
+                                paramValues?: {
+                                    [key: string]: {
+                                        /** @enum {string} */
+                                        type: "string" | "number" | "boolean" | "object" | "array" | "blueprint";
+                                        value: string | number | boolean | unknown[] | Record<string, never>;
+                                    };
+                                };
                             } | components["schemas"]["def-3"] | components["schemas"]["def-4"])[];
                         })[];
                         /** @default true */
@@ -13899,7 +15197,7 @@ export interface paths {
                                         to: string;
                                     } | {
                                         /** @enum {string} */
-                                        preset: "today" | "tomorrow" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                        preset: "today" | "tomorrow" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years" | "nextDay" | "nextWeek" | "next2Weeks" | "nextMonth" | "next3Months" | "next6Months" | "next12Months";
                                     } | {
                                         property: string;
                                         /** @enum {string} */
@@ -14058,6 +15356,108 @@ export interface paths {
                 };
             };
         };
+        trace?: never;
+    };
+    "/v1/pages/{identifier}/duplicate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Duplicate a page
+         * @description Creates a copy of an existing page with the same page permissions.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description The unique identifier of the resource you want to operate on. */
+                    identifier: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Duplicated successfully */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {unknown} */
+                            ok: true;
+                            identifier: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @constant */
+                            ok: false;
+                            error: string;
+                            message?: string;
+                        };
+                    };
+                };
+                /** @description A resource with the provided identifier was not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @constant */
+                            ok: false;
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Request body is too large (limit is 1MiB) */
+                413: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @constant */
+                            ok: false;
+                            error: string;
+                            message?: string;
+                        };
+                    };
+                };
+                /** @description The json provided does not match the route's schema */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @constant */
+                            ok: false;
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/v1/pages/{page_identifier}/widgets": {
@@ -14305,7 +15705,7 @@ export interface paths {
                                 /** @description Fetch all audit logs related to the specified integration. */
                                 InstallationId?: string;
                                 /** @description Fetch all audit logs related to the specified resource type/s.<br/>**Possible values**: [`blueprint`, `entity`, `run`, `webhook`, `scorecard`, `action`, `integration`] */
-                                resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration");
+                                resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "action_permissions" | "integration" | "secret")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "action_permissions" | "integration" | "secret");
                                 /** @description The fields you want to include in the response. If used, only the specified fields will be included in the response. */
                                 includes?: ("action" | "context" | "diff" | "identifier" | "resourceType" | "status" | "trigger" | "additionalData" | "message")[];
                                 /**
@@ -14471,6 +15871,34 @@ export interface paths {
                             createdAt?: string;
                             createdBy?: string;
                             /** @enum {unknown} */
+                            type: "workflow-runs-history-table";
+                            query?: Record<string, never>;
+                            tableConfig?: {
+                                filterSettings?: {
+                                    filterBy: components["schemas"]["def-1"];
+                                };
+                                groupSettings?: {
+                                    groupBy: string[];
+                                };
+                                sortSettings?: {
+                                    sortBy?: {
+                                        property: string;
+                                        /** @enum {unknown} */
+                                        order: "asc" | "desc";
+                                    }[];
+                                };
+                                propertiesSettings?: {
+                                    hidden?: string[];
+                                    order?: string[];
+                                };
+                            };
+                        } | {
+                            id?: string;
+                            updatedAt?: string;
+                            updatedBy?: string;
+                            createdAt?: string;
+                            createdBy?: string;
+                            /** @enum {unknown} */
                             type: "run-info";
                             title?: string;
                             runId: string;
@@ -14510,6 +15938,32 @@ export interface paths {
                             description?: string;
                             dataset: components["schemas"]["def-1"];
                             emptyStateText?: string;
+                            segmentTableViewConfig?: {
+                                [key: string]: {
+                                    filterSettings?: {
+                                        filterBy: components["schemas"]["def-1"];
+                                    };
+                                    groupSettings?: {
+                                        groupBy: string[];
+                                    };
+                                    sortSettings?: {
+                                        sortBy?: {
+                                            property: string;
+                                            /** @enum {unknown} */
+                                            order: "asc" | "desc";
+                                        }[];
+                                    };
+                                    propertiesSettings?: {
+                                        hidden?: string[];
+                                        shown?: string[];
+                                        order?: string[];
+                                    };
+                                    tabIndex?: number;
+                                    hidden?: boolean;
+                                    title?: string;
+                                    description?: string;
+                                };
+                            };
                         } | {
                             id?: string;
                             updatedAt?: string;
@@ -14525,6 +15979,32 @@ export interface paths {
                             description?: string;
                             dataset: components["schemas"]["def-1"];
                             emptyStateText?: string;
+                            segmentTableViewConfig?: {
+                                [key: string]: {
+                                    filterSettings?: {
+                                        filterBy: components["schemas"]["def-1"];
+                                    };
+                                    groupSettings?: {
+                                        groupBy: string[];
+                                    };
+                                    sortSettings?: {
+                                        sortBy?: {
+                                            property: string;
+                                            /** @enum {unknown} */
+                                            order: "asc" | "desc";
+                                        }[];
+                                    };
+                                    propertiesSettings?: {
+                                        hidden?: string[];
+                                        shown?: string[];
+                                        order?: string[];
+                                    };
+                                    tabIndex?: number;
+                                    hidden?: boolean;
+                                    title?: string;
+                                    description?: string;
+                                };
+                            };
                         } | ({
                             id?: string;
                             updatedAt?: string;
@@ -14541,10 +16021,10 @@ export interface paths {
                             xAxisTitle?: string;
                             yAxisTitle?: string;
                             /** @enum {string} */
-                            timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                            timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                             timeRange?: {
                                 /** @enum {string} */
-                                preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                             };
                             description?: string;
                             emptyStateText?: string;
@@ -14566,10 +16046,10 @@ export interface paths {
                             xAxisTitle?: string;
                             yAxisTitle?: string;
                             /** @enum {string} */
-                            timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                            timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                             timeRange?: {
                                 /** @enum {string} */
-                                preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                             };
                             description?: string;
                             emptyStateText?: string;
@@ -14594,10 +16074,10 @@ export interface paths {
                             xAxisTitle?: string;
                             yAxisTitle?: string;
                             /** @enum {string} */
-                            timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                            timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                             timeRange?: {
                                 /** @enum {string} */
-                                preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                             };
                             description?: string;
                             emptyStateText?: string;
@@ -14606,7 +16086,62 @@ export interface paths {
                             breakdownProperty?: string;
                             measureTimeBy: string;
                             dataset?: components["schemas"]["def-1"];
-                        }) | ({
+                        }) | {
+                            id?: string;
+                            updatedAt?: string;
+                            updatedBy?: string;
+                            createdAt?: string;
+                            createdBy?: string;
+                            icon?: string;
+                            /** @enum {unknown} */
+                            type: "multi-line-chart";
+                            title: string;
+                            xAxisTitle?: string;
+                            yAxisTitle?: string;
+                            /** @enum {string} */
+                            timeInterval: "hour" | "day" | "isoWeek" | "month" | "quarter";
+                            timeRange: {
+                                /** @enum {string} */
+                                preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
+                            };
+                            description?: string;
+                            emptyStateText?: string;
+                            lines: ({
+                                title: string;
+                                blueprint: string;
+                                /** @enum {unknown} */
+                                chartType: "propertiesValueHistory";
+                                entity: string;
+                                properties: string[];
+                            } | {
+                                title: string;
+                                blueprint: string;
+                                /** @enum {unknown} */
+                                chartType: "aggregatePropertiesValues";
+                                /** @enum {string} */
+                                func: "sum" | "average" | "min" | "max" | "median" | "last";
+                                properties: string[];
+                                measureTimeBy: string;
+                                dataset?: components["schemas"]["def-1"];
+                            } | {
+                                title: string;
+                                blueprint: string;
+                                /** @enum {unknown} */
+                                chartType: "countEntities";
+                                /** @enum {string} */
+                                func: "count" | "average";
+                                breakdownProperty?: string;
+                                measureTimeBy: string;
+                                dataset?: components["schemas"]["def-1"];
+                            })[];
+                            baselines?: {
+                                name?: string;
+                                value: number;
+                                color?: string;
+                            }[];
+                            /** @enum {string} */
+                            nullValueDisplayMode?: "zero" | "null";
+                        } | ({
                             id?: string;
                             updatedAt?: string;
                             updatedBy?: string;
@@ -14712,6 +16247,25 @@ export interface paths {
                             type: "my-entities";
                             title: string;
                             icon?: string;
+                        } | {
+                            id?: string;
+                            updatedAt?: string;
+                            updatedBy?: string;
+                            createdAt?: string;
+                            createdBy?: string;
+                            /** @enum {string} */
+                            type: "custom-widget";
+                            title: string;
+                            icon?: string;
+                            description?: string;
+                            pluginId: string;
+                            paramValues?: {
+                                [key: string]: {
+                                    /** @enum {string} */
+                                    type: "string" | "number" | "boolean" | "object" | "array" | "blueprint";
+                                    value: string | number | boolean | unknown[] | Record<string, never>;
+                                };
+                            };
                         } | components["schemas"]["def-3"] | components["schemas"]["def-4"] | {
                             id?: string;
                             updatedAt?: string;
@@ -14948,7 +16502,7 @@ export interface paths {
                                         /** @description Fetch all audit logs related to the specified integration. */
                                         InstallationId?: string;
                                         /** @description Fetch all audit logs related to the specified resource type/s.<br/>**Possible values**: [`blueprint`, `entity`, `run`, `webhook`, `scorecard`, `action`, `integration`] */
-                                        resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration");
+                                        resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "action_permissions" | "integration" | "secret")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "action_permissions" | "integration" | "secret");
                                         /** @description The fields you want to include in the response. If used, only the specified fields will be included in the response. */
                                         includes?: ("action" | "context" | "diff" | "identifier" | "resourceType" | "status" | "trigger" | "additionalData" | "message")[];
                                         /**
@@ -15114,6 +16668,34 @@ export interface paths {
                                     createdAt?: string;
                                     createdBy?: string;
                                     /** @enum {unknown} */
+                                    type: "workflow-runs-history-table";
+                                    query?: Record<string, never>;
+                                    tableConfig?: {
+                                        filterSettings?: {
+                                            filterBy: components["schemas"]["def-1"];
+                                        };
+                                        groupSettings?: {
+                                            groupBy: string[];
+                                        };
+                                        sortSettings?: {
+                                            sortBy?: {
+                                                property: string;
+                                                /** @enum {unknown} */
+                                                order: "asc" | "desc";
+                                            }[];
+                                        };
+                                        propertiesSettings?: {
+                                            hidden?: string[];
+                                            order?: string[];
+                                        };
+                                    };
+                                } | {
+                                    id?: string;
+                                    updatedAt?: string;
+                                    updatedBy?: string;
+                                    createdAt?: string;
+                                    createdBy?: string;
+                                    /** @enum {unknown} */
                                     type: "run-info";
                                     title?: string;
                                     runId: string;
@@ -15153,6 +16735,32 @@ export interface paths {
                                     description?: string;
                                     dataset: components["schemas"]["def-1"];
                                     emptyStateText?: string;
+                                    segmentTableViewConfig?: {
+                                        [key: string]: {
+                                            filterSettings?: {
+                                                filterBy: components["schemas"]["def-1"];
+                                            };
+                                            groupSettings?: {
+                                                groupBy: string[];
+                                            };
+                                            sortSettings?: {
+                                                sortBy?: {
+                                                    property: string;
+                                                    /** @enum {unknown} */
+                                                    order: "asc" | "desc";
+                                                }[];
+                                            };
+                                            propertiesSettings?: {
+                                                hidden?: string[];
+                                                shown?: string[];
+                                                order?: string[];
+                                            };
+                                            tabIndex?: number;
+                                            hidden?: boolean;
+                                            title?: string;
+                                            description?: string;
+                                        };
+                                    };
                                 } | {
                                     id?: string;
                                     updatedAt?: string;
@@ -15168,6 +16776,32 @@ export interface paths {
                                     description?: string;
                                     dataset: components["schemas"]["def-1"];
                                     emptyStateText?: string;
+                                    segmentTableViewConfig?: {
+                                        [key: string]: {
+                                            filterSettings?: {
+                                                filterBy: components["schemas"]["def-1"];
+                                            };
+                                            groupSettings?: {
+                                                groupBy: string[];
+                                            };
+                                            sortSettings?: {
+                                                sortBy?: {
+                                                    property: string;
+                                                    /** @enum {unknown} */
+                                                    order: "asc" | "desc";
+                                                }[];
+                                            };
+                                            propertiesSettings?: {
+                                                hidden?: string[];
+                                                shown?: string[];
+                                                order?: string[];
+                                            };
+                                            tabIndex?: number;
+                                            hidden?: boolean;
+                                            title?: string;
+                                            description?: string;
+                                        };
+                                    };
                                 } | ({
                                     id?: string;
                                     updatedAt?: string;
@@ -15184,10 +16818,10 @@ export interface paths {
                                     xAxisTitle?: string;
                                     yAxisTitle?: string;
                                     /** @enum {string} */
-                                    timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                                    timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                                     timeRange?: {
                                         /** @enum {string} */
-                                        preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                        preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                                     };
                                     description?: string;
                                     emptyStateText?: string;
@@ -15209,10 +16843,10 @@ export interface paths {
                                     xAxisTitle?: string;
                                     yAxisTitle?: string;
                                     /** @enum {string} */
-                                    timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                                    timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                                     timeRange?: {
                                         /** @enum {string} */
-                                        preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                        preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                                     };
                                     description?: string;
                                     emptyStateText?: string;
@@ -15237,10 +16871,10 @@ export interface paths {
                                     xAxisTitle?: string;
                                     yAxisTitle?: string;
                                     /** @enum {string} */
-                                    timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                                    timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                                     timeRange?: {
                                         /** @enum {string} */
-                                        preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                        preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                                     };
                                     description?: string;
                                     emptyStateText?: string;
@@ -15249,7 +16883,62 @@ export interface paths {
                                     breakdownProperty?: string;
                                     measureTimeBy: string;
                                     dataset?: components["schemas"]["def-1"];
-                                }) | ({
+                                }) | {
+                                    id?: string;
+                                    updatedAt?: string;
+                                    updatedBy?: string;
+                                    createdAt?: string;
+                                    createdBy?: string;
+                                    icon?: string;
+                                    /** @enum {unknown} */
+                                    type: "multi-line-chart";
+                                    title: string;
+                                    xAxisTitle?: string;
+                                    yAxisTitle?: string;
+                                    /** @enum {string} */
+                                    timeInterval: "hour" | "day" | "isoWeek" | "month" | "quarter";
+                                    timeRange: {
+                                        /** @enum {string} */
+                                        preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
+                                    };
+                                    description?: string;
+                                    emptyStateText?: string;
+                                    lines: ({
+                                        title: string;
+                                        blueprint: string;
+                                        /** @enum {unknown} */
+                                        chartType: "propertiesValueHistory";
+                                        entity: string;
+                                        properties: string[];
+                                    } | {
+                                        title: string;
+                                        blueprint: string;
+                                        /** @enum {unknown} */
+                                        chartType: "aggregatePropertiesValues";
+                                        /** @enum {string} */
+                                        func: "sum" | "average" | "min" | "max" | "median" | "last";
+                                        properties: string[];
+                                        measureTimeBy: string;
+                                        dataset?: components["schemas"]["def-1"];
+                                    } | {
+                                        title: string;
+                                        blueprint: string;
+                                        /** @enum {unknown} */
+                                        chartType: "countEntities";
+                                        /** @enum {string} */
+                                        func: "count" | "average";
+                                        breakdownProperty?: string;
+                                        measureTimeBy: string;
+                                        dataset?: components["schemas"]["def-1"];
+                                    })[];
+                                    baselines?: {
+                                        name?: string;
+                                        value: number;
+                                        color?: string;
+                                    }[];
+                                    /** @enum {string} */
+                                    nullValueDisplayMode?: "zero" | "null";
+                                } | ({
                                     id?: string;
                                     updatedAt?: string;
                                     updatedBy?: string;
@@ -15355,6 +17044,25 @@ export interface paths {
                                     type: "my-entities";
                                     title: string;
                                     icon?: string;
+                                } | {
+                                    id?: string;
+                                    updatedAt?: string;
+                                    updatedBy?: string;
+                                    createdAt?: string;
+                                    createdBy?: string;
+                                    /** @enum {string} */
+                                    type: "custom-widget";
+                                    title: string;
+                                    icon?: string;
+                                    description?: string;
+                                    pluginId: string;
+                                    paramValues?: {
+                                        [key: string]: {
+                                            /** @enum {string} */
+                                            type: "string" | "number" | "boolean" | "object" | "array" | "blueprint";
+                                            value: string | number | boolean | unknown[] | Record<string, never>;
+                                        };
+                                    };
                                 } | components["schemas"]["def-3"] | components["schemas"]["def-4"])[];
                             }[];
                         } | {
@@ -15592,7 +17300,7 @@ export interface paths {
                                     /** @description Fetch all audit logs related to the specified integration. */
                                     InstallationId?: string;
                                     /** @description Fetch all audit logs related to the specified resource type/s.<br/>**Possible values**: [`blueprint`, `entity`, `run`, `webhook`, `scorecard`, `action`, `integration`] */
-                                    resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration");
+                                    resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "action_permissions" | "integration" | "secret")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "action_permissions" | "integration" | "secret");
                                     /** @description The fields you want to include in the response. If used, only the specified fields will be included in the response. */
                                     includes?: ("action" | "context" | "diff" | "identifier" | "resourceType" | "status" | "trigger" | "additionalData" | "message")[];
                                     /**
@@ -15758,6 +17466,34 @@ export interface paths {
                                 createdAt?: string;
                                 createdBy?: string;
                                 /** @enum {unknown} */
+                                type: "workflow-runs-history-table";
+                                query?: Record<string, never>;
+                                tableConfig?: {
+                                    filterSettings?: {
+                                        filterBy: components["schemas"]["def-1"];
+                                    };
+                                    groupSettings?: {
+                                        groupBy: string[];
+                                    };
+                                    sortSettings?: {
+                                        sortBy?: {
+                                            property: string;
+                                            /** @enum {unknown} */
+                                            order: "asc" | "desc";
+                                        }[];
+                                    };
+                                    propertiesSettings?: {
+                                        hidden?: string[];
+                                        order?: string[];
+                                    };
+                                };
+                            } | {
+                                id?: string;
+                                updatedAt?: string;
+                                updatedBy?: string;
+                                createdAt?: string;
+                                createdBy?: string;
+                                /** @enum {unknown} */
                                 type: "run-info";
                                 title?: string;
                                 runId: string;
@@ -15797,6 +17533,32 @@ export interface paths {
                                 description?: string;
                                 dataset: components["schemas"]["def-1"];
                                 emptyStateText?: string;
+                                segmentTableViewConfig?: {
+                                    [key: string]: {
+                                        filterSettings?: {
+                                            filterBy: components["schemas"]["def-1"];
+                                        };
+                                        groupSettings?: {
+                                            groupBy: string[];
+                                        };
+                                        sortSettings?: {
+                                            sortBy?: {
+                                                property: string;
+                                                /** @enum {unknown} */
+                                                order: "asc" | "desc";
+                                            }[];
+                                        };
+                                        propertiesSettings?: {
+                                            hidden?: string[];
+                                            shown?: string[];
+                                            order?: string[];
+                                        };
+                                        tabIndex?: number;
+                                        hidden?: boolean;
+                                        title?: string;
+                                        description?: string;
+                                    };
+                                };
                             } | {
                                 id?: string;
                                 updatedAt?: string;
@@ -15812,6 +17574,32 @@ export interface paths {
                                 description?: string;
                                 dataset: components["schemas"]["def-1"];
                                 emptyStateText?: string;
+                                segmentTableViewConfig?: {
+                                    [key: string]: {
+                                        filterSettings?: {
+                                            filterBy: components["schemas"]["def-1"];
+                                        };
+                                        groupSettings?: {
+                                            groupBy: string[];
+                                        };
+                                        sortSettings?: {
+                                            sortBy?: {
+                                                property: string;
+                                                /** @enum {unknown} */
+                                                order: "asc" | "desc";
+                                            }[];
+                                        };
+                                        propertiesSettings?: {
+                                            hidden?: string[];
+                                            shown?: string[];
+                                            order?: string[];
+                                        };
+                                        tabIndex?: number;
+                                        hidden?: boolean;
+                                        title?: string;
+                                        description?: string;
+                                    };
+                                };
                             } | ({
                                 id?: string;
                                 updatedAt?: string;
@@ -15828,10 +17616,10 @@ export interface paths {
                                 xAxisTitle?: string;
                                 yAxisTitle?: string;
                                 /** @enum {string} */
-                                timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                                timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                                 timeRange?: {
                                     /** @enum {string} */
-                                    preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                    preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                                 };
                                 description?: string;
                                 emptyStateText?: string;
@@ -15853,10 +17641,10 @@ export interface paths {
                                 xAxisTitle?: string;
                                 yAxisTitle?: string;
                                 /** @enum {string} */
-                                timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                                timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                                 timeRange?: {
                                     /** @enum {string} */
-                                    preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                    preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                                 };
                                 description?: string;
                                 emptyStateText?: string;
@@ -15881,10 +17669,10 @@ export interface paths {
                                 xAxisTitle?: string;
                                 yAxisTitle?: string;
                                 /** @enum {string} */
-                                timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                                timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                                 timeRange?: {
                                     /** @enum {string} */
-                                    preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                                    preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                                 };
                                 description?: string;
                                 emptyStateText?: string;
@@ -15893,7 +17681,62 @@ export interface paths {
                                 breakdownProperty?: string;
                                 measureTimeBy: string;
                                 dataset?: components["schemas"]["def-1"];
-                            }) | ({
+                            }) | {
+                                id?: string;
+                                updatedAt?: string;
+                                updatedBy?: string;
+                                createdAt?: string;
+                                createdBy?: string;
+                                icon?: string;
+                                /** @enum {unknown} */
+                                type: "multi-line-chart";
+                                title: string;
+                                xAxisTitle?: string;
+                                yAxisTitle?: string;
+                                /** @enum {string} */
+                                timeInterval: "hour" | "day" | "isoWeek" | "month" | "quarter";
+                                timeRange: {
+                                    /** @enum {string} */
+                                    preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
+                                };
+                                description?: string;
+                                emptyStateText?: string;
+                                lines: ({
+                                    title: string;
+                                    blueprint: string;
+                                    /** @enum {unknown} */
+                                    chartType: "propertiesValueHistory";
+                                    entity: string;
+                                    properties: string[];
+                                } | {
+                                    title: string;
+                                    blueprint: string;
+                                    /** @enum {unknown} */
+                                    chartType: "aggregatePropertiesValues";
+                                    /** @enum {string} */
+                                    func: "sum" | "average" | "min" | "max" | "median" | "last";
+                                    properties: string[];
+                                    measureTimeBy: string;
+                                    dataset?: components["schemas"]["def-1"];
+                                } | {
+                                    title: string;
+                                    blueprint: string;
+                                    /** @enum {unknown} */
+                                    chartType: "countEntities";
+                                    /** @enum {string} */
+                                    func: "count" | "average";
+                                    breakdownProperty?: string;
+                                    measureTimeBy: string;
+                                    dataset?: components["schemas"]["def-1"];
+                                })[];
+                                baselines?: {
+                                    name?: string;
+                                    value: number;
+                                    color?: string;
+                                }[];
+                                /** @enum {string} */
+                                nullValueDisplayMode?: "zero" | "null";
+                            } | ({
                                 id?: string;
                                 updatedAt?: string;
                                 updatedBy?: string;
@@ -15999,6 +17842,25 @@ export interface paths {
                                 type: "my-entities";
                                 title: string;
                                 icon?: string;
+                            } | {
+                                id?: string;
+                                updatedAt?: string;
+                                updatedBy?: string;
+                                createdAt?: string;
+                                createdBy?: string;
+                                /** @enum {string} */
+                                type: "custom-widget";
+                                title: string;
+                                icon?: string;
+                                description?: string;
+                                pluginId: string;
+                                paramValues?: {
+                                    [key: string]: {
+                                        /** @enum {string} */
+                                        type: "string" | "number" | "boolean" | "object" | "array" | "blueprint";
+                                        value: string | number | boolean | unknown[] | Record<string, never>;
+                                    };
+                                };
                             } | components["schemas"]["def-3"] | components["schemas"]["def-4"])[];
                         };
                         parentWidgetId: string;
@@ -16342,7 +18204,7 @@ export interface paths {
                             content: string;
                             link?: string | null;
                             /** @enum {string} */
-                            color?: "blue" | "red";
+                            color?: "blue" | "red" | "green" | "yellow" | "orange" | "pink" | "purple" | "turquoise";
                         };
                     };
                 };
@@ -16433,11 +18295,11 @@ export interface paths {
                 path?: never;
                 cookie?: never;
             };
-            requestBody: {
+            requestBody?: {
                 content: {
                     "application/json": {
                         /** @description The name of the organization. */
-                        name: string;
+                        name?: string;
                         settings?: {
                             /** @description An array of blueprint identifiers that should be hidden. */
                             hiddenBlueprints?: string[];
@@ -16459,6 +18321,13 @@ export interface paths {
                              * @description Expiration date for Port support user access
                              */
                             supportUserExpiresAt?: string;
+                            /**
+                             * @description Streamer name for Port agent (KAFKA or POLLING).
+                             * @enum {string}
+                             */
+                            portAgentStreamerName?: "KAFKA" | "POLLING";
+                            /** @description The org-level default for whether blueprints are included in global search. Individual blueprints can override this via includeInGlobalSearch. */
+                            includeBlueprintsInGlobalSearchByDefault?: boolean;
                         };
                         isOnboarded?: boolean;
                         toolSelectionProvisioning?: {
@@ -16470,7 +18339,7 @@ export interface paths {
                             content?: string;
                             link?: string | null;
                             /** @enum {string} */
-                            color?: "blue" | "red";
+                            color?: "blue" | "red" | "green" | "yellow" | "orange" | "pink" | "purple" | "turquoise";
                         };
                     };
                 };
@@ -16557,7 +18426,7 @@ export interface paths {
         };
         /**
          * Get all organization secrets' metadata
-         * @description This route allows you to retrieve metadata about all secrets in your organization. Note that this endpoint returns only the metadata of the secrets, not the secrets content itself.<br/><br/>To learn more about secrets management in Port, check out the [documentation](https://docs.port.io/sso-rbac/port-secrets).
+         * @description This route allows you to retrieve metadata about all secrets in your organization. Note that this endpoint returns only the metadata of the secrets, not the secret content itself.<br/><br/>To learn more about secrets management in Port, check out the [documentation](https://docs.port.io/sso-rbac/port-secrets).
          */
         get: {
             parameters: {
@@ -16922,6 +18791,64 @@ export interface paths {
         };
         trace?: never;
     };
+    "/v1/integration/metadata": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get all integrations meta-data (member view)
+         * @description This route allows members to fetch meta-data on all integrations in their Port organization.<br></br>The response includes each integration's identifier, installation ID, integration type, and last update timestamp.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @constant */
+                            ok: false;
+                            error: string;
+                            message?: string;
+                        };
+                    };
+                };
+                /** @description A resource with the provided identifier was not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @constant */
+                            ok: false;
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/integration": {
         parameters: {
             query?: never;
@@ -16931,14 +18858,7 @@ export interface paths {
         };
         /**
          * Get all integrations
-         * @description This route allows you to fetch all integrations in your Port organization.
-         *     To learn more about integrations, check out the [documentation](https://docs.port.io/build-your-software-catalog/sync-data-to-catalog/).
-         *     :::warning Permission requirements
-         *
-         *     To use this endpoint, you must have a `moderator` or `admin` role in your Port organization.
-         *     To learn more about the different roles and permissions, please refer to the [documentation](/sso-rbac/users-and-teams/manage-users-teams#roles--permissions).
-         *     If you already have an existing Port account, this requirement will be enforced starting **January 1st, 2026**.
-         *     :::
+         * @description This route allows you to fetch all integrations in your Port organization.<br/>To learn more about integrations, check out the [documentation](https://docs.port.io/build-your-software-catalog/sync-data-to-catalog/).<br/><br/>**Permission requirements**<br/>To use this endpoint, you must have a `moderator` or `admin` role in your Port organization.<br/>To learn more about the different roles and permissions, please refer to the [documentation](https://docs.port.io/sso-rbac/users-and-teams/manage-users-teams/#roles--permissions).
          */
         get: {
             parameters: {
@@ -16999,14 +18919,7 @@ export interface paths {
         };
         /**
          * Get an integration
-         * @description This route allows you to fetch a specific integration in your Port organization.
-         *     To learn more about integrations, check out the [documentation](https://docs.port.io/build-your-software-catalog/sync-data-to-catalog/).
-         *     :::warning Permission requirements
-         *
-         *     To use this endpoint, you must have a `moderator` or `admin` role in your Port organization.
-         *     To learn more about the different roles and permissions, please refer to the [documentation](/sso-rbac/users-and-teams/manage-users-teams#roles--permissions).
-         *     If you already have an existing Port account, this requirement will be enforced starting **January 1st, 2026**.
-         *     :::
+         * @description This route allows you to fetch a specific integration in your Port organization.<br/>To learn more about integrations, check out the [documentation](https://docs.port.io/build-your-software-catalog/sync-data-to-catalog/).<br/><br/>**Permission requirements**<br/>To use this endpoint, you must have a `moderator` or `admin` role in your Port organization.<br/>To learn more about the different roles and permissions, please refer to the [documentation](https://docs.port.io/sso-rbac/users-and-teams/manage-users-teams/#roles--permissions).
          */
         get: {
             parameters: {
@@ -17154,13 +19067,17 @@ export interface paths {
                         installationAppType?: string;
                         /** @description The version of the integration. */
                         version?: string;
+                        /** @description The pinned version of the integration. If provided, the integration will be pinned to this specific version in the Kubernetes manifest. */
+                        pinnedVersion?: string;
                         spec?: {
-                            [key: string]: unknown;
+                            appSpec?: {
+                                [key: string]: unknown;
+                            };
+                            integrationSpec?: {
+                                [key: string]: unknown;
+                            };
                         };
-                        /**
-                         * @description If `true`, This integration will be able to process actions runs
-                         * @default false
-                         */
+                        /** @description If `true`, This integration will be able to process actions runs */
                         actionsProcessingEnabled?: boolean;
                         /** @description Various configuration options for the integration. */
                         config?: ({
@@ -17243,6 +19160,8 @@ export interface paths {
                              */
                             url: string;
                         });
+                        /** @description Whether the Port resources are initialized for the integration. */
+                        arePortResourcesInitialized?: boolean;
                     } & {
                         [key: string]: unknown;
                     };
@@ -17317,15 +19236,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get an integration's audit logs
-         * @description This route allows you to fetch the audit logs of a specific integration in your Port organization.
-         *     To learn more about integrations, check out the [documentation](https://docs.port.io/build-your-software-catalog/sync-data-to-catalog/).
-         *     :::warning Permission requirements
-         *
-         *     To use this endpoint, you must have a `moderator` or `admin` role in your Port organization.
-         *     To learn more about the different roles and permissions, please refer to the [documentation](/sso-rbac/users-and-teams/manage-users-teams#roles--permissions).
-         *     If you already have an existing Port account, this requirement will be enforced starting **January 1st, 2026**.
-         *     :::
+         * Get an integration's event logs
+         * @description This route allows you to fetch the event logs of a specific integration in your Port organization.<br/>To learn more about integrations, check out the [documentation](https://docs.port.io/build-your-software-catalog/sync-data-to-catalog/).<br/><br/>**Permission requirements**<br/>To use this endpoint, you must have a `moderator` or `admin` role in your Port organization.<br/>To learn more about the different roles and permissions, please refer to the [documentation](https://docs.port.io/sso-rbac/users-and-teams/manage-users-teams/#roles--permissions).
          */
         get: {
             parameters: {
@@ -17339,9 +19251,13 @@ export interface paths {
                     /** @description Determines whether to fetch logs before or after the specified timestamp. */
                     direction?: "up" | "down";
                     /** @description Filter logs belonging to a specific event. */
-                    eventId?: string | null;
+                    event_id?: string | null;
                     /** @description Filter logs by severity level. */
-                    level?: ("DEBUG" | "INFO" | "WARNING" | "ERROR" | "FATAL")[] | null;
+                    levels?: ("DEBUG" | "INFO" | "WARNING" | "ERROR" | "FATAL")[] | null;
+                    /** @description Filter logs by ETL phases. */
+                    etl_phases?: ("load" | "extract" | "transform")[] | null;
+                    /** @description Filter logs by kinds (e.g `pull-request`, `branch` for GitHub, `issue` for Jira, etc.) */
+                    kinds?: string[] | null;
                 };
                 header?: never;
                 path: {
@@ -17556,13 +19472,7 @@ export interface paths {
         };
         /**
          * Get all webhooks
-         * @description This route allows you to fetch all webhooks configured in your Port organization. You can also see them in the [data sources page](https://app.getport.io/settings/data-sources) of your Port account.
-         *     To learn more about webhooks, check out the [documentation](https://docs.port.io/build-your-software-catalog/custom-integration/webhook/).
-         *     :::warning Permission requirements
-         *     To use this endpoint, you must have a `moderator` or `admin` role in your Port organization.
-         *     To learn more about the different roles and permissions, please refer to the [documentation](/sso-rbac/users-and-teams/manage-users-teams#roles--permissions).
-         *     If you already have an existing Port account, this requirement will be enforced starting **January 1st, 2026**.
-         *     :::
+         * @description This route allows you to fetch all webhooks configured in your Port organization. You can also see them in the [data sources page](https://app.getport.io/settings/data-sources) of your Port account.<br/>To learn more about webhooks, check out the [documentation](https://docs.port.io/build-your-software-catalog/custom-integration/webhook/).<br/><br/>**Permission requirements**<br/>To use this endpoint, you must have a `moderator` or `admin` role in your Port organization.<br/>To learn more about the different roles and permissions, please refer to the [documentation](https://docs.port.io/sso-rbac/users-and-teams/manage-users-teams/#roles--permissions).
          */
         get: {
             parameters: {
@@ -17730,13 +19640,7 @@ export interface paths {
         };
         /**
          * Get a webhook
-         * @description This route allows you to fetch a specific webhook in your Port organization. You can also see it in the [data sources page](https://app.getport.io/settings/data-sources) of your Port account.
-         *     To learn more about webhooks, check out the [documentation](https://docs.port.io/build-your-software-catalog/custom-integration/webhook/).
-         *     :::warning Permission requirements
-         *     To use this endpoint, you must have a `moderator` or `admin` role in your Port organization.
-         *     To learn more about the different roles and permissions, please refer to the [documentation](/sso-rbac/users-and-teams/manage-users-teams#roles--permissions).
-         *     If you already have an existing Port account, this requirement will be enforced starting **January 1st, 2026**.
-         *     :::
+         * @description This route allows you to fetch a specific webhook in your Port organization. You can also see it in the [data sources page](https://app.getport.io/settings/data-sources) of your Port account.<br/>To learn more about webhooks, check out the [documentation](https://docs.port.io/build-your-software-catalog/custom-integration/webhook/).<br/><br/>**Permission requirements**<br/>To use this endpoint, you must have a `moderator` or `admin` role in your Port organization.<br/>To learn more about the different roles and permissions, please refer to the [documentation](https://docs.port.io/sso-rbac/users-and-teams/manage-users-teams/#roles--permissions).
          */
         get: {
             parameters: {
@@ -18087,6 +19991,64 @@ export interface paths {
         };
         trace?: never;
     };
+    "/v1/webhooks/metadata": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get all webhooks meta-data (member view)
+         * @description This route allows members to fetch meta-data on all webhooks in their Port organization.<br></br>The response includes each webhook's identifier, title, icon, and last update timestamp.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @constant */
+                            ok: false;
+                            error: string;
+                            message?: string;
+                        };
+                    };
+                };
+                /** @description A resource with the provided identifier was not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @constant */
+                            ok: false;
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/audit-log": {
         parameters: {
             query?: never;
@@ -18096,7 +20058,7 @@ export interface paths {
         };
         /**
          * Get audit logs
-         * @description This route allows you to fetch audit logs from your Port account. Your audit logs can also be viewed via [Port's UI](https://app.getport.io/settings/AuditLog).<br/><br/>This route will perform a logical `AND` between all query parameters below, and return all logs that match the criteria.<br/><br/>:::warning Beta integration value<br/>The `integration` value in the `resources` parameter is **experimental**. Its behavior may change in future versions of the API.<br/>:::<br/><br/>**Note:** Non-admin users have limited access to the audit logs API. They may:<br/>- Pass an `identifier` to access a specific audit log.<br/>- Pass an `entity` to retrieve audit logs of entities they have access to.<br/>Non-admin users **cannot** view audit logs of deleted entities.
+         * @description This route allows you to fetch audit logs from your Port account. Your audit logs can also be viewed via [Port's UI](https://app.getport.io/settings/AuditLog).<br/><br/>This route will perform a logical `AND` between all query parameters below, and return all logs that match the criteria.<br/><br/>**Note:** Non-admin users have limited access to the audit logs API. They may:<br/>- Pass an `identifier` to access a specific audit log.<br/>- Pass an `entity` to retrieve audit logs of entities they have access to.<br/>- Pass a `run_id` to retrieve audit logs of action runs they have access to.<br/>Non-admin users **cannot** view audit logs of deleted entities.<br/><br/>:::warning Beta integration value<br/>The `integration` value in the `resources` parameter is **experimental**. Its behavior may change in future versions of the API.<br/>:::
          */
         get: {
             parameters: {
@@ -18120,7 +20082,7 @@ export interface paths {
                     /** @description Fetch all audit logs related to the specified integration. */
                     InstallationId?: string;
                     /** @description Fetch all audit logs related to the specified resource type/s.<br/>**Possible values**: [`blueprint`, `entity`, `run`, `webhook`, `scorecard`, `action`, `integration`] */
-                    resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration");
+                    resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "action_permissions" | "integration" | "secret")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "action_permissions" | "integration" | "secret");
                     /** @description The fields you want to include in the response. If used, only the specified fields will be included in the response. */
                     includes?: ("action" | "context" | "diff" | "identifier" | "resourceType" | "status" | "trigger" | "additionalData" | "message")[];
                     /** @description The starting timestamp of the audit logs you want to fetch, in the ISO format `2022-04-23T18:25:43.511Z`. */
@@ -18791,7 +20753,7 @@ export interface paths {
             parameters: {
                 query?: {
                     /** @description The fields you want to fetch for each user. If used, only the specified fields will be included in the response. */
-                    fields?: ("id" | "email" | "firstName" | "isInvisible" | "lastName" | "picture" | "status" | "supportLevel" | "type" | "providers" | "createdAt" | "updatedAt" | "teams.name" | "teams.provider" | "teams.createdAt" | "teams.updatedAt" | "roles.name" | "roles.description" | "roles.isAdmin" | "roles.protected" | "roles.createdAt" | "roles.updatedAt" | "orgMembers.orgId" | "orgMembers.status" | "orgMembers.lastLoginAt")[];
+                    fields?: ("id" | "email" | "firstName" | "isInvisible" | "lastName" | "picture" | "status" | "supportLevel" | "type" | "providers" | "managedByScim" | "createdAt" | "updatedAt" | "teams.name" | "teams.provider" | "teams.createdAt" | "teams.updatedAt" | "roles.name" | "roles.description" | "roles.isAdmin" | "roles.protected" | "roles.orgId" | "roles.createdAt" | "roles.updatedAt" | "orgMembers.orgId" | "orgMembers.status" | "orgMembers.lastLoginAt")[];
                 };
                 header?: never;
                 path?: never;
@@ -18836,6 +20798,8 @@ export interface paths {
                                 }[];
                                 /** @default null */
                                 termsAccepted: boolean;
+                                /** @default null */
+                                managedByScim: boolean;
                             }[];
                         };
                     };
@@ -19053,6 +21017,8 @@ export interface paths {
                                 }[];
                                 /** @default null */
                                 termsAccepted: boolean;
+                                /** @default null */
+                                managedByScim: boolean;
                                 teamsIdentifiers?: string[];
                             };
                         };
@@ -19239,6 +21205,8 @@ export interface paths {
                             }[];
                             /** @default null */
                             termsAccepted: boolean;
+                            /** @default null */
+                            managedByScim: boolean;
                         };
                     };
                 };
@@ -19300,6 +21268,76 @@ export interface paths {
                 };
             };
         };
+        trace?: never;
+    };
+    "/v1/sso-providers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get SSO providers used in the organization
+         * @description This route allows to fetch all unique SSO providers that are currently used by users in the organization
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            ok?: boolean;
+                            providers?: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @constant */
+                            ok: false;
+                            error: string;
+                            message?: string;
+                        };
+                    };
+                };
+                /** @description A resource with the provided identifier was not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @constant */
+                            ok: false;
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/v1/apps": {
@@ -20752,7 +22790,7 @@ export interface paths {
         put?: never;
         /**
          * Create a migration
-         * @description This route allows you to create a migration in your Port organization.<br/><br/>You can use this to migrate data from one blueprint to another, or to convert the data type of a property in a blueprint.
+         * @description This route allows you to create a migration in your Port organization. You can use this to migrate data from one blueprint to another.<br/><br/>**Note** that it is not possible to directly change the data type of an existing property via the UI or the API. The type field setting of a property (**number**, **string**, etc.) is permanent and cannot be changed after creation.<br/><br/>However, you can create a new property with the desired type and migrate the old values to it. Refer to the [documentation](https://docs.port.io/build-your-software-catalog/customize-integrations/configure-data-model/setup-blueprint/properties/#change-a-property-type) for more information on how to change a property's type.
          */
         post: {
             parameters: {
@@ -21253,7 +23291,7 @@ export interface components {
                     to: string;
                 } | {
                     /** @enum {string} */
-                    preset: "today" | "tomorrow" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                    preset: "today" | "tomorrow" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years" | "nextDay" | "nextWeek" | "next2Weeks" | "nextMonth" | "next3Months" | "next6Months" | "next12Months";
                 } | {
                     property: string;
                     /** @enum {string} */
@@ -21356,7 +23394,7 @@ export interface components {
                     to: string;
                 } | {
                     /** @enum {string} */
-                    preset: "today" | "tomorrow" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                    preset: "today" | "tomorrow" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years" | "nextDay" | "nextWeek" | "next2Weeks" | "nextMonth" | "next3Months" | "next6Months" | "next12Months";
                 } | {
                     property: string;
                     /** @enum {string} */
@@ -21673,7 +23711,7 @@ export interface components {
                     /** @description Fetch all audit logs related to the specified integration. */
                     InstallationId?: string;
                     /** @description Fetch all audit logs related to the specified resource type/s.<br/>**Possible values**: [`blueprint`, `entity`, `run`, `webhook`, `scorecard`, `action`, `integration`] */
-                    resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration");
+                    resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "action_permissions" | "integration" | "secret")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "action_permissions" | "integration" | "secret");
                     /** @description The fields you want to include in the response. If used, only the specified fields will be included in the response. */
                     includes?: ("action" | "context" | "diff" | "identifier" | "resourceType" | "status" | "trigger" | "additionalData" | "message")[];
                     /**
@@ -21839,6 +23877,34 @@ export interface components {
                 createdAt?: string;
                 createdBy?: string;
                 /** @enum {unknown} */
+                type: "workflow-runs-history-table";
+                query?: Record<string, never>;
+                tableConfig?: {
+                    filterSettings?: {
+                        filterBy: components["schemas"]["def-1"];
+                    };
+                    groupSettings?: {
+                        groupBy: string[];
+                    };
+                    sortSettings?: {
+                        sortBy?: {
+                            property: string;
+                            /** @enum {unknown} */
+                            order: "asc" | "desc";
+                        }[];
+                    };
+                    propertiesSettings?: {
+                        hidden?: string[];
+                        order?: string[];
+                    };
+                };
+            } | {
+                id?: string;
+                updatedAt?: string;
+                updatedBy?: string;
+                createdAt?: string;
+                createdBy?: string;
+                /** @enum {unknown} */
                 type: "run-info";
                 title?: string;
                 runId: string;
@@ -21878,6 +23944,32 @@ export interface components {
                 description?: string;
                 dataset: components["schemas"]["def-1"];
                 emptyStateText?: string;
+                segmentTableViewConfig?: {
+                    [key: string]: {
+                        filterSettings?: {
+                            filterBy: components["schemas"]["def-1"];
+                        };
+                        groupSettings?: {
+                            groupBy: string[];
+                        };
+                        sortSettings?: {
+                            sortBy?: {
+                                property: string;
+                                /** @enum {unknown} */
+                                order: "asc" | "desc";
+                            }[];
+                        };
+                        propertiesSettings?: {
+                            hidden?: string[];
+                            shown?: string[];
+                            order?: string[];
+                        };
+                        tabIndex?: number;
+                        hidden?: boolean;
+                        title?: string;
+                        description?: string;
+                    };
+                };
             } | {
                 id?: string;
                 updatedAt?: string;
@@ -21893,6 +23985,32 @@ export interface components {
                 description?: string;
                 dataset: components["schemas"]["def-1"];
                 emptyStateText?: string;
+                segmentTableViewConfig?: {
+                    [key: string]: {
+                        filterSettings?: {
+                            filterBy: components["schemas"]["def-1"];
+                        };
+                        groupSettings?: {
+                            groupBy: string[];
+                        };
+                        sortSettings?: {
+                            sortBy?: {
+                                property: string;
+                                /** @enum {unknown} */
+                                order: "asc" | "desc";
+                            }[];
+                        };
+                        propertiesSettings?: {
+                            hidden?: string[];
+                            shown?: string[];
+                            order?: string[];
+                        };
+                        tabIndex?: number;
+                        hidden?: boolean;
+                        title?: string;
+                        description?: string;
+                    };
+                };
             } | ({
                 id?: string;
                 updatedAt?: string;
@@ -21909,10 +24027,10 @@ export interface components {
                 xAxisTitle?: string;
                 yAxisTitle?: string;
                 /** @enum {string} */
-                timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                 timeRange?: {
                     /** @enum {string} */
-                    preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                    preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                 };
                 description?: string;
                 emptyStateText?: string;
@@ -21934,10 +24052,10 @@ export interface components {
                 xAxisTitle?: string;
                 yAxisTitle?: string;
                 /** @enum {string} */
-                timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                 timeRange?: {
                     /** @enum {string} */
-                    preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                    preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                 };
                 description?: string;
                 emptyStateText?: string;
@@ -21962,10 +24080,10 @@ export interface components {
                 xAxisTitle?: string;
                 yAxisTitle?: string;
                 /** @enum {string} */
-                timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                 timeRange?: {
                     /** @enum {string} */
-                    preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                    preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                 };
                 description?: string;
                 emptyStateText?: string;
@@ -21974,7 +24092,62 @@ export interface components {
                 breakdownProperty?: string;
                 measureTimeBy: string;
                 dataset?: components["schemas"]["def-1"];
-            }) | ({
+            }) | {
+                id?: string;
+                updatedAt?: string;
+                updatedBy?: string;
+                createdAt?: string;
+                createdBy?: string;
+                icon?: string;
+                /** @enum {unknown} */
+                type: "multi-line-chart";
+                title: string;
+                xAxisTitle?: string;
+                yAxisTitle?: string;
+                /** @enum {string} */
+                timeInterval: "hour" | "day" | "isoWeek" | "month" | "quarter";
+                timeRange: {
+                    /** @enum {string} */
+                    preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
+                };
+                description?: string;
+                emptyStateText?: string;
+                lines: ({
+                    title: string;
+                    blueprint: string;
+                    /** @enum {unknown} */
+                    chartType: "propertiesValueHistory";
+                    entity: string;
+                    properties: string[];
+                } | {
+                    title: string;
+                    blueprint: string;
+                    /** @enum {unknown} */
+                    chartType: "aggregatePropertiesValues";
+                    /** @enum {string} */
+                    func: "sum" | "average" | "min" | "max" | "median" | "last";
+                    properties: string[];
+                    measureTimeBy: string;
+                    dataset?: components["schemas"]["def-1"];
+                } | {
+                    title: string;
+                    blueprint: string;
+                    /** @enum {unknown} */
+                    chartType: "countEntities";
+                    /** @enum {string} */
+                    func: "count" | "average";
+                    breakdownProperty?: string;
+                    measureTimeBy: string;
+                    dataset?: components["schemas"]["def-1"];
+                })[];
+                baselines?: {
+                    name?: string;
+                    value: number;
+                    color?: string;
+                }[];
+                /** @enum {string} */
+                nullValueDisplayMode?: "zero" | "null";
+            } | ({
                 id?: string;
                 updatedAt?: string;
                 updatedBy?: string;
@@ -22080,6 +24253,25 @@ export interface components {
                 type: "my-entities";
                 title: string;
                 icon?: string;
+            } | {
+                id?: string;
+                updatedAt?: string;
+                updatedBy?: string;
+                createdAt?: string;
+                createdBy?: string;
+                /** @enum {string} */
+                type: "custom-widget";
+                title: string;
+                icon?: string;
+                description?: string;
+                pluginId: string;
+                paramValues?: {
+                    [key: string]: {
+                        /** @enum {string} */
+                        type: "string" | "number" | "boolean" | "object" | "array" | "blueprint";
+                        value: string | number | boolean | unknown[] | Record<string, never>;
+                    };
+                };
             } | components["schemas"]["def-3"] | components["schemas"]["def-4"])[];
         };
         /** /schemas/grouperWidget */
@@ -22319,7 +24511,7 @@ export interface components {
                         /** @description Fetch all audit logs related to the specified integration. */
                         InstallationId?: string;
                         /** @description Fetch all audit logs related to the specified resource type/s.<br/>**Possible values**: [`blueprint`, `entity`, `run`, `webhook`, `scorecard`, `action`, `integration`] */
-                        resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "integration");
+                        resources?: ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "action_permissions" | "integration" | "secret")[] | ("blueprint" | "entity" | "run" | "webhook" | "scorecard" | "action" | "action_permissions" | "integration" | "secret");
                         /** @description The fields you want to include in the response. If used, only the specified fields will be included in the response. */
                         includes?: ("action" | "context" | "diff" | "identifier" | "resourceType" | "status" | "trigger" | "additionalData" | "message")[];
                         /**
@@ -22485,6 +24677,34 @@ export interface components {
                     createdAt?: string;
                     createdBy?: string;
                     /** @enum {unknown} */
+                    type: "workflow-runs-history-table";
+                    query?: Record<string, never>;
+                    tableConfig?: {
+                        filterSettings?: {
+                            filterBy: components["schemas"]["def-1"];
+                        };
+                        groupSettings?: {
+                            groupBy: string[];
+                        };
+                        sortSettings?: {
+                            sortBy?: {
+                                property: string;
+                                /** @enum {unknown} */
+                                order: "asc" | "desc";
+                            }[];
+                        };
+                        propertiesSettings?: {
+                            hidden?: string[];
+                            order?: string[];
+                        };
+                    };
+                } | {
+                    id?: string;
+                    updatedAt?: string;
+                    updatedBy?: string;
+                    createdAt?: string;
+                    createdBy?: string;
+                    /** @enum {unknown} */
                     type: "run-info";
                     title?: string;
                     runId: string;
@@ -22524,6 +24744,32 @@ export interface components {
                     description?: string;
                     dataset: components["schemas"]["def-1"];
                     emptyStateText?: string;
+                    segmentTableViewConfig?: {
+                        [key: string]: {
+                            filterSettings?: {
+                                filterBy: components["schemas"]["def-1"];
+                            };
+                            groupSettings?: {
+                                groupBy: string[];
+                            };
+                            sortSettings?: {
+                                sortBy?: {
+                                    property: string;
+                                    /** @enum {unknown} */
+                                    order: "asc" | "desc";
+                                }[];
+                            };
+                            propertiesSettings?: {
+                                hidden?: string[];
+                                shown?: string[];
+                                order?: string[];
+                            };
+                            tabIndex?: number;
+                            hidden?: boolean;
+                            title?: string;
+                            description?: string;
+                        };
+                    };
                 } | {
                     id?: string;
                     updatedAt?: string;
@@ -22539,6 +24785,32 @@ export interface components {
                     description?: string;
                     dataset: components["schemas"]["def-1"];
                     emptyStateText?: string;
+                    segmentTableViewConfig?: {
+                        [key: string]: {
+                            filterSettings?: {
+                                filterBy: components["schemas"]["def-1"];
+                            };
+                            groupSettings?: {
+                                groupBy: string[];
+                            };
+                            sortSettings?: {
+                                sortBy?: {
+                                    property: string;
+                                    /** @enum {unknown} */
+                                    order: "asc" | "desc";
+                                }[];
+                            };
+                            propertiesSettings?: {
+                                hidden?: string[];
+                                shown?: string[];
+                                order?: string[];
+                            };
+                            tabIndex?: number;
+                            hidden?: boolean;
+                            title?: string;
+                            description?: string;
+                        };
+                    };
                 } | ({
                     id?: string;
                     updatedAt?: string;
@@ -22555,10 +24827,10 @@ export interface components {
                     xAxisTitle?: string;
                     yAxisTitle?: string;
                     /** @enum {string} */
-                    timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                    timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                     timeRange?: {
                         /** @enum {string} */
-                        preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                        preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                     };
                     description?: string;
                     emptyStateText?: string;
@@ -22580,10 +24852,10 @@ export interface components {
                     xAxisTitle?: string;
                     yAxisTitle?: string;
                     /** @enum {string} */
-                    timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                    timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                     timeRange?: {
                         /** @enum {string} */
-                        preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                        preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                     };
                     description?: string;
                     emptyStateText?: string;
@@ -22608,10 +24880,10 @@ export interface components {
                     xAxisTitle?: string;
                     yAxisTitle?: string;
                     /** @enum {string} */
-                    timeInterval?: "hour" | "day" | "isoWeek" | "month";
+                    timeInterval?: "hour" | "day" | "isoWeek" | "month" | "quarter";
                     timeRange?: {
                         /** @enum {string} */
-                        preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                        preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
                     };
                     description?: string;
                     emptyStateText?: string;
@@ -22620,7 +24892,62 @@ export interface components {
                     breakdownProperty?: string;
                     measureTimeBy: string;
                     dataset?: components["schemas"]["def-1"];
-                }) | ({
+                }) | {
+                    id?: string;
+                    updatedAt?: string;
+                    updatedBy?: string;
+                    createdAt?: string;
+                    createdBy?: string;
+                    icon?: string;
+                    /** @enum {unknown} */
+                    type: "multi-line-chart";
+                    title: string;
+                    xAxisTitle?: string;
+                    yAxisTitle?: string;
+                    /** @enum {string} */
+                    timeInterval: "hour" | "day" | "isoWeek" | "month" | "quarter";
+                    timeRange: {
+                        /** @enum {string} */
+                        preset: "today" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years";
+                    };
+                    description?: string;
+                    emptyStateText?: string;
+                    lines: ({
+                        title: string;
+                        blueprint: string;
+                        /** @enum {unknown} */
+                        chartType: "propertiesValueHistory";
+                        entity: string;
+                        properties: string[];
+                    } | {
+                        title: string;
+                        blueprint: string;
+                        /** @enum {unknown} */
+                        chartType: "aggregatePropertiesValues";
+                        /** @enum {string} */
+                        func: "sum" | "average" | "min" | "max" | "median" | "last";
+                        properties: string[];
+                        measureTimeBy: string;
+                        dataset?: components["schemas"]["def-1"];
+                    } | {
+                        title: string;
+                        blueprint: string;
+                        /** @enum {unknown} */
+                        chartType: "countEntities";
+                        /** @enum {string} */
+                        func: "count" | "average";
+                        breakdownProperty?: string;
+                        measureTimeBy: string;
+                        dataset?: components["schemas"]["def-1"];
+                    })[];
+                    baselines?: {
+                        name?: string;
+                        value: number;
+                        color?: string;
+                    }[];
+                    /** @enum {string} */
+                    nullValueDisplayMode?: "zero" | "null";
+                } | ({
                     id?: string;
                     updatedAt?: string;
                     updatedBy?: string;
@@ -22726,6 +25053,25 @@ export interface components {
                     type: "my-entities";
                     title: string;
                     icon?: string;
+                } | {
+                    id?: string;
+                    updatedAt?: string;
+                    updatedBy?: string;
+                    createdAt?: string;
+                    createdBy?: string;
+                    /** @enum {string} */
+                    type: "custom-widget";
+                    title: string;
+                    icon?: string;
+                    description?: string;
+                    pluginId: string;
+                    paramValues?: {
+                        [key: string]: {
+                            /** @enum {string} */
+                            type: "string" | "number" | "boolean" | "object" | "array" | "blueprint";
+                            value: string | number | boolean | unknown[] | Record<string, never>;
+                        };
+                    };
                 } | components["schemas"]["def-3"] | components["schemas"]["def-4"])[];
             }[];
         };
@@ -22792,7 +25138,7 @@ export interface components {
                     to: string;
                 } | {
                     /** @enum {string} */
-                    preset: "today" | "tomorrow" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months";
+                    preset: "today" | "tomorrow" | "yesterday" | "lastDay" | "lastWeek" | "last2Weeks" | "lastMonth" | "last3Months" | "last6Months" | "last12Months" | "last2Years" | "last3Years" | "nextDay" | "nextWeek" | "next2Weeks" | "nextMonth" | "next3Months" | "next6Months" | "next12Months";
                 } | {
                     property: string;
                     /** @enum {string} */
@@ -22838,7 +25184,7 @@ export interface components {
                 };
                 /** @enum {unknown} */
                 operator: "=" | "!=" | "containsAny" | "contains" | "doesNotContains" | "beginsWith" | "doesNotBeginsWith" | "endsWith" | "doesNotEndsWith" | "in" | "notIn";
-                value: null | string | number | boolean | string[] | {
+                value: null | string | number | boolean | string[] | number[] | boolean[] | string[] | {
                     property: string;
                     /** @enum {string} */
                     context: "user" | "userTeams";
@@ -22849,13 +25195,13 @@ export interface components {
                 targetProperty?: "$title" | "$identifier";
                 /** @enum {unknown} */
                 operator: "=" | "!=" | "containsAny" | "contains" | "doesNotContains" | "beginsWith" | "doesNotBeginsWith" | "endsWith" | "doesNotEndsWith" | "in" | "notIn";
-                value: null | string | number | boolean | string[];
+                value: null | string | number | boolean | string[] | number[] | boolean[] | string[];
             } | {
                 scorecard: string;
                 scorecardRule?: string;
                 /** @enum {unknown} */
                 operator: "=" | "!=" | "containsAny" | "contains" | "doesNotContains" | "beginsWith" | "doesNotBeginsWith" | "endsWith" | "doesNotEndsWith" | "in" | "notIn";
-                value: null | string | number | boolean | string[];
+                value: null | string | number | boolean | string[] | number[] | boolean[] | string[];
             }) | {
                 /** @enum {unknown} */
                 operator: "relatedTo";

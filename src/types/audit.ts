@@ -15,15 +15,15 @@ export type AuditStatus = 'SUCCESS' | 'FAILURE';
 /**
  * Audit log resource types
  */
-export type AuditResource = 
-  | 'Entity'
-  | 'Blueprint'
-  | 'Action'
-  | 'Scorecard'
-  | 'Team'
-  | 'User'
-  | 'Integration'
-  | 'Webhook';
+export type AuditResource =
+  | 'blueprint'
+  | 'entity'
+  | 'run'
+  | 'webhook'
+  | 'scorecard'
+  | 'action'
+  | 'integration'
+  | 'secret';
 
 /**
  * Audit log entry
@@ -100,7 +100,5 @@ export interface QueryAuditLogsOptions {
   includes?: string[];
   /** Maximum number of logs to return */
   limit?: number;
-  /** Action type filter */
-  actionType?: string;
 }
 

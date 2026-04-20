@@ -108,8 +108,8 @@ describe('EntityResource', () => {
 
     it('should fetch an entity by identifier with blueprint', async () => {
       vi.mocked(mockHttpClient.get).mockResolvedValue({ entity: { identifier: 'e1' } });
-      await entityResource.get('e1', 'b1');
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/v1/blueprints/b1/entities/e1', undefined);
+      await entityResource.get('e1', { blueprint: 'b1' });
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/v1/blueprints/b1/entities/e1', { blueprint: 'b1' });
     });
   });
 
@@ -143,11 +143,11 @@ describe('EntityResource', () => {
 
     it('should update an entity with blueprint', async () => {
       vi.mocked(mockHttpClient.patch).mockResolvedValue({ entity: { identifier: 'e1' } });
-      await entityResource.update('e1', { title: 'T' }, 'b1');
+      await entityResource.update('e1', { title: 'T' }, { blueprint: 'b1' });
       expect(mockHttpClient.patch).toHaveBeenCalledWith(
         '/v1/blueprints/b1/entities/e1',
         { title: 'T' },
-        undefined
+        { blueprint: 'b1' }
       );
     });
   });
@@ -164,11 +164,11 @@ describe('EntityResource', () => {
     it('should delete an entity with blueprint', async () => {
       vi.mocked(mockHttpClient.delete).mockResolvedValue(undefined);
 
-      await entityResource.delete('test-entity', 'service');
+      await entityResource.delete('test-entity', { blueprint: 'service' });
 
       expect(mockHttpClient.delete).toHaveBeenCalledWith(
         '/v1/blueprints/service/entities/test-entity',
-        undefined
+        { blueprint: 'service' }
       );
     });
   });
@@ -295,10 +295,10 @@ describe('EntityResource', () => {
 
     it('should get related entities with blueprint', async () => {
       vi.mocked(mockHttpClient.get).mockResolvedValue({ entities: [] });
-      await entityResource.getRelated('e1', 'r1', 'b1');
+      await entityResource.getRelated('e1', 'r1', { blueprint: 'b1' });
       expect(mockHttpClient.get).toHaveBeenCalledWith(
         '/v1/blueprints/b1/entities/e1/relations/r1',
-        undefined
+        { blueprint: 'b1' }
       );
     });
   });

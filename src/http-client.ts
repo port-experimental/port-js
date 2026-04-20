@@ -258,7 +258,7 @@ export class HttpClient {
     const context = {
       method,
       url: path,
-      requestId: serverRequestId || `${method}-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
+      requestId: serverRequestId || this.generateRequestId(method),
     };
 
     switch (response.status) {
@@ -389,6 +389,10 @@ export class HttpClient {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
+  private generateRequestId(method: string): string {
+    return `${method}-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+  }
+
   /**
    * Execute HTTP request with retries
    */
@@ -419,13 +423,14 @@ export class HttpClient {
 
     while (attempt < this.maxRetries) {
       let timeoutId: NodeJS.Timeout | undefined;
+      let onAbort: (() => void) | undefined;
       try {
         // Get access token
         const token = await this.getAccessToken();
 
-        this.logger.debug(`${method} ${path}`, { 
+        this.logger.debug(`${method} ${path}`, {
           attempt: attempt + 1,
-          hasData: !!data 
+          hasData: !!data
         });
 
         // Create abort controller for timeout
@@ -437,9 +442,8 @@ export class HttpClient {
           if (options.signal.aborted) {
             controller.abort(options.signal.reason);
           } else {
-            options.signal.addEventListener('abort', () => {
-              controller.abort(options.signal!.reason);
-            }, { once: true });
+            onAbort = () => controller.abort(options.signal!.reason);
+            options.signal.addEventListener('abort', onAbort, { once: true });
           }
         }
 
@@ -457,14 +461,9 @@ export class HttpClient {
           dispatcher: this.proxyAgent,
         });
 
-        // Clear timeout in finally block to prevent timer leaks
-        if (timeoutId) {
-          clearTimeout(timeoutId);
-        }
-
-        this.logger.debug(`Response ${method} ${path}`, { 
+        this.logger.debug(`Response ${method} ${path}`, {
           status: response.status,
-          attempt: attempt + 1 
+          attempt: attempt + 1
         });
 
         // Handle error responses
@@ -480,74 +479,57 @@ export class HttpClient {
         return (await response.json()) as T;
       } catch (error) {
         lastError = error;
-        
-        // Clear timeout in catch block as well
-        if (timeoutId) {
-          clearTimeout(timeoutId);
-        }
-        
-        this.logger.warn(`Request failed: ${method} ${path}`, { 
+
+        this.logger.warn(`Request failed: ${method} ${path}`, {
           attempt: attempt + 1,
-          error: error instanceof Error ? error.message : String(error) 
+          error: error instanceof Error ? error.message : String(error)
         });
 
         // Handle abort
         if (error instanceof Error && error.name === 'AbortError') {
           // Check if it was user-initiated cancellation
           if (options?.signal?.aborted) {
-            // User cancelled the request
-            throw error; // Re-throw the cancellation error
+            throw error;
           }
           // Otherwise it was a timeout
-          const context = {
-            method,
-            url: path,
-            requestId: `${method}-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
-          };
-          const timeoutError = new PortTimeoutError(
+          lastError = new PortTimeoutError(
             `Request timeout after ${timeout}ms`,
             timeout,
-            context
+            { method, url: path, requestId: this.generateRequestId(method) }
           );
-          lastError = timeoutError;
         }
 
         // Handle network errors
         if (error instanceof TypeError) {
-          const context = {
-            method,
-            url: path,
-            requestId: `${method}-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
-          };
           lastError = new PortNetworkError(
             'Network error occurred',
             error,
-            context
+            { method, url: path, requestId: this.generateRequestId(method) }
           );
         }
 
         // Check if should retry
         if (skipRetry || !this.shouldRetry(lastError, attempt, method)) {
-          this.logger.error(`Request failed permanently: ${method} ${path}`, { 
+          this.logger.error(`Request failed permanently: ${method} ${path}`, {
             attempt: attempt + 1,
-            error: lastError instanceof Error ? lastError.message : String(lastError) 
+            error: lastError instanceof Error ? lastError.message : String(lastError)
           });
           throw lastError;
         }
 
         // Calculate retry delay
         const delay = this.getRetryDelay(attempt, lastError);
-        this.logger.info(`Retrying request: ${method} ${path}`, { 
+        this.logger.info(`Retrying request: ${method} ${path}`, {
           attempt: attempt + 1,
-          delay 
+          delay
         });
         await this.sleep(delay);
 
         attempt++;
       } finally {
-        // Always clear timeout to prevent timer leaks
-        if (timeoutId) {
-          clearTimeout(timeoutId);
+        if (timeoutId) clearTimeout(timeoutId);
+        if (onAbort && options?.signal) {
+          options.signal.removeEventListener('abort', onAbort);
         }
       }
     }
@@ -601,8 +583,8 @@ export class HttpClient {
   /**
    * DELETE request
    */
-  async delete<T>(path: string, options?: RequestOptions): Promise<T> {
-    return this.executeRequest<T>('DELETE', path, undefined, options);
+  async delete(path: string, options?: RequestOptions): Promise<void> {
+    return this.executeRequest<void>('DELETE', path, undefined, options);
   }
 }
 

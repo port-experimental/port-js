@@ -1,6 +1,6 @@
 {
   "name": "@port-experimental/port-sdk",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "Type-safe TypeScript SDK for Port.io API (Backend/Server-Side Only)",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -21,8 +21,9 @@
     "dev": "tsup --watch",
     "type-check": "tsc --noEmit",
     "types:download": "curl -o openapi.json https://api.port.io/swagger/json",
+    "types:sanitize": "tsx scripts/sanitize-openapi.ts",
     "types:generate": "openapi-typescript openapi.json -o src/types/api.ts",
-    "types:update": "pnpm types:download && pnpm types:generate",
+    "types:update": "pnpm types:download && pnpm types:sanitize && pnpm types:generate",
     "types:check": "tsx scripts/check-types.ts",
     "types:validate": "pnpm type-check",
     "docs:api": "typedoc",
