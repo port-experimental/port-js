@@ -101,7 +101,6 @@ export class AuditResource extends BaseResource {
       to: options?.to instanceof Date ? options.to.toISOString() : options?.to,
       includes: options?.includes?.join(','),
       limit: options?.limit,
-      actionType: options?.actionType,
     });
 
     const response = await this.httpClient.get<ApiAuditLogsResponse>(

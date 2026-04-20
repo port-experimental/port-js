@@ -27,6 +27,20 @@ import type {
 } from '../types';
 import type { RequestOptions } from '../http-client';
 
+type EntityRequestOptions = RequestOptions & { blueprint?: string };
+
+interface AggregationApiResponse {
+  ok?: boolean;
+  aggregation?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+interface PropertyHistoryApiResponse {
+  ok?: boolean;
+  history?: Record<string, unknown>[];
+  [key: string]: unknown;
+}
+
 /**
  * Entity resource class
  * 
@@ -106,17 +120,11 @@ export class EntityResource extends BaseResource {
    * const entity = await client.entities.get('my-service');
    * ```
    */
-  async get(identifier: string, blueprint?: string, options?: RequestOptions): Promise<Entity> {
-    this.validateIdentifier(identifier);
-
-    let path: string;
-    if (blueprint) {
-      path = `${this.basePath}/${encodeURIComponent(blueprint)}/entities/${encodeURIComponent(identifier)}`;
-    } else {
-      // Search across all blueprints
-      path = `/v1/entities/${encodeURIComponent(identifier)}`;
-    }
-
+  async get(identifier: string, options?: EntityRequestOptions): Promise<Entity> {
+    this.validateIdentifierFormat(identifier);
+    const path = options?.blueprint
+      ? `${this.basePath}/${encodeURIComponent(options.blueprint)}/entities/${encodeURIComponent(identifier)}`
+      : `/v1/entities/${encodeURIComponent(identifier)}`;
     const response = await this.httpClient.get<ApiEntityResponse>(path, options);
     return this.transformEntity(response.entity);
   }
@@ -147,24 +155,13 @@ export class EntityResource extends BaseResource {
   async update(
     identifier: string,
     data: UpdateEntityInput,
-    blueprint?: string,
-    options?: RequestOptions
+    options?: EntityRequestOptions
   ): Promise<Entity> {
-    this.validateIdentifier(identifier);
-
-    let path: string;
-    if (blueprint) {
-      path = `${this.basePath}/${encodeURIComponent(blueprint)}/entities/${encodeURIComponent(identifier)}`;
-    } else {
-      path = `/v1/entities/${encodeURIComponent(identifier)}`;
-    }
-
-    const response = await this.httpClient.patch<ApiEntityResponse>(
-      path,
-      data,
-      options
-    );
-
+    this.validateIdentifierFormat(identifier);
+    const path = options?.blueprint
+      ? `${this.basePath}/${encodeURIComponent(options.blueprint)}/entities/${encodeURIComponent(identifier)}`
+      : `/v1/entities/${encodeURIComponent(identifier)}`;
+    const response = await this.httpClient.patch<ApiEntityResponse>(path, data, options);
     return this.transformEntity(response.entity);
   }
 
@@ -181,16 +178,11 @@ export class EntityResource extends BaseResource {
    * await client.entities.delete('my-service');
    * ```
    */
-  async delete(identifier: string, blueprint?: string, options?: RequestOptions): Promise<void> {
-    this.validateIdentifier(identifier);
-
-    let path: string;
-    if (blueprint) {
-      path = `${this.basePath}/${encodeURIComponent(blueprint)}/entities/${encodeURIComponent(identifier)}`;
-    } else {
-      path = `/v1/entities/${encodeURIComponent(identifier)}`;
-    }
-
+  async delete(identifier: string, options?: EntityRequestOptions): Promise<void> {
+    this.validateIdentifierFormat(identifier);
+    const path = options?.blueprint
+      ? `${this.basePath}/${encodeURIComponent(options.blueprint)}/entities/${encodeURIComponent(identifier)}`
+      : `/v1/entities/${encodeURIComponent(identifier)}`;
     await this.httpClient.delete(path, options);
   }
 
@@ -213,26 +205,12 @@ export class EntityResource extends BaseResource {
    * ```
    */
   async list(options?: ListEntityOptions): Promise<PaginatedResponse<Entity>> {
-    let path: string;
+    const { blueprint, ...paginatorOptions } = options || {};
+    const path = blueprint
+      ? `${this.basePath}/${encodeURIComponent(blueprint)}/entities`
+      : '/v1/entities';
 
-    if (options?.blueprint) {
-      path = this.buildUrl(
-        `${this.basePath}/${encodeURIComponent(options.blueprint)}/entities`,
-        {
-          limit: options.limit,
-          offset: options.offset,
-          include: options.include?.join(','),
-        }
-      );
-    } else {
-      path = this.buildUrl('/v1/entities', {
-        limit: options?.limit,
-        offset: options?.offset,
-        include: options?.include?.join(','),
-      });
-    }
-
-    const response = await this.paginate<Entity>(path, options, 'entities');
+    const response = await this.paginate<Entity>(path, paginatorOptions, 'entities');
 
     return {
       ...response,
@@ -255,14 +233,14 @@ export class EntityResource extends BaseResource {
    */
   async *stream(options?: ListEntityOptions): AsyncIterableIterator<Entity> {
     let path: string;
+    const { blueprint, ...paginationOptions } = options || {};
 
-    if (options?.blueprint) {
-      path = `${this.basePath}/${encodeURIComponent(options.blueprint)}/entities`;
+    if (blueprint) {
+      path = `${this.basePath}/${encodeURIComponent(blueprint)}/entities`;
     } else {
       path = '/v1/entities';
     }
-
-    for await (const entity of super.streamPaginated<Entity>(path, options, 'entities')) {
+    for await (const entity of super.streamPaginated<Entity>(path, paginationOptions, 'entities')) {
       yield this.transformEntity(entity);
     }
   }
@@ -344,7 +322,7 @@ export class EntityResource extends BaseResource {
    * ```
    */
   async batchUpdate(updates: BatchUpdateEntityInput[], options?: RequestOptions): Promise<Entity[]> {
-    updates.forEach(update => this.validateIdentifier(update.identifier));
+    updates.forEach(update => this.validateIdentifierFormat(update.identifier));
 
     const response = await this.httpClient.patch<ApiEntitiesResponse>(
       '/v1/entities/batch',
@@ -362,30 +340,30 @@ export class EntityResource extends BaseResource {
    * @param options - Optional request options
    * @returns Aggregation results
    */
-  async aggregate(input: EntityAggregationInput, options?: RequestOptions): Promise<any> {
-    const response = await this.httpClient.post<any>('/v1/entities/aggregate', input, options);
-    return response.aggregation || response;
+  async aggregate(input: EntityAggregationInput, options?: RequestOptions): Promise<Record<string, unknown>> {
+    const response = await this.httpClient.post<AggregationApiResponse>('/v1/entities/aggregate', input, options);
+    return response.aggregation ?? response;
   }
 
   /**
    * Aggregate entities over time
-   * 
+   *
    * @param input - Aggregation configuration
    * @param options - Optional request options
    * @returns Aggregation over time results
    */
-  async aggregateOverTime(input: EntityAggregationInput, options?: RequestOptions): Promise<any> {
-    const response = await this.httpClient.post<any>(
+  async aggregateOverTime(input: EntityAggregationInput, options?: RequestOptions): Promise<Record<string, unknown>> {
+    const response = await this.httpClient.post<AggregationApiResponse>(
       '/v1/entities/aggregate-over-time',
       input,
       options
     );
-    return response.aggregation || response;
+    return response.aggregation ?? response;
   }
 
   /**
    * Fetch history of entity properties
-   * 
+   *
    * @param input - History request configuration
    * @param options - Optional request options
    * @returns Historical property values
@@ -393,13 +371,13 @@ export class EntityResource extends BaseResource {
   async getPropertiesHistory(
     input: EntityPropertiesHistoryInput,
     options?: RequestOptions
-  ): Promise<any> {
-    const response = await this.httpClient.post<any>(
+  ): Promise<Record<string, unknown>[] | Record<string, unknown>> {
+    const response = await this.httpClient.post<PropertyHistoryApiResponse>(
       '/v1/entities/properties-history',
       input,
       options
     );
-    return response.history || response;
+    return response.history ?? response;
   }
 
   /**
@@ -476,7 +454,7 @@ export class EntityResource extends BaseResource {
    * ```
    */
   async batchDelete(identifiers: string[], options?: RequestOptions): Promise<void> {
-    identifiers.forEach(id => this.validateIdentifier(id));
+    identifiers.forEach(id => this.validateIdentifierFormat(id));
 
     await this.httpClient.post('/v1/entities/batch/delete', {
       identifiers,
@@ -502,74 +480,36 @@ export class EntityResource extends BaseResource {
   async getRelated(
     identifier: string,
     relation: string,
-    blueprint?: string,
-    options?: RequestOptions
+    options?: EntityRequestOptions
   ): Promise<Entity[]> {
-    this.validateIdentifier(identifier);
-
-    let path: string;
-    if (blueprint) {
-      path = `${this.basePath}/${encodeURIComponent(blueprint)}/entities/${encodeURIComponent(identifier)}/relations/${encodeURIComponent(relation)}`;
-    } else {
-      path = `/v1/entities/${encodeURIComponent(identifier)}/relations/${encodeURIComponent(relation)}`;
-    }
-
+    this.validateIdentifierFormat(identifier);
+    const path = options?.blueprint
+      ? `${this.basePath}/${encodeURIComponent(options.blueprint)}/entities/${encodeURIComponent(identifier)}/relations/${encodeURIComponent(relation)}`
+      : `/v1/entities/${encodeURIComponent(identifier)}/relations/${encodeURIComponent(relation)}`;
     const response = await this.httpClient.get<ApiEntitiesResponse>(path, options);
     return response.entities.map(e => this.transformEntity(e));
   }
 
-  /**
-   * Validate create input
-   */
-  private validateCreateInput(data: CreateEntityInput): void {
-    if (!data.identifier || data.identifier.trim() === '') {
-      throw new PortValidationError('Entity identifier is required', [
-        { field: 'identifier', message: 'Required field' },
-      ]);
-    }
-
-    if (!data.blueprint || data.blueprint.trim() === '') {
-      throw new PortValidationError('Entity blueprint is required', [
-        { field: 'blueprint', message: 'Required field' },
-      ]);
-    }
-
-    // Validate identifier format
-    if (!/^[a-zA-Z0-9_-]+$/.test(data.identifier)) {
-      throw new PortValidationError(
-        'Entity identifier must contain only alphanumeric characters, hyphens, and underscores',
-        [
-          {
-            field: 'identifier',
-            message: 'Invalid format',
-            value: data.identifier,
-          },
-        ]
-      );
-    }
-  }
-
-  /**
-   * Validate identifier
-   */
-  private validateIdentifier(identifier: string): void {
+  private validateIdentifierFormat(identifier: string): void {
     if (!identifier || identifier.trim() === '') {
       throw new PortValidationError('Entity identifier is required', [
         { field: 'identifier', message: 'Required field' },
       ]);
     }
-
     if (!/^[a-zA-Z0-9_-]+$/.test(identifier)) {
       throw new PortValidationError(
         'Entity identifier must contain only alphanumeric characters, hyphens, and underscores',
-        [
-          {
-            field: 'identifier',
-            message: 'Invalid format',
-            value: identifier,
-          },
-        ]
+        [{ field: 'identifier', message: 'Invalid format', value: identifier }]
       );
+    }
+  }
+
+  private validateCreateInput(data: CreateEntityInput): void {
+    this.validateIdentifierFormat(data.identifier);
+    if (!data.blueprint || data.blueprint.trim() === '') {
+      throw new PortValidationError('Entity blueprint is required', [
+        { field: 'blueprint', message: 'Required field' },
+      ]);
     }
   }
 
@@ -577,14 +517,7 @@ export class EntityResource extends BaseResource {
    * Transform API entity to SDK entity
    */
   private transformEntity(entity: ApiEntity | Entity): Entity {
-    const result: any = { ...entity };
-    if (result.createdAt) {
-      result.createdAt = new Date(result.createdAt);
-    }
-    if (result.updatedAt) {
-      result.updatedAt = new Date(result.updatedAt);
-    }
-    return result as Entity;
+    return this.transformTimestamps(entity) as Entity;
   }
 }
 

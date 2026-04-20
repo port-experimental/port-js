@@ -5,14 +5,8 @@
 import { HttpClient } from '../http-client';
 import { PaginationOptions, PaginatedResponse } from '../types';
 
-/**
- * API paginated response
- */
 interface ApiPaginatedResponse<T> {
-  entities?: T[];
-  blueprints?: T[];
-  actions?: T[];
-  scorecards?: T[];
+  [key: string]: T[] | number | boolean | string | undefined;
   total: number;
   limit: number;
   offset: number;
@@ -45,19 +39,24 @@ export abstract class BaseResource {
   ): string {
     if (!params) return path;
 
-    const query = new URLSearchParams();
+    const [basePath, existingQuery] = path.split('?');
+    const query = new URLSearchParams(existingQuery);
+
     for (const [key, value] of Object.entries(params)) {
       if (value !== undefined && value !== null) {
-        if (Array.isArray(value)) {
-          query.append(key, value.join(','));
-        } else {
-          query.append(key, String(value));
+        // Only add if not already present to avoid duplication
+        if (!query.has(key)) {
+          if (Array.isArray(value)) {
+            query.append(key, value.join(','));
+          } else {
+            query.append(key, String(value));
+          }
         }
       }
     }
 
     const queryString = query.toString();
-    return queryString ? `${path}?${queryString}` : path;
+    return queryString ? `${basePath}?${queryString}` : basePath!;
   }
 
   /**
@@ -66,13 +65,9 @@ export abstract class BaseResource {
   protected async paginate<T>(
     path: string,
     options?: PaginationOptions,
-    dataKey: keyof ApiPaginatedResponse<T> = 'entities' as keyof ApiPaginatedResponse<T>
+    dataKey = 'entities'
   ): Promise<PaginatedResponse<T>> {
-    const url = this.buildUrl(path, {
-      limit: options?.limit,
-      offset: options?.offset,
-      cursor: options?.cursor,
-    });
+    const url = this.buildUrl(path, { ...options });
 
     const response = await this.httpClient.get<ApiPaginatedResponse<T>>(url);
 
@@ -99,7 +94,7 @@ export abstract class BaseResource {
   protected async *streamPaginated<T>(
     path: string,
     options?: PaginationOptions,
-    dataKey: keyof ApiPaginatedResponse<T> = 'entities' as keyof ApiPaginatedResponse<T>
+    dataKey = 'entities'
   ): AsyncIterableIterator<T> {
     let currentOffset = options?.offset || 0;
     let currentCursor = options?.cursor;
@@ -124,10 +119,19 @@ export abstract class BaseResource {
       currentCursor = response.pagination.nextCursor;
       currentOffset += response.data.length;
 
-      if (!hasMore || response.data.length === 0) {
+      if (response.data.length === 0) {
         break;
       }
     }
+  }
+
+  protected transformTimestamps<T extends object>(obj: T): T {
+    const result = obj as Record<string, unknown>;
+    return {
+      ...obj,
+      createdAt: result['createdAt'] != null ? new Date(result['createdAt'] as string) : undefined,
+      updatedAt: result['updatedAt'] != null ? new Date(result['updatedAt'] as string) : undefined,
+    } as T;
   }
 }
 

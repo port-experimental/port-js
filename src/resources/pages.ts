@@ -194,27 +194,10 @@ export class PageResource extends BaseResource {
    * Transform API page to SDK page
    */
   private transformPage(page: ApiPage | Page): Page {
-    const result: any = { ...page };
-    if (result.createdAt) {
-      result.createdAt = new Date(result.createdAt);
-    }
-    if (result.updatedAt) {
-      result.updatedAt = new Date(result.updatedAt);
-    }
-    return result as Page;
+    return this.transformTimestamps(page) as Page;
   }
 
-  /**
-   * Transform API widget to SDK widget
-   */
   private transformWidget(widget: ApiWidget | PageWidget): PageWidget {
-    const result: any = { ...widget };
-    if (result.createdAt) {
-      result.createdAt = new Date(result.createdAt);
-    }
-    if (result.updatedAt) {
-      result.updatedAt = new Date(result.updatedAt);
-    }
-    return result as PageWidget;
+    return this.transformTimestamps(widget) as PageWidget;
   }
 }
